@@ -1,0 +1,74 @@
+// backend/gSheetsLogger.jsw
+/**
+ * Velo by Wix -> Google Sheets ログ追記ユーティリティ
+ * - クリックログ 1行追記
+ * - URL 生成ヘルパ
+ * - 簡易ヘルスチェック
+ *
+ * 注意:
+ *  - Secrets: 'G_SHEETS_ID' を使用
+ *  - appendValues 第2引数は 1次元の string[]
+ *  - Web モジュール(.jsw)として公開し、フロントから直接 import する
+ */
+
+import { appendValues, getValues } from '@velo/google-sheets-integration-backend';
+import { getSecret } from 'wix-secrets-backend';
+
+/** JST の現在時刻を "YYYY/MM/DD HH:mm:ss" で返す */
+function nowJSTString() {
+  const s = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+  // toLocaleString は環境差があるため、後段処理では文字列のまま扱う想定
+  return String(s);
+}
+
+/** 大きな文字列や undefined を吸収して短くする */
+function safeStr(v) {
+  if (v === null || v === undefined) return '';
+  const s = typeof v === 'string' ? v : String(v);
+  return s.trim().slice(0, 5000); // セル肥大化を防止
+}
+
+/**
+ * クリックログ 1行追記
+ * @param {{memberId:string, dealName:string}} p
+ * @returns {Promise<{ok:true, updates?:any}>}
+ */
+export async function logClick({ memberId, dealName }) {
+  const mid = safeStr(memberId);
+  const dname = safeStr(dealName);
+  if (!mid || !dname) {
+    throw new Error('memberId, dealName は必須');
+  }
+  const sheetId = await getSecret('G_SHEETS_ID');
+  if (!sheetId) throw new Error('Secret "G_SHEETS_ID" が未設定です');
+
+  const values = [nowJSTString(), mid, dname]; // A:日時, B:memberId, C:dealName
+  const res = await appendValues(sheetId, values, 'クリックログ!A:C');
+  return { ok: true, updates: res?.data?.updates };
+}
+
+/**
+ * 基本リンク + ?id1=<memberId> を生成
+ * @param {string} baseLink
+ * @param {string} memberId
+ * @returns {string} 生成URL（baseLink が falsy の場合は ''）
+ */
+export function buildClickUrl(baseLink, memberId) {
+  const base = safeStr(baseLink);
+  const mid = safeStr(memberId);
+  if (!base || !mid) return '';
+  return base.includes('?') ? `${base}&id1=${encodeURIComponent(mid)}` : `${base}?id1=${encodeURIComponent(mid)}`;
+}
+
+/** 動作確認用（Secrets とシートアクセスの疎通） */
+export async function healthCheck() {
+  const sheetId = await getSecret('G_SHEETS_ID');
+  if (!sheetId) return { ok: false, reason: 'Secret G_SHEETS_ID missing' };
+  try {
+    // 1行目だけ軽く読む（存在チェック）
+    const r = await getValues(sheetId, 'クリックログ!A1:C1');
+    return { ok: true, sheetId, firstRow: r?.data?.values?.[0] || [] };
+  } catch (e) {
+    return { ok: false, reason: String(e?.message || e) };
+  }
+}
