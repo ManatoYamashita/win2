@@ -178,13 +178,20 @@ function runImportAndAggregate() {
     const isApproved = isApprovedStatus_(statusRaw);
     const reward = parseMoney_(rewardRaw);
 
+    // ゲスト判定（guest: で始まるIDはゲストとして扱う）
+    const isGuest = /^guest:/i.test(memberIdRaw);
+
     const basePay = (cfg.ONLY_PAY_ON_APPROVED && !isApproved) ? 0 : reward;
     const rawCashback = basePay * cfg.CASHBACK_RATE;
-    const cashback = applyRounding_(rawCashback, cfg.ROUNDING_MODE); // ← 丸め方式
+    // ゲストの場合は還元額0、会員の場合は計算結果を適用
+    const cashback = isGuest ? 0 : applyRounding_(rawCashback, cfg.ROUNDING_MODE);
 
     if (isApproved) approvedCount++;
 
-    const displayName = memberMap.get(memberIdRaw) || memberIdRaw;
+    // ゲストの場合は「非会員」表記、会員の場合は会員リストから取得または memberIdRaw
+    const displayName = isGuest
+      ? '非会員'
+      : (memberMap.get(memberIdRaw) || memberIdRaw);
     const dealName = csvDealRaw || latestDealByMember.get(memberIdRaw) || '不明';
 
     outputChunk.push([
