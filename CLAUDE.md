@@ -9,20 +9,27 @@ WIN×Ⅱ is a membership-based affiliate blog platform that provides cashback to
 ## Tech Stack
 
 **Frontend & Backend:**
-- Next.js 15 (App Router)
-- TypeScript
-- TailwindCSS 4
+- Next.js 15.1.4 (App Router)
+- React 19
+- TypeScript 5 (strict mode, noUncheckedIndexedAccess enabled)
+- TailwindCSS v3.4.1 (v4 planned for future)
 - shadcn/ui for UI components
-- Next-Auth (Auth.js) for authentication
+- Next-Auth v5.0.0-beta.29 (AuthJS) for authentication
 
 **Data Management:**
-- microCMS: Blog posts and deal information
-- Google Sheets API: Member database and conversion tracking
+- microCMS v3.2.0: Blog posts and deal information
+- Google Sheets API (googleapis v164.1.0): Member database and conversion tracking
 - Existing Google Apps Script (GAS) runs daily at 3:10 AM for data aggregation
 
 **External Integration:**
 - Primary: A8.net
 - Future: AFB, もしもアフィリエイト, バリューコマース
+
+**Key Dependencies:**
+- bcryptjs v3.0.2 (password hashing, salt rounds: 10)
+- zod v4.1.12 (validation)
+- class-variance-authority v0.7.1 (component variants)
+- Radix UI primitives (@radix-ui/react-slot, @radix-ui/react-label)
 
 **Deployment:**
 - Vercel
@@ -107,21 +114,22 @@ POST /api/track-click         - Log click + generate tracking URL with id1
 
 ## Development Commands
 
-*(To be added once project is initialized)*
-
-Example structure:
 ```bash
-# Development
+# Development server (http://localhost:3000)
 npm run dev
 
-# Build
+# Production build
 npm run build
 
-# Type checking
-npm run type-check
+# Start production server
+npm run start
 
 # Linting
 npm run lint
+
+# Type checking (TypeScript)
+# Note: Use tsc --noEmit for manual type checking
+npx tsc --noEmit
 ```
 
 ## Design Reference
@@ -174,16 +182,25 @@ The existing GAS script:
 
 **Do not modify GAS** unless explicitly requested.
 
-## Phase 1 Implementation Priority
+## Phase 1 Implementation Status
 
-1. Environment setup (Next.js 15, TailwindCSS 4, TypeScript)
-2. Authentication (Next-Auth + Google Sheets)
-3. Member registration and login
-4. microCMS integration
-5. Blog listing and detail pages
-6. **Critical**: /api/track-click implementation with proper id1 tracking
-7. Member dashboard with conversion history
-8. Deal listing page (member-only)
+### ✅ Completed (70%)
+1. ✅ Environment setup (Next.js 15, TailwindCSS v3, TypeScript)
+2. ✅ shadcn/ui initialization (Button, Input, Card, Label components)
+3. ✅ microCMS SDK setup with complete type definitions (Blog, Deal, Category)
+4. ✅ Google Sheets API authentication and utility functions
+5. ✅ Basic layout components (Header, Footer in app/layout.tsx)
+6. ✅ Environment variables configuration (.env.local, .env.example)
+
+### 🚧 In Progress
+7. 🚧 Next-Auth v5 (AuthJS) setup with CredentialsProvider
+
+### ⏳ Pending
+8. ⏳ Member registration and login
+9. ⏳ Blog listing and detail pages
+10. ⏳ **Critical**: /api/track-click implementation with proper id1 tracking
+11. ⏳ Member dashboard with conversion history
+12. ⏳ Deal listing page (member-only)
 
 ## External Service Credentials
 
