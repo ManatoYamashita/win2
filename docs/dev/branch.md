@@ -2,7 +2,7 @@
 
 ## 概要
 
-kozokaAIコーポレートサイトプロジェクトでは、シンプルで効率的な2ブランチ管理戦略を採用しています。開発・検証環境（dev）と本番環境（main）を明確に分離し、安全で迅速なデプロイメントフローを実現します。
+win2 アフィリアエイトブログシステムプロジェクトでは、シンプルで効率的な2ブランチ管理戦略を採用しています。開発・検証環境（dev）と本番環境（main）を明確に分離し、安全で迅速なデプロイメントフローを実現します。
 
 ## ブランチ体系
 
@@ -10,8 +10,8 @@ kozokaAIコーポレートサイトプロジェクトでは、シンプルで効
 
 | ブランチ名 | 役割 | デプロイ先 | 直接Push |
 |-----------|------|-----------|----------|
-| `dev` | 開発・検証用ブランチ | 検証環境 (AWS Amplify) | 🚫 禁止 |
-| `main` | 本番用メインブランチ | 本番環境 `https://about.kozoka.ai` | 🚫 禁止 |
+| `dev` | 開発・検証用ブランチ | 検証環境 (未デプロイ) | 🚫 禁止 |
+| `main` | 本番用メインブランチ | 本番環境（未デプロイ - Vercelの予定） | 🚫 禁止 |
 
 **重要**: `main`ブランチは`dev`ブランチからのマージのみで更新されます。
 
@@ -196,11 +196,11 @@ remote: - Changes must be made through a pull request.
 2. プルリクエストを作成
 3. 適切なレビュープロセスを経てマージ
 
-## CI/CDパイプライン（GitHub Actions）
+## CI/CDパイプライン（GitHub Actions）※将来実装予定
 
-### ワークフロー概要
+### ワークフロー概要（計画）
 
-#### 1. `push-feature.yml`（featureブランチpush時）
+#### 1. `push-feature.yml`（featureブランチpush時）※未実装
 - **トリガー**: `feature/**`ブランチへのpush
 - **処理内容**:
   - 依存関係インストール
@@ -209,7 +209,7 @@ remote: - Changes must be made through a pull request.
   - 自動PR作成（devブランチへ）
 - **成果物**: 詳細な変更レポート付きPR
 
-#### 2. `merge-dev.yml`（devブランチマージ時）
+#### 2. `merge-dev.yml`（devブランチマージ時）※未実装
 - **トリガー**: devブランチへのpush/PR
 - **処理内容**:
   - Lint＆ビルド検証
@@ -217,7 +217,7 @@ remote: - Changes must be made through a pull request.
   - Core Web Vitals分析
 - **成果物**: パフォーマンスレポート
 
-#### 3. `merge-main.yml`（mainブランチマージ時）
+#### 3. `merge-main.yml`（mainブランチマージ時）※未実装
 - **トリガー**: mainブランチへのpush/PRマージ
 - **処理内容**:
   - 本番ビルド検証
@@ -225,28 +225,28 @@ remote: - Changes must be made through a pull request.
   - featureブランチ自動削除
 - **成果物**: 本番デプロイレポート
 
-### GitHub Actionsの詳細仕様
+### 将来実装予定の詳細仕様
 
-詳細な実装については [.github/workflows/README.md](../.github/workflows/README.md) を参照してください。
+実装時は [.github/workflows/README.md](../.github/workflows/README.md) に詳細を記載予定。
 
 ## デプロイメント戦略
 
 ### 自動デプロイメント
 
-- **`dev`ブランチ**: 検証環境に自動デプロイ（AWS Amplify）
-- **`main`ブランチ**: 本番環境（`https://about.kozoka.ai`）に自動デプロイ
-- **CI/CDチェック**: GitHub Actionsによる品質保証
+- **`dev`ブランチ**: 検証環境に自動デプロイ（未設定・Vercel予定）
+- **`main`ブランチ**: 本番環境に自動デプロイ（未設定・Vercel予定）
+- **CI/CDチェック**: GitHub Actionsによる品質保証（未実装・将来実装予定）
 
 ### 手動デプロイメント
 
-緊急時やロールバック時は、AWS Amplifyコンソールから手動デプロイメント実行
+緊急時やロールバック時は、デプロイメント環境が確定次第、適切な方法で手動デプロイメント実行
 
 ### デプロイメント監視
 
-- GitHub Actionsでのビルド状況確認
-- AWS Amplifyコンソールでビルド状況を監視
-- デプロイ失敗時の自動通知設定
-- ヘルスチェックと自動ロールバック
+- GitHub Actionsでのビルド状況確認（未実装・将来実装予定）
+- Vercelダッシュボードでのビルド状況を監視（将来実装予定）
+- デプロイ失敗時の自動通知設定（将来実装予定）
+- ヘルスチェックと自動ロールバック（将来実装予定）
 
 ## 注意事項・ベストプラクティス
 
@@ -329,9 +329,9 @@ git push origin main  # または dev
 # 正しいプルリクエストフローで修正を再実装
 ```
 
-#### 4. デプロイメントエラーが発生した場合
+#### 4. デプロイメントエラーが発生した場合（将来実装時）
 
-1. AWS Amplifyコンソールでエラーログ確認
+1. Vercelダッシュボードでエラーログ確認
 2. 前回成功したバージョンにロールバック
 3. 問題修正後に再デプロイメント
 4. 検証環境での十分なテスト実施
@@ -340,7 +340,6 @@ git push origin main  # または dev
 
 - [README.md](../README.md) - プロジェクト概要
 - [CLAUDE.md](../CLAUDE.md) - 開発ガイドライン
-- [.github/workflows/README.md](../.github/workflows/README.md) - CI/CDワークフロー詳細
 
 ---
 
