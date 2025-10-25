@@ -151,9 +151,16 @@ docs/
 
 このセクションは、ドキュメントの主要な更新を記録します。
 
+### 2025-10-26
+- **Phase 2-1 Email Verification & Password Reset 開発環境テスト完了**
+  - `email-setup.md`: トラブルシューティング追加（v1.0.1）
+    - 環境変数の設定ミス（`RESEND_FROM_EMAIL` 未設定、`NEXT_PUBLIC_APP_URL` 誤設定）の解決方法を追加
+    - 開発環境でのメール送信テスト完了を確認
+  - **ステータス:** 開発環境テスト完了、本番用ドメイン取得待ち
+
 ### 2025-10-25
 - **Phase 2-1 Email Verification & Password Reset 実装完了**
-  - `email-setup.md`: 新規作成（Email送信設定の完全ガイド）
+  - `email-setup.md`: 新規作成（Email送信設定の完全ガイド v1.0.0）
     - Resend開発環境セットアップ手順
     - 将来の本番環境移行計画（ドメイン取得、DNS設定）
     - トラブルシューティングガイド

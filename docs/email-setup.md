@@ -142,6 +142,36 @@ Resend API error: { message: "..." }
 2. 送信元メールアドレスが未検証 → `onboarding@resend.dev` を使用
 3. 送信先が自分のメールアドレス以外 → 開発環境では自分宛のみ
 
+### 環境変数の設定ミス（重要）
+
+**エラーメッセージ:**
+```
+Resend API error: {
+  statusCode: 403,
+  message: 'The example.com domain is not verified. Please, add and verify your domain on https://resend.com/domains',
+  name: 'validation_error'
+}
+Failed to send verification email: The example.com domain is not verified...
+```
+
+**原因:**
+`.env.local` に **`RESEND_FROM_EMAIL` が設定されていない**、または **`NEXT_PUBLIC_APP_URL` にメールアドレスが設定されている**
+
+**解決策:**
+1. `.env.local` を確認し、以下の設定が正しいことを確認：
+
+```bash
+# ✅ 正しい設定例
+RESEND_FROM_EMAIL=onboarding@resend.dev          # ← メールアドレス
+NEXT_PUBLIC_APP_URL=http://localhost:3000        # ← アプリケーションURL
+
+# ❌ よくある間違い
+# NEXT_PUBLIC_APP_URL=onboarding@resend.dev      # ← これは間違い！
+```
+
+2. 開発サーバーを再起動（`Ctrl+C` → `npm run dev`）
+3. API Response で `"emailSent": true` になることを確認
+
 ## 将来の本番環境移行計画
 
 ### Phase 1: ドメイン取得（優先度: HIGH）
@@ -260,9 +290,10 @@ RESEND_FROM_EMAIL=support@win2-affiliate.com
 | 日付 | バージョン | 変更内容 |
 |------|-----------|---------|
 | 2025-10-25 | 1.0.0 | 初版作成（開発環境用設定） |
+| 2025-10-26 | 1.0.1 | トラブルシューティング追加（環境変数の設定ミス）、開発環境テスト完了 |
 
 ---
 
-**最終更新:** 2025-10-25
+**最終更新:** 2025-10-26
 **担当:** Claude Code (Sonnet 4.5)
-**ステータス:** 開発環境用設定完了、本番環境移行待ち
+**ステータス:** 開発環境テスト完了、本番環境移行待ち
