@@ -1,0 +1,159 @@
+name: Push Feature Checks
+
+on:
+  push:
+    branches:
+      - "feature/**"
+      - "fix/**"
+      - "update/**"
+      - "refactor/**"
+      - "doc/**"
+      - "test/**"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  ci:
+    name: Lint & Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Build project
+        run: npm run build
+
+      - name: Create or update PR to dev
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const baseBranch = "dev";
+            const fallbackBase = "main";
+            const headRef = context.ref.replace("refs/heads/", "");
+
+            const ensureBranch = async (branch) => {
+              try {
+                await github.rest.repos.getBranch({ owner, repo, branch });
+                core.info(`Branch "${branch}" already exists.`);
+                return true;
+              } catch (error) {
+                if (error.status === 404) {
+                  core.info(`Branch "${branch}" does not exist. Creating from "${fallbackBase}".`);
+                  const base = await github.rest.repos.getBranch({ owner, repo, branch: fallbackBase });
+                  await github.rest.git.createRef({
+                    owner,
+                    repo,
+                    ref: `refs/heads/${branch}`,
+                    sha: base.data.commit.sha,
+                  });
+                  core.info(`Branch "${branch}" created.`);
+                  return true;
+                }
+                throw error;
+              }
+            };
+
+            await ensureBranch(baseBranch);
+
+            const formatTitle = (ref) => {
+              const segments = ref.split("/");
+              const prefix = segments[0]?.toUpperCase() ?? "FEATURE";
+              const remainder = segments.slice(1).join("/") || ref;
+              const words = remainder
+                .replace(/[-_]/g, " ")
+                .split(" ")
+                .filter(Boolean)
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1));
+              return `${prefix}: ${words.join(" ") || remainder}`;
+            };
+
+            const getSummary = async (base, head) => {
+              try {
+                const { data } = await github.rest.repos.compareCommits({
+                  owner,
+                  repo,
+                  base,
+                  head,
+                });
+                if (!data.commits.length) {
+                  return "- コミット差分はありません";
+                }
+                return data.commits
+                  .map((commit) => {
+                    const message = commit.commit.message.split("\n")[0];
+                    return `- ${message}`;
+                  })
+                  .join("\n");
+              } catch (error) {
+                core.warning(`差分の取得に失敗しました(${base} vs ${head}): ${error.message}`);
+                return "- コミット差分を取得できませんでした";
+              }
+            };
+
+            const title = formatTitle(headRef);
+            const changesSummary = await getSummary(baseBranch, headRef);
+            const prBody = `## 概要
+自動生成されたプルリクエストです。${title} の変更を ${baseBranch} ブランチへ提案します。
+
+## 変更内容
+${changesSummary}
+
+## 影響範囲
+- 自動判定対象外（必要に応じて更新してください）
+
+## その他
+- Lint: ✅
+- Build: ✅
+- このプルリクエストは CI により自動作成されました`;
+
+            const existing = await github.rest.pulls.list({
+              owner,
+              repo,
+              head: `${owner}:${headRef}`,
+              base: baseBranch,
+              state: "open",
+            });
+
+            if (existing.data.length > 0) {
+              const pr = existing.data[0];
+              core.info(`既存のPRを更新します: ${pr.html_url}`);
+              await github.rest.pulls.update({
+                owner,
+                repo,
+                pull_number: pr.number,
+                title,
+                body: prBody,
+              });
+              return;
+            }
+
+            const created = await github.rest.pulls.create({
+              owner,
+              repo,
+              head: headRef,
+              base: baseBranch,
+              title,
+              body: prBody,
+              maintainer_can_modify: true,
+            });
+
+            core.notice(`PR を作成しました: ${created.data.html_url}`);
