@@ -21,6 +21,7 @@ export const SHEET_NAMES = {
  * F: 郵便番号
  * G: 電話番号
  * H: 登録日時
+ * I: emailVerified (TRUE/FALSE) - Phase 2追加
  */
 export interface MemberRow {
   memberId: string;
@@ -31,6 +32,7 @@ export interface MemberRow {
   postalCode?: string;
   phone?: string;
   registeredAt: string;
+  emailVerified?: boolean;
 }
 
 /**
@@ -151,7 +153,7 @@ export async function updateSheet(
  */
 export async function getMemberByEmail(email: string): Promise<MemberRow | null> {
   try {
-    const rows = await readSheet(SHEET_NAMES.MEMBERS, "A2:H");
+    const rows = await readSheet(SHEET_NAMES.MEMBERS, "A2:I");
 
     const memberRow = rows.find(row => row[2] === email);
 
@@ -168,6 +170,7 @@ export async function getMemberByEmail(email: string): Promise<MemberRow | null>
       postalCode: memberRow[5],
       phone: memberRow[6],
       registeredAt: memberRow[7] || "",
+      emailVerified: memberRow[8] === "TRUE" || memberRow[8] === "true",
     };
   } catch (error) {
     console.error("Error getting member by email:", error);
@@ -181,7 +184,7 @@ export async function getMemberByEmail(email: string): Promise<MemberRow | null>
  */
 export async function getMemberById(memberId: string): Promise<MemberRow | null> {
   try {
-    const rows = await readSheet(SHEET_NAMES.MEMBERS, "A2:H");
+    const rows = await readSheet(SHEET_NAMES.MEMBERS, "A2:I");
 
     const memberRow = rows.find(row => row[0] === memberId);
 
@@ -198,6 +201,7 @@ export async function getMemberById(memberId: string): Promise<MemberRow | null>
       postalCode: memberRow[5],
       phone: memberRow[6],
       registeredAt: memberRow[7] || "",
+      emailVerified: memberRow[8] === "TRUE" || memberRow[8] === "true",
     };
   } catch (error) {
     console.error("Error getting member by ID:", error);
@@ -219,6 +223,7 @@ export async function addMember(member: MemberRow): Promise<void> {
     member.postalCode || "",
     member.phone || "",
     member.registeredAt,
+    member.emailVerified === true ? "TRUE" : "FALSE", // Phase 2: Email verification flag
   ];
 
   await appendToSheet(SHEET_NAMES.MEMBERS, values);
@@ -286,6 +291,42 @@ export async function getResultsByMemberId(memberId: string): Promise<ResultRow[
     return results;
   } catch (error) {
     console.error("Error getting results by member ID:", error);
+    throw error;
+  }
+}
+
+/**
+ * 会員のメール認証状態を更新（Phase 2）
+ * @param memberId 会員ID
+ * @param verified 認証状態（true: 認証済み, false: 未認証）
+ */
+export async function updateMemberEmailVerified(
+  memberId: string,
+  verified: boolean
+): Promise<void> {
+  try {
+    const rows = await readSheet(SHEET_NAMES.MEMBERS, "A2:I");
+
+    // memberIdで行を検索
+    const rowIndex = rows.findIndex(row => row[0] === memberId);
+
+    if (rowIndex === -1) {
+      throw new Error(`Member not found: ${memberId}`);
+    }
+
+    // 行番号は2から開始（ヘッダー行が1行目）
+    const sheetRowNumber = rowIndex + 2;
+
+    // I列（9列目）のみを更新
+    await updateSheet(
+      SHEET_NAMES.MEMBERS,
+      `I${sheetRowNumber}:I${sheetRowNumber}`,
+      [[verified ? "TRUE" : "FALSE"]]
+    );
+
+    console.log(`Updated emailVerified for member ${memberId} to ${verified}`);
+  } catch (error) {
+    console.error("Error updating member email verified status:", error);
     throw error;
   }
 }
