@@ -6,11 +6,14 @@ import jwt from "jsonwebtoken";
  */
 const jwtSecret = process.env.JWT_SECRET;
 
-if (!jwtSecret) {
-  throw new Error("JWT_SECRET environment variable is not set");
-}
+export const isJwtConfigured = Boolean(jwtSecret);
 
-const JWT_SECRET: string = jwtSecret;
+function getJwtSecret(): string {
+  if (!jwtSecret) {
+    throw new Error("JWT_SECRET environment variable is not set");
+  }
+  return jwtSecret;
+}
 
 /**
  * JWTトークンのpayload型定義
@@ -43,7 +46,7 @@ export function generateVerificationToken(email: string): string {
   };
 
   // 24時間有効なトークンを生成
-  return jwt.sign(payload, JWT_SECRET, {
+  return jwt.sign(payload, getJwtSecret(), {
     expiresIn: "24h",
   });
 }
@@ -60,7 +63,7 @@ export function generatePasswordResetToken(email: string): string {
   };
 
   // 1時間有効なトークンを生成
-  return jwt.sign(payload, JWT_SECRET, {
+  return jwt.sign(payload, getJwtSecret(), {
     expiresIn: "1h",
   });
 }
@@ -72,7 +75,7 @@ export function generatePasswordResetToken(email: string): string {
  */
 export function verifyToken(token: string): TokenVerificationResult {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as TokenPayload;
+    const decoded = jwt.verify(token, getJwtSecret()) as TokenPayload;
 
     // payloadの型チェック
     if (!decoded.email || !decoded.type) {
