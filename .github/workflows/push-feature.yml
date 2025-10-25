@@ -111,19 +111,21 @@ jobs:
 
             const title = formatTitle(headRef);
             const changesSummary = await getSummary(baseBranch, headRef);
-            const prBody = `## 概要
-自動生成されたプルリクエストです。${title} の変更を ${baseBranch} ブランチへ提案します。
-
-## 変更内容
-${changesSummary}
-
-## 影響範囲
-- 自動判定対象外（必要に応じて更新してください）
-
-## その他
-- Lint: ✅
-- Build: ✅
-- このプルリクエストは CI により自動作成されました`;
+            const prBody = [
+              "## 概要",
+              `自動生成されたプルリクエストです。${title} の変更を ${baseBranch} ブランチへ提案します。`,
+              "",
+              "## 変更内容",
+              changesSummary,
+              "",
+              "## 影響範囲",
+              "- 自動判定対象外（必要に応じて更新してください）",
+              "",
+              "## その他",
+              "- Lint: ✅",
+              "- Build: ✅",
+              "- このプルリクエストは CI により自動作成されました",
+            ].join("\n");
 
             const existing = await github.rest.pulls.list({
               owner,
