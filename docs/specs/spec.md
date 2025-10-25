@@ -18,7 +18,7 @@
 
 バックエンド/API:
 - Next.js API Routes
-- Next-Auth v5.0.0-beta.29 (Auth.js) - 認証
+- Next-Auth v4.24.11 (安定版) - 認証
 - Google Sheets API (googleapis v164.1.0) - 会員・成果データ管理
 - bcryptjs v3.0.2 (パスワードハッシュ化、salt rounds: 10)
 
@@ -512,7 +512,8 @@ GET  /api/sheets/results         // 成果データ取得（管理用）
 - [x] Google Sheets API連携設定（認証・ユーティリティ関数実装済）
 - [x] shadcn/ui初期化（Button, Input, Card, Label, Form, Toast実装済）
 - [x] 基本レイアウト・UIコンポーネント作成（Header、Footer、SessionProvider実装済）
-- [x] Next-Auth v5設定（authOptions、型拡張、APIルート実装完了）
+- [x] Next-Auth v4設定（authOptions、型拡張、APIルート実装完了）
+  - 注: v5 beta版との互換性問題により v4.24.11（安定版）を使用
 
 ### Phase 2: 認証・会員機能（1週間）**実装状況: 100%完了**
 - [x] 会員登録機能
@@ -521,7 +522,7 @@ GET  /api/sheets/results         // 成果データ取得（管理用）
   - [x] パスワードハッシュ化（bcryptjs、salt rounds: 10）
   - [x] 登録後自動ログイン
 - [x] ログイン/ログアウト機能
-  - [x] Next-Auth v5 CredentialsProvider
+  - [x] Next-Auth v4 CredentialsProvider
   - [x] JWT セッション管理（30日間）
   - [x] ログインページ（`/login`）実装
 - [x] マイページ

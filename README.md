@@ -51,7 +51,7 @@ WIN×Ⅱ は、ASP（アフィリエイトサービスプロバイダー）の�
 
 ### バックエンド・API
 - **Next.js API Routes**: サーバーサイドAPI
-- **Next-Auth**: v5.0.0-beta.29（AuthJS）
+- **Next-Auth**: v4.24.11（安定版）
 - **Google Sheets API**: googleapis v164.1.0
 - **microCMS SDK**: v3.2.0（Headless CMS）
 - **bcryptjs**: v3.0.2（パスワードハッシュ化、salt rounds: 10）

@@ -107,7 +107,7 @@ win2/
 - **Google Sheets API**: googleapis v164.1.0
 - **microCMS SDK**: v3.2.0（Headless CMS）
 - **bcryptjs**: v3.0.2（パスワードハッシュ化、salt rounds: 10）
-- **Next-Auth**: v5.0.0-beta.29（実装完了）
+- **Next-Auth**: v4.24.11（安定版、実装完了）
 
 ### バリデーション・ユーティリティ
 - **zod**: v4.1.12（スキーマバリデーション）
@@ -474,11 +474,13 @@ export function cn(...inputs: ClassValue[]) {
 
 ## Next-Auth 統合（実装完了）
 
-**バージョン**: v5.0.0-beta.29（AuthJS）
+**バージョン**: v4.24.11（安定版）
+
+**注**: 当初 Next-Auth v5.0.0-beta.29 (AuthJS) を使用していたが、Next.js 15.5.6 との互換性問題（`TypeError: Function.prototype.apply` エラー）が発生したため、安定版の v4.24.11 にダウングレード。v4 でも全ての認証機能は正常に動作し、本番環境での実績も豊富。
 
 ### 認証システム概要
 
-Next-Auth v5 を使用した認証システムを実装。CredentialsProvider によるメールアドレス + パスワード認証、JWT セッション管理、認証保護ミドルウェアを含みます。
+Next-Auth v4 を使用した認証システムを実装。CredentialsProvider によるメールアドレス + パスワード認証、JWT セッション管理、認証保護ミドルウェアを含みます。
 
 #### 主要ファイル
 
