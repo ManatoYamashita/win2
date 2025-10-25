@@ -1,4 +1,4 @@
-import { sheets, SPREADSHEET_ID } from "./googleapis";
+import { sheets, SPREADSHEET_ID, isGoogleSheetsConfigured } from "./googleapis";
 
 /**
  * Google Sheetsシート名定義（spec.mdに基づく）
@@ -71,6 +71,16 @@ export interface ResultRow {
   memo?: string;
 }
 
+function getSheetsClient() {
+  if (!isGoogleSheetsConfigured || !sheets || !SPREADSHEET_ID) {
+    throw new Error(
+      "Google Sheets client is not configured. Set GOOGLE_SHEETS_CLIENT_EMAIL, GOOGLE_SHEETS_PRIVATE_KEY, and GOOGLE_SHEETS_SPREADSHEET_ID."
+    );
+  }
+
+  return { sheetsClient: sheets, spreadsheetId: SPREADSHEET_ID };
+}
+
 /**
  * シートからデータを読み取る（範囲指定）
  * @param sheetName シート名
@@ -81,10 +91,11 @@ export async function readSheet(
   range?: string
 ): Promise<string[][]> {
   try {
+    const { sheetsClient, spreadsheetId } = getSheetsClient();
     const fullRange = range ? `${sheetName}!${range}` : sheetName;
 
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
+    const response = await sheetsClient.spreadsheets.values.get({
+      spreadsheetId,
       range: fullRange,
     });
 
@@ -105,8 +116,10 @@ export async function appendToSheet(
   values: (string | number | undefined)[]
 ): Promise<void> {
   try {
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID,
+    const { sheetsClient, spreadsheetId } = getSheetsClient();
+
+    await sheetsClient.spreadsheets.values.append({
+      spreadsheetId,
       range: sheetName,
       valueInputOption: "USER_ENTERED",
       requestBody: {
@@ -131,10 +144,11 @@ export async function updateSheet(
   values: (string | number | undefined)[][]
 ): Promise<void> {
   try {
+    const { sheetsClient, spreadsheetId } = getSheetsClient();
     const fullRange = `${sheetName}!${range}`;
 
-    await sheets.spreadsheets.values.update({
-      spreadsheetId: SPREADSHEET_ID,
+    await sheetsClient.spreadsheets.values.update({
+      spreadsheetId,
       range: fullRange,
       valueInputOption: "USER_ENTERED",
       requestBody: {
