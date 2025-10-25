@@ -148,14 +148,24 @@ jobs:
               return;
             }
 
-            const created = await github.rest.pulls.create({
-              owner,
-              repo,
-              head: headRef,
-              base: baseBranch,
-              title,
-              body: prBody,
-              maintainer_can_modify: true,
-            });
+            try {
+              const created = await github.rest.pulls.create({
+                owner,
+                repo,
+                head: headRef,
+                base: baseBranch,
+                title,
+                body: prBody,
+                maintainer_can_modify: true,
+              });
 
-            core.notice(`PR を作成しました: ${created.data.html_url}`);
+              core.notice(`PR を作成しました: ${created.data.html_url}`);
+            } catch (error) {
+              if (error.status === 403) {
+                core.warning(
+                  "権限不足のため自動PR作成をスキップしました (GitHub Actions token permissions)."
+                );
+                return;
+              }
+              throw error;
+            }
