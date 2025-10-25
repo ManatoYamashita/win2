@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { generateVerificationToken } from "@/lib/tokens";
@@ -12,7 +12,7 @@ import { getMemberByEmail } from "@/lib/sheets";
  * ログイン済みユーザーが認証メールの再送信をリクエストする際に呼ばれる
  * セッション認証必須、新しいトークンを生成してメール送信
  */
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     // セッション認証チェック
     const session = await getServerSession(authOptions);

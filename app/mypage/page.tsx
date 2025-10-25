@@ -21,7 +21,7 @@ import { AlertCircle, Mail, Loader2 } from "lucide-react";
  * セッションからmemberIdを取得し、/api/members/meから会員情報を取得して表示
  */
 export default function MypagePage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const { toast } = useToast();
   const [member, setMember] = useState<Omit<MemberRow, "passwordHash"> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
