@@ -4,11 +4,13 @@ import jwt from "jsonwebtoken";
  * JWT Secret（環境変数から取得）
  * 設定されていない場合はエラー
  */
-const JWT_SECRET = process.env.JWT_SECRET;
+const jwtSecret = process.env.JWT_SECRET;
 
-if (!JWT_SECRET) {
+if (!jwtSecret) {
   throw new Error("JWT_SECRET environment variable is not set");
 }
+
+const JWT_SECRET: string = jwtSecret;
 
 /**
  * JWTトークンのpayload型定義

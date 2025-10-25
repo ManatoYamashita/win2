@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -20,13 +20,7 @@ import { useToast } from "@/hooks/use-toast";
 import { resetPasswordSchema, type ResetPasswordInput } from "@/lib/validations/auth";
 import { Lock, Loader2, AlertCircle } from "lucide-react";
 
-/**
- * パスワードリセット実行ページ
- * /reset-password?token=xxx
- *
- * トークンを検証し、新しいパスワードを設定
- */
-export default function ResetPasswordPage() {
+function ResetPasswordPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
@@ -78,7 +72,6 @@ export default function ResetPasswordPage() {
           description: result.message,
         });
 
-        // 2秒後にログインページへリダイレクト
         setTimeout(() => {
           router.push("/login");
         }, 2000);
@@ -144,10 +137,8 @@ export default function ResetPasswordPage() {
 
         <form onSubmit={handleSubmit(onSubmit)}>
           <CardContent className="space-y-4">
-            {/* トークン（hidden） */}
             <input type="hidden" {...register("token")} />
 
-            {/* 新しいパスワード */}
             <div className="space-y-2">
               <Label htmlFor="password">新しいパスワード</Label>
               <Input
@@ -162,7 +153,6 @@ export default function ResetPasswordPage() {
               )}
             </div>
 
-            {/* パスワード確認 */}
             <div className="space-y-2">
               <Label htmlFor="passwordConfirm">パスワード確認</Label>
               <Input
@@ -173,7 +163,9 @@ export default function ResetPasswordPage() {
                 disabled={isSubmitting}
               />
               {errors.passwordConfirm && (
-                <p className="text-sm text-destructive">{errors.passwordConfirm.message}</p>
+                <p className="text-sm text-destructive">
+                  {errors.passwordConfirm.message}
+                </p>
               )}
             </div>
           </CardContent>
@@ -204,5 +196,20 @@ export default function ResetPasswordPage() {
         </form>
       </Card>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <span className="text-muted-foreground">読み込み中...</span>
+        </div>
+      }
+    >
+      <ResetPasswordPageContent />
+    </Suspense>
   );
 }

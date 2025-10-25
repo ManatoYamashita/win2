@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,7 +28,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { loginSchema, LoginInput } from "@/lib/validations/auth";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
@@ -84,7 +84,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="container mx-auto flex items-center justify-center min-h-screen py-12 px-4">
+    <div className="container mx-auto flex min-h-screen items-center justify-center py-12 px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>ログイン</CardTitle>
@@ -95,7 +95,6 @@ export default function LoginPage() {
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* メールアドレス */}
               <FormField
                 control={form.control}
                 name="email"
@@ -114,7 +113,6 @@ export default function LoginPage() {
                 )}
               />
 
-              {/* パスワード */}
               <FormField
                 control={form.control}
                 name="password"
@@ -153,5 +151,19 @@ export default function LoginPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <span className="text-muted-foreground">読み込み中...</span>
+        </div>
+      }
+    >
+      <LoginPageContent />
+    </Suspense>
   );
 }
