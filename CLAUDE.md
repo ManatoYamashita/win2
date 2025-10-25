@@ -184,23 +184,22 @@ The existing GAS script:
 
 ## Phase 1 Implementation Status
 
-### ✅ Completed (70%)
+### ✅ Completed (85%)
 1. ✅ Environment setup (Next.js 15, TailwindCSS v3, TypeScript)
 2. ✅ shadcn/ui initialization (Button, Input, Card, Label components)
 3. ✅ microCMS SDK setup with complete type definitions (Blog, Deal, Category)
 4. ✅ Google Sheets API authentication and utility functions
 5. ✅ Basic layout components (Header, Footer in app/layout.tsx)
 6. ✅ Environment variables configuration (.env.local, .env.example)
-
-### 🚧 In Progress
-7. 🚧 Next-Auth v5 (AuthJS) setup with CredentialsProvider
+7. ✅ Next-Auth v4.24.11 setup with CredentialsProvider (v5互換性問題によりダウングレード)
+8. ✅ Member registration API implementation (/api/register)
 
 ### ⏳ Pending
-8. ⏳ Member registration and login
-9. ⏳ Blog listing and detail pages
-10. ⏳ **Critical**: /api/track-click implementation with proper id1 tracking
-11. ⏳ Member dashboard with conversion history
-12. ⏳ Deal listing page (member-only)
+9. ⏳ Login functionality and session management
+10. ⏳ Blog listing and detail pages
+11. ⏳ **Critical**: /api/track-click implementation with proper id1 tracking
+12. ⏳ Member dashboard with conversion history (/mypage, /mypage/history)
+13. ⏳ Deal listing page (member-only)
 
 ## External Service Credentials
 
