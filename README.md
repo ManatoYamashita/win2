@@ -14,23 +14,29 @@ WIN×Ⅱ は、ASP（アフィリエイトサービスプロバイダー）の�
 - **キャッシュバックシステム**: 成果の20%を会員に還元
 - **トラッキング**: 会員・非会員（guest:UUID）のクリックログ記録
 
-### Phase 1 実装状況（70% 完了）
+### 実装状況
 
-✅ **完了**:
+✅ **Phase 1 完了（100%）**:
 - Next.js 15.1.4 プロジェクト初期化（App Router、TypeScript 5 strict mode）
-- TailwindCSS v3.4.1 + shadcn/ui セットアップ
+- TailwindCSS v3.4.1 + shadcn/ui セットアップ（Button、Input、Card、Label、Form、Toast）
 - microCMS SDK 統合（Blog、Deal、Category 型定義完了）
 - Google Sheets API 認証・ユーティリティ関数実装
-- 基本レイアウトコンポーネント（Header、Footer）
+- 基本レイアウトコンポーネント（Header、Footer、SessionProvider）
+- Next-Auth v5 基盤設定完了
 
-🚧 **実装中**:
-- Next-Auth v5 (AuthJS) 設定
+✅ **Phase 2 完了（100%）**:
+- 会員登録機能（Zod バリデーション + react-hook-form）
+- 会員登録 API（`/api/register`、bcrypt パスワードハッシュ化）
+- ログイン/ログアウト機能（Next-Auth v5 CredentialsProvider）
+- 認証保護ミドルウェア（`/mypage/*`、`/deals/*` 保護）
+- マイページ実装（登録情報表示、サイドナビゲーション）
+- 会員情報取得 API（`/api/members/me`）
 
 ⏳ **未実装**:
-- 会員登録・ログイン機能
-- ブログ記事一覧・詳細ページ
-- 案件一覧ページ
-- クリック追跡API（/api/track-click）
+- ブログ記事一覧・詳細ページ（Phase 3）
+- 案件一覧ページ（Phase 4）
+- クリック追跡API（Phase 4）
+- 申込履歴表示（Phase 4）
 
 ---
 
@@ -97,9 +103,9 @@ GOOGLE_SHEETS_CLIENT_EMAIL=your-service-account@project.iam.gserviceaccount.com
 GOOGLE_SHEETS_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
 GOOGLE_SHEETS_SPREADSHEET_ID=your-spreadsheet-id
 
-# Next-Auth（実装中）
+# Next-Auth
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-secret-key
+NEXTAUTH_SECRET=your-secret-key  # openssl rand -base64 32 で生成推奨
 ```
 
 ### 開発サーバー起動
@@ -142,16 +148,26 @@ win2/
 │   └── globals.css         # グローバルCSS
 │
 ├── components/             # Reactコンポーネント
+│   ├── providers/          # React Context Providers
+│   │   └── session-provider.tsx  # Next-Auth SessionProvider
 │   └── ui/                 # shadcn/ui コンポーネント
 │
 ├── lib/                    # ユーティリティ・API関数
 │   ├── googleapis.ts       # Google Sheets 認証
 │   ├── sheets.ts           # Sheets 操作関数
 │   ├── microcms.ts         # microCMS クライアント
+│   ├── auth.ts             # Next-Auth 設定
+│   ├── validations/        # Zod バリデーションスキーマ
 │   └── utils.ts            # shadcn/ui ユーティリティ
 │
+├── hooks/                  # React カスタムフック
+│   └── use-toast.ts        # Toast通知フック
+│
 ├── types/                  # TypeScript 型定義
-│   └── microcms.ts         # microCMS API型
+│   ├── microcms.ts         # microCMS API型
+│   └── next-auth.d.ts      # Next-Auth 型拡張
+│
+├── middleware.ts           # 認証保護ミドルウェア
 │
 ├── docs/                   # プロジェクトドキュメント
 │   ├── index.md            # ドキュメント索引
@@ -252,18 +268,21 @@ PREFIX: コミットメッセージ
 
 ## 開発フェーズ
 
-### Phase 1: 環境構築・基盤実装（70% 完了）
+### Phase 1: 環境構築・基盤実装（100% 完了）
 - [x] Next.js 15 プロジェクト初期化
 - [x] TailwindCSS + shadcn/ui セットアップ
 - [x] microCMS SDK 統合
 - [x] Google Sheets API 認証・ユーティリティ実装
 - [x] 基本レイアウトコンポーネント
-- [ ] Next-Auth 設定（実装中）
+- [x] Next-Auth v5 基盤設定
 
-### Phase 2: 認証・会員機能（未着手）
-- 会員登録API + フォーム
-- ログイン/ログアウト
-- マイページ（登録情報表示・編集、申込履歴）
+### Phase 2: 認証・会員機能（100% 完了）
+- [x] 会員登録API + フォーム（Zod + react-hook-form）
+- [x] ログイン/ログアウト（Next-Auth v5 CredentialsProvider）
+- [x] 認証保護ミドルウェア
+- [x] マイページ（登録情報表示、サイドナビゲーション）
+- [ ] 登録情報編集（Phase 3 で実装予定）
+- [ ] 申込履歴表示（Phase 4 で実装予定）
 
 ### Phase 3: CMS連携・ブログ機能（未着手）
 - ブログ記事一覧（ISR）・詳細ページ（SSG）

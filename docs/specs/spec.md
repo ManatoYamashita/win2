@@ -505,24 +505,31 @@ GET  /api/sheets/results         // 成果データ取得（管理用）
 
 ## 6. 開発フェーズ
 
-### Phase 1: 環境構築・基盤実装（1週間）**実装状況: 70%完了**
+### Phase 1: 環境構築・基盤実装（1週間）**実装状況: 100%完了**
 - [x] Next.js 15プロジェクト初期化（Next.js 15.1.4、React 19、TypeScript 5）
 - [x] TailwindCSS セットアップ（v3.4.1導入完了）
 - [x] microCMS API設定（Blog, Deal, Category型定義完了、SDK実装済）
 - [x] Google Sheets API連携設定（認証・ユーティリティ関数実装済）
-- [x] shadcn/ui初期化（Button, Input, Card, Label実装済）
-- [x] 基本レイアウト・UIコンポーネント作成（Header、Footer実装済）
-- [ ] Next-Auth設定（実装中）
+- [x] shadcn/ui初期化（Button, Input, Card, Label, Form, Toast実装済）
+- [x] 基本レイアウト・UIコンポーネント作成（Header、Footer、SessionProvider実装済）
+- [x] Next-Auth v5設定（authOptions、型拡張、APIルート実装完了）
 
-### Phase 2: 認証・会員機能（1週間）
-- [ ] 会員登録機能
-  - [ ] フォームバリデーション
-  - [ ] Google Sheets書込API
-  - [ ] パスワードハッシュ化
-- [ ] ログイン/ログアウト機能
-- [ ] マイページ
-  - [ ] 登録情報表示・編集
-  - [ ] 申込履歴表示（Sheetsから取得）
+### Phase 2: 認証・会員機能（1週間）**実装状況: 100%完了**
+- [x] 会員登録機能
+  - [x] フォームバリデーション（Zod + react-hook-form）
+  - [x] Google Sheets書込API（`/api/register`実装完了）
+  - [x] パスワードハッシュ化（bcryptjs、salt rounds: 10）
+  - [x] 登録後自動ログイン
+- [x] ログイン/ログアウト機能
+  - [x] Next-Auth v5 CredentialsProvider
+  - [x] JWT セッション管理（30日間）
+  - [x] ログインページ（`/login`）実装
+- [x] マイページ
+  - [x] 認証保護ミドルウェア（`middleware.ts`）
+  - [x] レイアウト実装（サイドナビゲーション）
+  - [x] 登録情報表示（`/api/members/me`から取得）
+  - [ ] 登録情報編集（Phase 3で実装予定）
+  - [ ] 申込履歴表示（Phase 4で実装予定）
 
 ### Phase 3: CMS連携・ブログ機能（1週間）
 - [ ] microCMS連携ライブラリ実装

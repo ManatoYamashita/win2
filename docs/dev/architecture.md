@@ -4,8 +4,9 @@
 
 本ドキュメントでは、WIN×Ⅱ プロジェクトの実装されたアーキテクチャの詳細を記載します。ディレクトリ構成、設定ファイル、主要な技術的決定を含みます。
 
-**最終更新日**: 2025-01-25
-**Phase 1 実装状況**: 70% 完了
+**最終更新日**: 2025-10-25
+**Phase 1 実装状況**: 100% 完了
+**Phase 2 実装状況**: 100% 完了
 
 ---
 
@@ -14,25 +15,55 @@
 ```text
 win2/
 ├── app/                        # Next.js 15 App Router ディレクトリ
-│   ├── layout.tsx              # ルートレイアウト（Header、Footer含む）
+│   ├── layout.tsx              # ルートレイアウト（Header、Footer、SessionProvider含む）
 │   ├── page.tsx                # トップページ（/）
-│   └── globals.css             # グローバルスタイル（TailwindCSS含む）
+│   ├── globals.css             # グローバルスタイル（TailwindCSS含む）
+│   ├── api/                    # API Routes
+│   │   ├── auth/
+│   │   │   └── [...nextauth]/ # Next-Auth API ルート
+│   │   │       └── route.ts
+│   │   ├── register/           # 会員登録API
+│   │   │   └── route.ts
+│   │   └── members/
+│   │       └── me/             # 会員情報取得API
+│   │           └── route.ts
+│   ├── login/                  # ログインページ
+│   │   └── page.tsx
+│   ├── register/               # 会員登録ページ
+│   │   └── page.tsx
+│   └── mypage/                 # マイページ（会員限定）
+│       ├── layout.tsx          # サイドナビ付きレイアウト
+│       └── page.tsx            # 登録情報表示
 │
 ├── components/                 # Reactコンポーネント
+│   ├── providers/              # React Context Providers
+│   │   └── session-provider.tsx  # Next-Auth SessionProvider ラッパー
 │   └── ui/                     # shadcn/ui ベースコンポーネント
 │       ├── button.tsx          # Buttonコンポーネント
 │       ├── input.tsx           # Inputコンポーネント
 │       ├── card.tsx            # Cardコンポーネント
-│       └── label.tsx           # Labelコンポーネント
+│       ├── label.tsx           # Labelコンポーネント
+│       ├── form.tsx            # Formコンポーネント（react-hook-form統合）
+│       ├── toast.tsx           # Toastコンポーネント
+│       └── toaster.tsx         # Toasterコンテナ
 │
 ├── lib/                        # ライブラリ・ユーティリティ関数
 │   ├── utils.ts                # shadcn/ui 用ユーティリティ（cn関数）
 │   ├── googleapis.ts           # Google Sheets API 認証設定
 │   ├── sheets.ts               # Google Sheets 操作関数
-│   └── microcms.ts             # microCMS クライアント設定・API関数
+│   ├── microcms.ts             # microCMS クライアント設定・API関数
+│   ├── auth.ts                 # Next-Auth 設定（authOptions）
+│   └── validations/
+│       └── auth.ts             # Zod バリデーションスキーマ
+│
+├── hooks/                      # React カスタムフック
+│   └── use-toast.ts            # Toast通知フック
 │
 ├── types/                      # TypeScript 型定義
-│   └── microcms.ts             # microCMS API レスポンス型定義
+│   ├── microcms.ts             # microCMS API レスポンス型定義
+│   └── next-auth.d.ts          # Next-Auth 型拡張（memberId追加）
+│
+├── middleware.ts               # Next.js ミドルウェア（認証保護）
 │
 ├── docs/                       # プロジェクトドキュメント
 │   ├── index.md                # ドキュメント索引
@@ -76,7 +107,7 @@ win2/
 - **Google Sheets API**: googleapis v164.1.0
 - **microCMS SDK**: v3.2.0（Headless CMS）
 - **bcryptjs**: v3.0.2（パスワードハッシュ化、salt rounds: 10）
-- **Next-Auth**: v5.0.0-beta.29（実装中）
+- **Next-Auth**: v5.0.0-beta.29（実装完了）
 
 ### バリデーション・ユーティリティ
 - **zod**: v4.1.12（スキーマバリデーション）
@@ -441,27 +472,373 @@ export function cn(...inputs: ClassValue[]) {
 
 ---
 
-## Next-Auth 統合（実装中）
+## Next-Auth 統合（実装完了）
 
 **バージョン**: v5.0.0-beta.29（AuthJS）
 
-**予定される実装**:
-- CredentialsProvider を使用したメールアドレス + パスワード認証
-- JWT セッション管理
-- セッション拡張（memberId 含む）
-- 認証保護ミドルウェア
+### 認証システム概要
+
+Next-Auth v5 を使用した認証システムを実装。CredentialsProvider によるメールアドレス + パスワード認証、JWT セッション管理、認証保護ミドルウェアを含みます。
+
+#### 主要ファイル
+
+**`lib/auth.ts`** - Next-Auth 設定ファイル
+
+```typescript
+export const authOptions: NextAuthOptions = {
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "メールアドレス", type: "email" },
+        password: { label: "パスワード", type: "password" },
+      },
+      async authorize(credentials) {
+        // 1. バリデーション
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("メールアドレスとパスワードを入力してください");
+        }
+
+        // 2. Google Sheets から会員情報取得
+        const member = await getMemberByEmail(credentials.email);
+        if (!member) {
+          throw new Error("メールアドレスまたはパスワードが正しくありません");
+        }
+
+        // 3. パスワード検証（bcrypt）
+        const passwordHash = member.passwordHash;
+        if (!passwordHash) {
+          throw new Error("パスワード情報が不正です");
+        }
+        const isPasswordValid = await bcrypt.compare(
+          credentials.password,
+          passwordHash
+        );
+        if (!isPasswordValid) {
+          throw new Error("メールアドレスまたはパスワードが正しくありません");
+        }
+
+        // 4. ユーザーオブジェクト返却（memberId含む）
+        return {
+          id: member.memberId,
+          memberId: member.memberId,
+          email: member.email,
+          name: member.name,
+        };
+      },
+    }),
+  ],
+  callbacks: {
+    // JWT callback: トークンに memberId を追加
+    async jwt({ token, user }) {
+      if (user) {
+        token.memberId = user.memberId;
+        token.email = user.email;
+        token.name = user.name;
+      }
+      return token;
+    },
+    // Session callback: セッションに memberId を追加
+    async session({ session, token }) {
+      if (token && session.user) {
+        session.user.memberId = token.memberId as string;
+        session.user.email = token.email as string;
+        session.user.name = token.name as string;
+      }
+      return session;
+    },
+  },
+  pages: {
+    signIn: "/login",
+    error: "/login",
+  },
+  session: {
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60, // 30日間
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+};
+```
+
+**`types/next-auth.d.ts`** - Next-Auth 型拡張
+
+セッションに `memberId` を含めるため、Next-Auth の型を拡張：
+
+```typescript
+declare module "next-auth" {
+  interface Session {
+    user: {
+      memberId: string;
+    } & DefaultSession["user"];
+  }
+
+  interface User extends DefaultUser {
+    memberId: string;
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    memberId?: string;
+  }
+}
+```
+
+**`middleware.ts`** - 認証保護ミドルウェア
+
+Next-Auth の `withAuth` を使用し、特定のルート（`/mypage/*`, `/deals/*`）を認証保護：
+
+```typescript
+import { withAuth } from "next-auth/middleware";
+import { NextResponse } from "next/server";
+
+export default withAuth(
+  function middleware(req) {
+    return NextResponse.next();
+  },
+  {
+    callbacks: {
+      authorized: ({ token }) => !!token,
+    },
+    pages: {
+      signIn: "/login",
+    },
+  }
+);
+
+export const config = {
+  matcher: ["/mypage/:path*", "/deals/:path*"],
+};
+```
+
+### 会員登録フロー
+
+**`app/api/register/route.ts`** - 会員登録 API
+
+```typescript
+export async function POST(request: NextRequest) {
+  // 1. リクエストボディ取得
+  const body = await request.json();
+
+  // 2. Zod バリデーション
+  const validationResult = registerSchema.safeParse(body);
+  if (!validationResult.success) {
+    return NextResponse.json(
+      { error: "入力内容に誤りがあります", details: validationResult.error.issues },
+      { status: 400 }
+    );
+  }
+
+  const { name, email, password, birthday, postalCode, phone } = validationResult.data;
+
+  // 3. メールアドレス重複チェック
+  const existingMember = await getMemberByEmail(email);
+  if (existingMember) {
+    return NextResponse.json(
+      { error: "このメールアドレスは既に登録されています" },
+      { status: 409 }
+    );
+  }
+
+  // 4. パスワードハッシュ化（bcrypt、salt rounds: 10）
+  const passwordHash = await bcrypt.hash(password, 10);
+
+  // 5. memberId 生成（UUID v4）
+  const memberId = randomUUID();
+
+  // 6. Google Sheets に会員情報追加
+  await addMember({
+    memberId,
+    name,
+    email,
+    passwordHash,
+    birthday,
+    postalCode,
+    phone,
+    registeredAt: new Date().toISOString(),
+  });
+
+  return NextResponse.json(
+    { message: "会員登録が完了しました", memberId, email },
+    { status: 201 }
+  );
+}
+```
+
+### バリデーションスキーマ
+
+**`lib/validations/auth.ts`** - Zod スキーマ定義
+
+```typescript
+export const registerSchema = z.object({
+  name: z.string().min(1, { message: "氏名を入力してください" }).max(100),
+  email: z.string().min(1).email({ message: "有効なメールアドレスを入力してください" }),
+  password: z.string().min(8, { message: "パスワードは8文字以上で入力してください" }).max(100),
+  passwordConfirm: z.string().min(1),
+  birthday: z.string().optional().refine((val) => {
+    if (!val) return true;
+    return /^\d{4}-\d{2}-\d{2}$/.test(val);
+  }, { message: "生年月日はYYYY-MM-DD形式で入力してください" }),
+  postalCode: z.string().optional(),
+  phone: z.string().optional(),
+}).refine((data) => data.password === data.passwordConfirm, {
+  message: "パスワードが一致しません",
+  path: ["passwordConfirm"],
+});
+
+export const loginSchema = z.object({
+  email: z.string().min(1, { message: "メールアドレスを入力してください" }).email({ message: "有効なメールアドレスを入力してください" }),
+  password: z.string().min(1, { message: "パスワードを入力してください" }),
+});
+```
+
+### マイページ実装
+
+**`app/mypage/layout.tsx`** - マイページレイアウト
+
+サイドナビゲーション付きの2カラムレイアウト：
+
+```typescript
+export default function MypageLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="grid md:grid-cols-4 gap-6">
+      {/* サイドナビ */}
+      <aside className="md:col-span-1">
+        <Card>
+          <CardHeader>
+            <CardTitle>マイメニュー</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Link href="/mypage">
+              <Button variant="ghost" className="w-full justify-start">
+                登録情報
+              </Button>
+            </Link>
+            <Link href="/mypage/history">
+              <Button variant="ghost" className="w-full justify-start">
+                申込履歴
+              </Button>
+            </Link>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-destructive"
+              onClick={() => signOut({ callbackUrl: "/" })}
+            >
+              ログアウト
+            </Button>
+          </CardContent>
+        </Card>
+      </aside>
+
+      {/* メインコンテンツ */}
+      <main className="md:col-span-3">{children}</main>
+    </div>
+  );
+}
+```
+
+**`app/mypage/page.tsx`** - 登録情報表示ページ
+
+セッションから `memberId` を取得し、`/api/members/me` から会員情報を取得して表示：
+
+```typescript
+export default function MypagePage() {
+  const { data: session, status } = useSession();
+  const [member, setMember] = useState<Omit<MemberRow, "passwordHash"> | null>(null);
+
+  useEffect(() => {
+    const fetchMemberInfo = async () => {
+      const response = await fetch("/api/members/me");
+      if (!response.ok) {
+        throw new Error("会員情報の取得に失敗しました");
+      }
+      const data = await response.json();
+      setMember(data);
+    };
+
+    if (status === "authenticated") {
+      fetchMemberInfo();
+    }
+  }, [status]);
+
+  // 会員情報表示（memberId、氏名、メールアドレス、生年月日、郵便番号、電話番号、登録日時）
+}
+```
+
+**`app/api/members/me/route.ts`** - 会員情報取得 API
+
+```typescript
+export async function GET(request: NextRequest) {
+  // 1. セッション確認
+  const session = await getServerSession(authOptions);
+  if (!session || !session.user?.memberId) {
+    return NextResponse.json(
+      { error: "認証が必要です" },
+      { status: 401 }
+    );
+  }
+
+  // 2. Google Sheets から会員情報取得
+  const member = await getMemberById(session.user.memberId);
+  if (!member) {
+    return NextResponse.json(
+      { error: "会員情報が見つかりません" },
+      { status: 404 }
+    );
+  }
+
+  // 3. パスワードハッシュを除外してレスポンス
+  const { passwordHash, ...memberData } = member;
+  return NextResponse.json(memberData, { status: 200 });
+}
+```
+
+### SessionProvider 統合
+
+**`components/providers/session-provider.tsx`**
+
+クライアントコンポーネントとして SessionProvider をラップし、サーバーコンポーネントの `app/layout.tsx` から利用可能に：
+
+```typescript
+"use client";
+
+import { SessionProvider as NextAuthSessionProvider } from "next-auth/react";
+import { ReactNode } from "react";
+
+export function SessionProvider({ children }: { children: ReactNode }) {
+  return <NextAuthSessionProvider>{children}</NextAuthSessionProvider>;
+}
+```
+
+**`app/layout.tsx`** での使用：
+
+```typescript
+import { SessionProvider } from "@/components/providers/session-provider";
+import { Toaster } from "@/components/ui/toaster";
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="ja">
+      <body>
+        <SessionProvider>
+          <div className="min-h-screen flex flex-col">
+            <header>...</header>
+            <main>{children}</main>
+            <footer>...</footer>
+          </div>
+          <Toaster />
+        </SessionProvider>
+      </body>
+    </html>
+  );
+}
+```
 
 詳細は `docs/specs/spec.md` の「3.1.1 会員登録フロー」参照。
 
 ---
 
 ## 今後の実装予定
-
-### Phase 2: 認証・会員機能
-- 会員登録API（/api/register）
-- Next-Auth 完全設定
-- ログイン/ログアウト機能
-- マイページ実装
 
 ### Phase 3: CMS連携・ブログ機能
 - ブログ記事一覧ページ（ISR）
