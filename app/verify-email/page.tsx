@@ -1,20 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 
-/**
- * メール認証ページ
- * /verify-email?token=xxx
- *
- * ユーザーが認証メールのリンクをクリックした際に表示される
- * トークンを検証してメール認証を完了する
- */
-export default function VerifyEmailPage() {
+function VerifyEmailPageContent() {
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("");
@@ -23,19 +23,20 @@ export default function VerifyEmailPage() {
   useEffect(() => {
     const token = searchParams.get("token");
 
-    // トークンがない場合
     if (!token) {
       setStatus("error");
       setMessage("無効なリンクです。認証トークンが見つかりません。");
       return;
     }
 
-    // メール認証APIを呼び出し
     const verifyEmail = async () => {
       try {
-        const response = await fetch(`/api/verify-email?token=${encodeURIComponent(token)}`, {
-          method: "GET",
-        });
+        const response = await fetch(
+          `/api/verify-email?token=${encodeURIComponent(token)}`,
+          {
+            method: "GET",
+          }
+        );
 
         const data = await response.json();
 
@@ -50,7 +51,9 @@ export default function VerifyEmailPage() {
       } catch (error) {
         console.error("Error verifying email:", error);
         setStatus("error");
-        setMessage("メール認証中にエラーが発生しました。しばらくしてから再度お試しください。");
+        setMessage(
+          "メール認証中にエラーが発生しました。しばらくしてから再度お試しください。"
+        );
       }
     };
 
@@ -62,8 +65,12 @@ export default function VerifyEmailPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            {status === "loading" && <Loader2 className="h-16 w-16 text-orange-600 animate-spin" />}
-            {status === "success" && <CheckCircle2 className="h-16 w-16 text-green-600" />}
+            {status === "loading" && (
+              <Loader2 className="h-16 w-16 text-orange-600 animate-spin" />
+            )}
+            {status === "success" && (
+              <CheckCircle2 className="h-16 w-16 text-green-600" />
+            )}
             {status === "error" && <XCircle className="h-16 w-16 text-red-600" />}
           </div>
           <CardTitle className="text-2xl">
@@ -126,5 +133,20 @@ export default function VerifyEmailPage() {
         </CardFooter>
       </Card>
     </div>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          <span className="text-muted-foreground">読み込み中...</span>
+        </div>
+      }
+    >
+      <VerifyEmailPageContent />
+    </Suspense>
   );
 }
