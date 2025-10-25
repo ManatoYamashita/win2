@@ -21,6 +21,7 @@ docs/
 │   └── asp.md               ← ASP認証情報（A8.net, AFB, もしも, バリュコマ）
 │
 └── dev/                      ← 開発ワークフロー・規約
+    ├── architecture.md      ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
     └── branch.md            ← Git ブランチ戦略・CI/CD・コミット規約
 ```
 
@@ -38,6 +39,7 @@ docs/
 
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
+| **architecture.md** | アーキテクチャ詳細 | ディレクトリ構成、TypeScript/TailwindCSS設定、実装済み機能、データフロー |
 | **branch.md** | ブランチ戦略 | 2ブランチ管理（dev/main）、PR規約、コミットメッセージ形式、CI/CD |
 
 ### 今後追加が想定されるドキュメントカテゴリ
@@ -135,6 +137,21 @@ docs/
 - Task Master の `update-subtask` コマンドで記録した実装ノートは、必要に応じてドキュメント化
 
 詳細は `../.taskmaster/CLAUDE.md` を参照してください。
+
+---
+
+## 更新履歴
+
+このセクションは、ドキュメントの主要な更新を記録します。
+
+### 2025-01-25
+- **Phase 1 実装状況を反映**
+  - `specs/spec.md`: 技術スタックに具体的なバージョン番号を追加（Next.js 15.1.4、React 19、TailwindCSS v3.4.1 等）
+  - `specs/spec.md`: Phase 1 チェックリストを更新し、70%完了状況を反映
+  - 完了項目: Next.js初期化、TailwindCSS、microCMS SDK、Google Sheets API、shadcn/ui、基本レイアウト
+  - 実装中: Next-Auth設定
+  - `dev/architecture.md`: 新規作成（ディレクトリ構成とTypeScript設定の詳細を文書化）
+  - 本ファイル（`index.md`）: 更新履歴セクション追加
 
 ---
 

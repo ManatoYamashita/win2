@@ -10,19 +10,27 @@
 
 ```
 フロントエンド:
-- Next.js 15 (App Router)
-- TypeScript
-- TailwindCSS 4
-- shadcn/ui (UIコンポーネント)
+- Next.js 15.1.4 (App Router)
+- React 19
+- TypeScript 5 (strict mode, noUncheckedIndexedAccess enabled)
+- TailwindCSS v3.4.1 (v4は将来対応予定)
+- shadcn/ui (UIコンポーネント、Radix UI primitives使用)
 
 バックエンド/API:
 - Next.js API Routes
-- Next-Auth (Auth.js) - 認証
-- Google Sheets API - 会員・成果データ管理
+- Next-Auth v5.0.0-beta.29 (Auth.js) - 認証
+- Google Sheets API (googleapis v164.1.0) - 会員・成果データ管理
+- bcryptjs v3.0.2 (パスワードハッシュ化、salt rounds: 10)
 
 CMS/データ管理:
-- microCMS - ブログ記事・案件情報管理
+- microCMS v3.2.0 - ブログ記事・案件情報管理
 - Google Sheets - 会員DB・成果データ（既存GAS継続利用）
+
+バリデーション:
+- zod v4.1.12
+
+スタイリング補助:
+- class-variance-authority v0.7.1 (コンポーネントバリアント管理)
 
 外部連携:
 - A8.net（優先実装）
@@ -497,13 +505,14 @@ GET  /api/sheets/results         // 成果データ取得（管理用）
 
 ## 6. 開発フェーズ
 
-### Phase 1: 環境構築・基盤実装（1週間）
-- [ ] Next.js 15プロジェクト初期化
-- [ ] TailwindCSS 4セットアップ
-- [ ] microCMS API設定（3つのAPI作成）
-- [ ] Google Sheets API連携設定
-- [ ] Next-Auth設定
-- [ ] 基本レイアウト・UIコンポーネント作成
+### Phase 1: 環境構築・基盤実装（1週間）**実装状況: 70%完了**
+- [x] Next.js 15プロジェクト初期化（Next.js 15.1.4、React 19、TypeScript 5）
+- [x] TailwindCSS セットアップ（v3.4.1導入完了）
+- [x] microCMS API設定（Blog, Deal, Category型定義完了、SDK実装済）
+- [x] Google Sheets API連携設定（認証・ユーティリティ関数実装済）
+- [x] shadcn/ui初期化（Button, Input, Card, Label実装済）
+- [x] 基本レイアウト・UIコンポーネント作成（Header、Footer実装済）
+- [ ] Next-Auth設定（実装中）
 
 ### Phase 2: 認証・会員機能（1週間）
 - [ ] 会員登録機能
