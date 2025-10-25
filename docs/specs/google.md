@@ -55,7 +55,7 @@ H: 登録日時 (ISO8601)
 ### Google Apps Script
 
 - `code.gs`
-    
+
     ```jsx
     /**
      * WIN×Ⅱ 成果CSV 取込～キャッシュバック集計（2025/10/05）

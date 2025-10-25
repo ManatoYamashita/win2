@@ -80,8 +80,18 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error("Registration error:", error);
+
+    // より詳細なエラー情報を返す（開発環境のみ）
+    const errorMessage = error instanceof Error ? error.message : "不明なエラー";
+    const errorStack = error instanceof Error ? error.stack : undefined;
+
+    console.error("Error details:", { message: errorMessage, stack: errorStack });
+
     return NextResponse.json(
-      { error: "会員登録中にエラーが発生しました" },
+      {
+        error: "会員登録中にエラーが発生しました",
+        details: process.env.NODE_ENV === 'development' ? errorMessage : undefined
+      },
       { status: 500 }
     );
   }
