@@ -10,19 +10,27 @@
 
 ```
 フロントエンド:
-- Next.js 15 (App Router)
-- TypeScript
-- TailwindCSS 4
-- shadcn/ui (UIコンポーネント)
+- Next.js 15.1.4 (App Router)
+- React 19
+- TypeScript 5 (strict mode, noUncheckedIndexedAccess enabled)
+- TailwindCSS v3.4.1 (v4は将来対応予定)
+- shadcn/ui (UIコンポーネント、Radix UI primitives使用)
 
 バックエンド/API:
 - Next.js API Routes
-- Next-Auth (Auth.js) - 認証
-- Google Sheets API - 会員・成果データ管理
+- Next-Auth v4.24.11 (安定版) - 認証
+- Google Sheets API (googleapis v164.1.0) - 会員・成果データ管理
+- bcryptjs v3.0.2 (パスワードハッシュ化、salt rounds: 10)
 
 CMS/データ管理:
-- microCMS - ブログ記事・案件情報管理
+- microCMS v3.2.0 - ブログ記事・案件情報管理
 - Google Sheets - 会員DB・成果データ（既存GAS継続利用）
+
+バリデーション:
+- zod v4.1.12
+
+スタイリング補助:
+- class-variance-authority v0.7.1 (コンポーネントバリアント管理)
 
 外部連携:
 - A8.net（優先実装）
@@ -497,23 +505,32 @@ GET  /api/sheets/results         // 成果データ取得（管理用）
 
 ## 6. 開発フェーズ
 
-### Phase 1: 環境構築・基盤実装（1週間）
-- [ ] Next.js 15プロジェクト初期化
-- [ ] TailwindCSS 4セットアップ
-- [ ] microCMS API設定（3つのAPI作成）
-- [ ] Google Sheets API連携設定
-- [ ] Next-Auth設定
-- [ ] 基本レイアウト・UIコンポーネント作成
+### Phase 1: 環境構築・基盤実装（1週間）**実装状況: 100%完了**
+- [x] Next.js 15プロジェクト初期化（Next.js 15.1.4、React 19、TypeScript 5）
+- [x] TailwindCSS セットアップ（v3.4.1導入完了）
+- [x] microCMS API設定（Blog, Deal, Category型定義完了、SDK実装済）
+- [x] Google Sheets API連携設定（認証・ユーティリティ関数実装済）
+- [x] shadcn/ui初期化（Button, Input, Card, Label, Form, Toast実装済）
+- [x] 基本レイアウト・UIコンポーネント作成（Header、Footer、SessionProvider実装済）
+- [x] Next-Auth v4設定（authOptions、型拡張、APIルート実装完了）
+  - 注: v5 beta版との互換性問題により v4.24.11（安定版）を使用
 
-### Phase 2: 認証・会員機能（1週間）
-- [ ] 会員登録機能
-  - [ ] フォームバリデーション
-  - [ ] Google Sheets書込API
-  - [ ] パスワードハッシュ化
-- [ ] ログイン/ログアウト機能
-- [ ] マイページ
-  - [ ] 登録情報表示・編集
-  - [ ] 申込履歴表示（Sheetsから取得）
+### Phase 2: 認証・会員機能（1週間）**実装状況: 100%完了**
+- [x] 会員登録機能
+  - [x] フォームバリデーション（Zod + react-hook-form）
+  - [x] Google Sheets書込API（`/api/register`実装完了）
+  - [x] パスワードハッシュ化（bcryptjs、salt rounds: 10）
+  - [x] 登録後自動ログイン
+- [x] ログイン/ログアウト機能
+  - [x] Next-Auth v4 CredentialsProvider
+  - [x] JWT セッション管理（30日間）
+  - [x] ログインページ（`/login`）実装
+- [x] マイページ
+  - [x] 認証保護ミドルウェア（`middleware.ts`）
+  - [x] レイアウト実装（サイドナビゲーション）
+  - [x] 登録情報表示（`/api/members/me`から取得）
+  - [ ] 登録情報編集（Phase 3で実装予定）
+  - [ ] 申込履歴表示（Phase 4で実装予定）
 
 ### Phase 3: CMS連携・ブログ機能（1週間）
 - [ ] microCMS連携ライブラリ実装
