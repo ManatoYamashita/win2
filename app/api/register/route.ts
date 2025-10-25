@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import { randomUUID } from "crypto";
 import { getMemberByEmail, addMember } from "@/lib/sheets";
 import { registerSchema } from "@/lib/validations/auth";
+import { generateVerificationToken } from "@/lib/tokens";
+import { sendVerificationEmail } from "@/lib/email";
 
 /**
  * 会員登録API
@@ -57,7 +59,7 @@ export async function POST(request: NextRequest) {
     // 登録日時
     const registeredAt = new Date().toISOString();
 
-    // Google Sheetsに会員情報を追加
+    // Google Sheetsに会員情報を追加（Phase 2: emailVerified=false）
     await addMember({
       memberId,
       name,
@@ -67,14 +69,27 @@ export async function POST(request: NextRequest) {
       postalCode,
       phone,
       registeredAt,
+      emailVerified: false, // Phase 2: メール未認証
     });
+
+    // Phase 2: メール認証トークン生成と送信
+    const verificationToken = generateVerificationToken(email);
+    const emailResult = await sendVerificationEmail(email, verificationToken);
+
+    if (!emailResult.success) {
+      console.error("Failed to send verification email:", emailResult.error);
+      // メール送信失敗でも登録自体は成功とする（後で再送信可能）
+    } else {
+      console.log(`Verification email sent to ${email}, messageId: ${emailResult.messageId}`);
+    }
 
     // 成功レスポンス
     return NextResponse.json(
       {
-        message: "会員登録が完了しました",
+        message: "会員登録が完了しました。認証メールを送信しましたので、メールをご確認ください。",
         memberId,
         email,
+        emailSent: emailResult.success,
       },
       { status: 201 }
     );

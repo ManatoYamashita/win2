@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { getMemberById } from "@/lib/sheets";
@@ -11,7 +11,7 @@ import { getMemberById } from "@/lib/sheets";
  * セッションからmemberIdを取得し、Google Sheetsから会員情報を返す
  * パスワードハッシュは除外して返却
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // セッション確認
     const session = await getServerSession(authOptions);
@@ -34,7 +34,8 @@ export async function GET(request: NextRequest) {
     }
 
     // パスワードハッシュを除外してレスポンス
-    const { passwordHash, ...memberData } = member;
+    const { passwordHash: _passwordHash, ...memberData } = member;
+    void _passwordHash;
 
     return NextResponse.json(memberData, { status: 200 });
   } catch (error) {

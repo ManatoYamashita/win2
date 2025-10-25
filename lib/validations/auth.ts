@@ -79,3 +79,40 @@ export const loginSchema = z.object({
  * ログインフォームの型定義
  */
 export type LoginInput = z.infer<typeof loginSchema>;
+
+/**
+ * パスワードリセット要求フォームのバリデーションスキーマ（Phase 2）
+ */
+export const forgotPasswordSchema = z.object({
+  email: z
+    .string()
+    .min(1, { message: "メールアドレスを入力してください" })
+    .email({ message: "有効なメールアドレスを入力してください" }),
+});
+
+/**
+ * パスワードリセット要求フォームの型定義
+ */
+export type ForgotPasswordInput = z.infer<typeof forgotPasswordSchema>;
+
+/**
+ * パスワードリセットフォームのバリデーションスキーマ（Phase 2）
+ */
+export const resetPasswordSchema = z.object({
+  token: z.string().min(1, { message: "トークンが必要です" }),
+  password: z
+    .string()
+    .min(8, { message: "パスワードは8文字以上で入力してください" })
+    .max(100, { message: "パスワードは100文字以内で入力してください" }),
+  passwordConfirm: z
+    .string()
+    .min(1, { message: "確認用パスワードを入力してください" }),
+}).refine((data) => data.password === data.passwordConfirm, {
+  message: "パスワードが一致しません",
+  path: ["passwordConfirm"],
+});
+
+/**
+ * パスワードリセットフォームの型定義
+ */
+export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;

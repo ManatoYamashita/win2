@@ -1,4 +1,5 @@
-import type { NextAuthOptions } from "next-auth";
+import type { NextAuthOptions, Session, User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { getMemberByEmail } from "@/lib/sheets";
@@ -59,11 +60,15 @@ export const authOptions: NextAuthOptions = {
      * JWT callback
      * トークンにmemberIdを追加
      */
-    async jwt({ token, user }: { token: any; user?: any }) {
+    async jwt({ token, user }: { token: JWT; user?: User }) {
       if (user) {
         token.memberId = user.memberId;
-        token.email = user.email;
-        token.name = user.name;
+        if (user.email) {
+          token.email = user.email;
+        }
+        if (user.name) {
+          token.name = user.name;
+        }
       }
       return token;
     },
@@ -71,11 +76,17 @@ export const authOptions: NextAuthOptions = {
      * Session callback
      * セッションにmemberIdを追加
      */
-    async session({ session, token }: { session: any; token: any }) {
-      if (token && session.user) {
-        session.user.memberId = token.memberId as string;
-        session.user.email = token.email as string;
-        session.user.name = token.name as string;
+    async session({ session, token }: { session: Session; token: JWT }) {
+      if (session.user) {
+        if (token.memberId) {
+          session.user.memberId = token.memberId;
+        }
+        if (token.email) {
+          session.user.email = token.email;
+        }
+        if (token.name) {
+          session.user.name = token.name;
+        }
       }
       return session;
     },
