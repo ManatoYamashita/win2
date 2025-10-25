@@ -10,6 +10,5 @@ import { authOptions } from "@/lib/auth";
  * GET /api/auth/csrf - CSRFトークン取得
  * GET /api/auth/providers - プロバイダー一覧
  */
-const handler = NextAuth(authOptions);
-
-export { handler as GET, handler as POST };
+export const GET = NextAuth(authOptions);
+export const POST = NextAuth(authOptions);
