@@ -1,4 +1,4 @@
-import { sheets, SPREADSHEET_ID } from "./googleapis";
+import { sheets, SPREADSHEET_ID, isGoogleSheetsConfigured } from "./googleapis";
 
 /**
  * Google Sheetsシート名定義（spec.mdに基づく）
@@ -21,6 +21,7 @@ export const SHEET_NAMES = {
  * F: 郵便番号
  * G: 電話番号
  * H: 登録日時
+ * I: emailVerified (TRUE/FALSE) - Phase 2追加
  */
 export interface MemberRow {
   memberId: string;
@@ -31,6 +32,7 @@ export interface MemberRow {
   postalCode?: string;
   phone?: string;
   registeredAt: string;
+  emailVerified?: boolean;
 }
 
 /**
@@ -69,6 +71,16 @@ export interface ResultRow {
   memo?: string;
 }
 
+function getSheetsClient() {
+  if (!isGoogleSheetsConfigured || !sheets || !SPREADSHEET_ID) {
+    throw new Error(
+      "Google Sheets client is not configured. Set GOOGLE_SHEETS_CLIENT_EMAIL, GOOGLE_SHEETS_PRIVATE_KEY, and GOOGLE_SHEETS_SPREADSHEET_ID."
+    );
+  }
+
+  return { sheetsClient: sheets, spreadsheetId: SPREADSHEET_ID };
+}
+
 /**
  * シートからデータを読み取る（範囲指定）
  * @param sheetName シート名
@@ -79,10 +91,11 @@ export async function readSheet(
   range?: string
 ): Promise<string[][]> {
   try {
+    const { sheetsClient, spreadsheetId } = getSheetsClient();
     const fullRange = range ? `${sheetName}!${range}` : sheetName;
 
-    const response = await sheets.spreadsheets.values.get({
-      spreadsheetId: SPREADSHEET_ID,
+    const response = await sheetsClient.spreadsheets.values.get({
+      spreadsheetId,
       range: fullRange,
     });
 
@@ -103,8 +116,10 @@ export async function appendToSheet(
   values: (string | number | undefined)[]
 ): Promise<void> {
   try {
-    await sheets.spreadsheets.values.append({
-      spreadsheetId: SPREADSHEET_ID,
+    const { sheetsClient, spreadsheetId } = getSheetsClient();
+
+    await sheetsClient.spreadsheets.values.append({
+      spreadsheetId,
       range: sheetName,
       valueInputOption: "USER_ENTERED",
       requestBody: {
@@ -129,10 +144,11 @@ export async function updateSheet(
   values: (string | number | undefined)[][]
 ): Promise<void> {
   try {
+    const { sheetsClient, spreadsheetId } = getSheetsClient();
     const fullRange = `${sheetName}!${range}`;
 
-    await sheets.spreadsheets.values.update({
-      spreadsheetId: SPREADSHEET_ID,
+    await sheetsClient.spreadsheets.values.update({
+      spreadsheetId,
       range: fullRange,
       valueInputOption: "USER_ENTERED",
       requestBody: {
@@ -151,7 +167,7 @@ export async function updateSheet(
  */
 export async function getMemberByEmail(email: string): Promise<MemberRow | null> {
   try {
-    const rows = await readSheet(SHEET_NAMES.MEMBERS, "A2:H");
+    const rows = await readSheet(SHEET_NAMES.MEMBERS, "A2:I");
 
     const memberRow = rows.find(row => row[2] === email);
 
@@ -168,6 +184,7 @@ export async function getMemberByEmail(email: string): Promise<MemberRow | null>
       postalCode: memberRow[5],
       phone: memberRow[6],
       registeredAt: memberRow[7] || "",
+      emailVerified: memberRow[8] === "TRUE" || memberRow[8] === "true",
     };
   } catch (error) {
     console.error("Error getting member by email:", error);
@@ -181,7 +198,7 @@ export async function getMemberByEmail(email: string): Promise<MemberRow | null>
  */
 export async function getMemberById(memberId: string): Promise<MemberRow | null> {
   try {
-    const rows = await readSheet(SHEET_NAMES.MEMBERS, "A2:H");
+    const rows = await readSheet(SHEET_NAMES.MEMBERS, "A2:I");
 
     const memberRow = rows.find(row => row[0] === memberId);
 
@@ -198,6 +215,7 @@ export async function getMemberById(memberId: string): Promise<MemberRow | null>
       postalCode: memberRow[5],
       phone: memberRow[6],
       registeredAt: memberRow[7] || "",
+      emailVerified: memberRow[8] === "TRUE" || memberRow[8] === "true",
     };
   } catch (error) {
     console.error("Error getting member by ID:", error);
@@ -219,6 +237,7 @@ export async function addMember(member: MemberRow): Promise<void> {
     member.postalCode || "",
     member.phone || "",
     member.registeredAt,
+    member.emailVerified === true ? "TRUE" : "FALSE", // Phase 2: Email verification flag
   ];
 
   await appendToSheet(SHEET_NAMES.MEMBERS, values);
@@ -277,15 +296,51 @@ export async function getResultsByMemberId(memberId: string): Promise<ResultRow[
         name: row[0] || "",
         dealName: row[1] || "",
         status: row[2] || "",
-        cashbackAmount: parseFloat(row[3]) || 0,
+        cashbackAmount: parseFloat(row[3] ?? "0") || 0,
         memberId: row[4] || "",
-        originalReward: parseFloat(row[5]) || 0,
+        originalReward: parseFloat(row[5] ?? "0") || 0,
         memo: row[6],
       }));
 
     return results;
   } catch (error) {
     console.error("Error getting results by member ID:", error);
+    throw error;
+  }
+}
+
+/**
+ * 会員のメール認証状態を更新（Phase 2）
+ * @param memberId 会員ID
+ * @param verified 認証状態（true: 認証済み, false: 未認証）
+ */
+export async function updateMemberEmailVerified(
+  memberId: string,
+  verified: boolean
+): Promise<void> {
+  try {
+    const rows = await readSheet(SHEET_NAMES.MEMBERS, "A2:I");
+
+    // memberIdで行を検索
+    const rowIndex = rows.findIndex(row => row[0] === memberId);
+
+    if (rowIndex === -1) {
+      throw new Error(`Member not found: ${memberId}`);
+    }
+
+    // 行番号は2から開始（ヘッダー行が1行目）
+    const sheetRowNumber = rowIndex + 2;
+
+    // I列（9列目）のみを更新
+    await updateSheet(
+      SHEET_NAMES.MEMBERS,
+      `I${sheetRowNumber}:I${sheetRowNumber}`,
+      [[verified ? "TRUE" : "FALSE"]]
+    );
+
+    console.log(`Updated emailVerified for member ${memberId} to ${verified}`);
+  } catch (error) {
+    console.error("Error updating member email verified status:", error);
     throw error;
   }
 }
