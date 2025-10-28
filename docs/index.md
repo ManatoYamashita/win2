@@ -144,6 +144,19 @@ docs/
 
 このセクションは、ドキュメントの主要な更新を記録します。
 
+### 2025-10-29
+- **Markdownパース機能の完全化とスタイリング最適化**
+  - `@tailwindcss/typography` プラグインをインストール
+  - `tailwind.config.ts`: typographyプラグインを追加
+  - `components/blog/blog-content.tsx`: proseクラスをオレンジテーマに最適化
+    - 見出し（H1-H6）のスタイリング強化
+    - リスト（ul/ol）、引用（blockquote）のデザイン改善
+    - コードブロック（inline/block）のシンタックスハイライト対応
+    - テーブル、画像、リンクのレスポンシブ対応
+  - `react-markdown`, `remark-gfm`, `rehype-raw`: 再インストール（devブランチに追加）
+  - `lib/sheets.ts`: TypeScript型エラー修正（parseFloat型安全性向上）
+  - **ステータス**: Markdown表示機能完全対応、スタイリング最適化完了
+
 ### 2025-01-25
 - **Phase 1 実装状況を反映**
   - `specs/spec.md`: 技術スタックに具体的なバージョン番号を追加（Next.js 15.1.4、React 19、TailwindCSS v3.4.1 等）
