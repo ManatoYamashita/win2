@@ -17,6 +17,7 @@ docs/
 ├── email-setup.md            ← Email送信設定ガイド（Resend, 開発環境/本番環境）
 ├── resend-setup.md           ← Resend.com 詳細セットアップ手順書（DNS設定・ドメイン検証・APIキー）
 ├── microcms-setup.md         ← microCMS設定ガイド（API作成、フィールド定義、環境変数設定）
+├── seo-implementation.md     ← SEO実装ガイド（全ページのメタデータ、OGP、Twitter Card、JSON-LD）
 │
 ├── specs/                    ← プロジェクト仕様・外部連携情報
 │   ├── spec.md              ← WIN×Ⅱ プロジェクト要件定義書（システム設計・機能要件）
@@ -42,6 +43,7 @@ docs/
 | **email-setup.md** | Email送信設定ガイド | Resend設定、開発環境用セットアップ、ドメイン取得計画、トラブルシューティング |
 | **resend-setup.md** | Resend.com詳細セットアップ手順書 | アカウント作成、ドメイン追加、DNS設定（SPF/DKIM/DMARC）、ドメイン検証、APIキー取得、テスト送信、トラブルシューティング |
 | **microcms-setup.md** | microCMS設定ガイド | API作成（blogs/deals/categories）、フィールド定義、サンプルデータ、環境変数設定、トラブルシューティング |
+| **seo-implementation.md** | SEO実装ガイド | 全ページのメタデータ、OGP、Twitter Card、JSON-LD構造化データ、検証方法、今後の改善案 |
 
 #### `specs/` - 仕様・外部連携
 
@@ -167,6 +169,31 @@ docs/
 ## 更新履歴
 
 このセクションは、ドキュメントの主要な更新を記録します。
+
+### 2025-10-30
+
+#### 全ページ包括的SEO実装完了
+- **seo-implementation.md**: 新規作成（SEO実装ガイド v1.0.0）
+  - 実装範囲: 7ページ（ホーム、ログイン、会員登録、ブログ詳細、ブログ一覧、カテゴリ、ルートレイアウト）
+  - **Phase 1**: 主要ページ（ホーム、ログイン、会員登録）のメタデータ・JSON-LD実装
+    - app/page.tsx: サーバーコンポーネント化（useScrollReveal削除）、Organization・WebSiteスキーマ
+    - app/login/layout.tsx: クライアントコンポーネント用layout作成、WebPageスキーマ
+    - app/register/layout.tsx: クライアントコンポーネント用layout作成、WebPageスキーマ
+  - **Phase 2**: ブログ関連ページのSEO拡張
+    - app/blog/[id]/page.tsx: Articleスキーマ追加（動的メタデータ生成）
+    - app/blog/page.tsx: Twitter Card + CollectionPageスキーマ追加
+    - app/category/[id]/page.tsx: OpenGraph完全実装 + Twitter Card + CollectionPageスキーマ
+  - **Phase 3**: ルートレイアウトSEO拡張
+    - app/layout.tsx: title.template設定、包括的なOGP・Twitter Card・robots設定
+  - **技術仕様**:
+    - Next.js 15 Metadata API使用
+    - 全ページで `/ogp.jpg` (1200x630px) 使用
+    - JSON-LD: Organization, WebSite, WebPage, Article, CollectionPageスキーマ
+    - robots設定: index/follow + googleBot詳細設定
+    - canonical URL設定
+  - **検証方法**: Lighthouse SEO監査、OGP検証ツール、JSON-LD検証、Rich Results Test
+  - **今後の改善案**: BreadcrumbList・FAQ・HowToスキーマ、サイトマップ生成、RSSフィード、i18n対応
+  - **ステータス**: 全ページSEO実装完了、検証待ち
 
 ### 2025-10-29
 

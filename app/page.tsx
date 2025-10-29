@@ -1,8 +1,62 @@
-'use client';
-
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { useScrollReveal } from "@/hooks/use-scroll-reveal";
+
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
+export const metadata: Metadata = {
+  title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
+  description:
+    "WIN×Ⅱは、保険・不動産・転職・エンタメなど、暮らしに役立つサービスを無料でご紹介し、キャッシュバックも受けられる会員制プラットフォームです。300件以上の厳選サービスから最適な選択をサポートします。",
+  keywords: [
+    "キャッシュバック",
+    "アフィリエイト",
+    "保険相談",
+    "不動産査定",
+    "転職支援",
+    "サブスクリプション",
+    "お得",
+    "WIN×Ⅱ",
+  ],
+  openGraph: {
+    title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
+    description:
+      "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。成果に応じたキャッシュバック付きの会員制プラットフォーム。",
+    images: [
+      {
+        url: `${appUrl}/ogp.jpg`,
+        width: 1200,
+        height: 630,
+        alt: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
+      },
+    ],
+    type: "website",
+    url: appUrl,
+    siteName: "WIN×Ⅱ",
+    locale: "ja_JP",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
+    description:
+      "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。成果に応じたキャッシュバック付き。",
+    images: [`${appUrl}/ogp.jpg`],
+  },
+  alternates: {
+    canonical: appUrl,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+};
 
 type ServiceFeature = {
   title: string;
@@ -125,32 +179,71 @@ const faqList: Faq[] = [
 ];
 
 export default function Home() {
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "WIN×Ⅱ",
+    url: appUrl,
+    logo: `${appUrl}/assets/win2/logo.webp`,
+    description:
+      "保険・不動産・転職・エンタメなど、暮らしに役立つサービスを無料でご紹介し、キャッシュバックも受けられる会員制プラットフォーム",
+    contactPoint: {
+      "@type": "ContactPoint",
+      contactType: "Customer Service",
+      availableLanguage: ["Japanese"],
+    },
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "WIN×Ⅱ",
+    url: appUrl,
+    description:
+      "キャッシュバック付きアフィリエイトブログプラットフォーム",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${appUrl}/blog?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
-    <main className="bg-[#f8f5f2] text-slate-900">
-      <HeroSection />
-      <ProblemSection />
-      <ServiceIntroSection />
-      <MeritSection />
-      <HighlightSection />
-      <AchievementSection />
-      <FreeSection />
-      <TestimonialsSection />
-      <FaqSection />
-      <BottomCtaSection />
-    </main>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(organizationSchema),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(websiteSchema),
+        }}
+      />
+      <main className="bg-[#f8f5f2] text-slate-900">
+        <HeroSection />
+        <ProblemSection />
+        <ServiceIntroSection />
+        <MeritSection />
+        <HighlightSection />
+        <AchievementSection />
+        <FreeSection />
+        <TestimonialsSection />
+        <FaqSection />
+        <BottomCtaSection />
+      </main>
+    </>
   );
 }
 
 function HeroSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLElement>();
-
   return (
-    <section
-      ref={ref}
-      className={`relative bg-gradient-to-b from-[#fff7f2] to-[#fdeee3] py-20 transition-transform-opacity ${
-        isVisible ? "reveal-visible" : "reveal"
-      }`}
-    >
+    <section className="relative bg-gradient-to-b from-[#fff7f2] to-[#fdeee3] py-20">
       <div className="absolute inset-0">
         <Image
           src="/assets/images/office-super-blur.webp"
@@ -174,8 +267,8 @@ function HeroSection() {
             </p>
           </div>
           <div className="flex flex-wrap gap-4">
-            <StatPill image="/assets/images/掲載ジャンル数30以上.webp" alt="掲載ジャンル数30以上" />
-            <StatPill image="/assets/images/無料掲載サービス数.webp" alt="無料掲載サービス数500以上" />
+            <StatPill image="/assets/images/掲載ジャンル数30以上.webp" alt="掲載ジャンル数30以上" />
+            <StatPill image="/assets/images/無料掲載サービス数.webp" alt="無料掲載サービス数500以上" />
             <StatPill image="/assets/images/win2-is-.webp" alt="最短5日で成果反映" />
           </div>
           <div className="flex flex-wrap items-center gap-4">
@@ -217,15 +310,8 @@ function StatPill({ image, alt }: { image: string; alt: string }) {
 }
 
 function ProblemSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLElement>();
-
   return (
-    <section
-      ref={ref}
-      className={`relative bg-white py-24 transition-transform-opacity ${
-        isVisible ? "reveal-visible" : "reveal"
-      }`}
-    >
+    <section className="relative bg-white py-24">
       <div className="absolute inset-0">
         <Image
           src="/assets/images/problem-opacity-white.webp"
@@ -257,15 +343,8 @@ function ProblemSection() {
 }
 
 function ServiceIntroSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLElement>();
-
   return (
-    <section
-      ref={ref}
-      className={`bg-[#fffaf4] py-24 transition-transform-opacity ${
-        isVisible ? "reveal-visible" : "reveal"
-      }`}
-    >
+    <section className="bg-[#fffaf4] py-24">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-12 px-4 text-center md:px-6 lg:px-8">
         <Image
           src="/assets/images/win2-is.webp"
@@ -285,7 +364,7 @@ function ServiceIntroSection() {
           ))}
         </div>
         <Image
-          src="/assets/images/ワンストップwin2.webp"
+          src="/assets/images/ワンストップwin2.webp"
           alt="ワンストップ"
           width={720}
           height={340}
@@ -297,15 +376,8 @@ function ServiceIntroSection() {
 }
 
 function MeritSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLElement>();
-
   return (
-    <section
-      ref={ref}
-      className={`bg-white py-24 transition-transform-opacity ${
-        isVisible ? "reveal-visible" : "reveal"
-      }`}
-    >
+    <section className="bg-white py-24">
       <div className="mx-auto max-w-6xl space-y-12 px-4 md:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold text-[#f48a3c] md:text-4xl">WIN×Ⅱでのメリット</h2>
@@ -335,15 +407,8 @@ function MeritSection() {
 }
 
 function HighlightSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLElement>();
-
   return (
-    <section
-      ref={ref}
-      className={`bg-[#f0f6fb] py-24 transition-transform-opacity ${
-        isVisible ? "reveal-visible" : "reveal"
-      }`}
-    >
+    <section className="bg-[#f0f6fb] py-24">
       <div className="mx-auto max-w-6xl space-y-12 px-4 md:px-6 lg:px-8">
         <div className="text-center">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-orange-500">
@@ -386,15 +451,8 @@ function HighlightSection() {
 }
 
 function AchievementSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLElement>();
-
   return (
-    <section
-      ref={ref}
-      className={`bg-[#fffaf4] py-24 transition-transform-opacity ${
-        isVisible ? "reveal-visible" : "reveal"
-      }`}
-    >
+    <section className="bg-[#fffaf4] py-24">
       <div className="mx-auto max-w-5xl space-y-12 px-4 text-center md:px-6 lg:px-8">
         <h2 className="text-3xl font-bold text-[#f48a3c] md:text-4xl">実績・掲載数</h2>
         <div className="grid gap-8 md:grid-cols-2">
@@ -419,15 +477,8 @@ function AchievementSection() {
 }
 
 function FreeSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLElement>();
-
   return (
-    <section
-      ref={ref}
-      className={`bg-gradient-to-b from-[#f9f9f9] via-white to-[#f9f9f9] py-16 transition-transform-opacity ${
-        isVisible ? "reveal-visible" : "reveal"
-      }`}
-    >
+    <section className="bg-gradient-to-b from-[#f9f9f9] via-white to-[#f9f9f9] py-16">
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 text-center md:px-6">
         <h2 className="text-2xl font-bold text-[#f05972] md:text-3xl">ご利用料金はすべて無料！</h2>
         <p className="text-sm leading-relaxed text-slate-600 md:text-base">
@@ -439,15 +490,8 @@ function FreeSection() {
 }
 
 function TestimonialsSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLElement>();
-
   return (
-    <section
-      ref={ref}
-      className={`bg-white py-24 transition-transform-opacity ${
-        isVisible ? "reveal-visible" : "reveal"
-      }`}
-    >
+    <section className="bg-white py-24">
       <div className="mx-auto max-w-5xl space-y-10 px-4 md:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold md:text-4xl">ご利用者様の声</h2>
@@ -481,15 +525,8 @@ function TestimonialsSection() {
 }
 
 function FaqSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLElement>();
-
   return (
-    <section
-      ref={ref}
-      className={`bg-[#fff7f0] py-24 transition-transform-opacity ${
-        isVisible ? "reveal-visible" : "reveal"
-      }`}
-    >
+    <section className="bg-[#fff7f0] py-24">
       <div className="mx-auto max-w-5xl space-y-10 px-4 md:px-6 lg:px-8">
         <div className="text-center">
           <h2 className="text-3xl font-bold md:text-4xl">よくあるご質問</h2>
@@ -526,15 +563,8 @@ function FaqSection() {
 }
 
 function BottomCtaSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLElement>();
-
   return (
-    <section
-      ref={ref}
-      className={`bg-gradient-to-r from-[#f05972] to-[#f48a3c] py-16 transition-transform-opacity ${
-        isVisible ? "reveal-visible" : "reveal"
-      }`}
-    >
+    <section className="bg-gradient-to-r from-[#f05972] to-[#f48a3c] py-16">
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 text-center text-white md:px-6">
         <h2 className="text-3xl font-bold md:text-4xl">いますぐ WIN×Ⅱ をはじめましょう</h2>
         <p className="text-sm leading-relaxed text-white/90 md:text-base">
