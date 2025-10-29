@@ -134,6 +134,9 @@ export async function readSheet(
  * シートに行を追加（末尾に追記）
  * @param sheetName シート名
  * @param values 追加する値の配列
+ *
+ * 注意: A列から確実に記録するため、range を明示的に指定
+ * 会員リストの場合: A列（memberId）からI列（emailVerified）までの9列
  */
 export async function appendToSheet(
   sheetName: string,
@@ -142,9 +145,14 @@ export async function appendToSheet(
   try {
     const { sheetsClient, spreadsheetId } = getSheetsClient();
 
+    // A列から始まる範囲を明示的に指定
+    // 値の長さに基づいて終了列を決定（最大26列までサポート）
+    const endColumn = String.fromCharCode(64 + Math.min(values.length, 26)); // A=65, Z=90
+    const explicitRange = `${sheetName}!A:${endColumn}`;
+
     await sheetsClient.spreadsheets.values.append({
       spreadsheetId,
-      range: sheetName,
+      range: explicitRange,
       valueInputOption: "USER_ENTERED",
       requestBody: {
         values: [values.map(v => v ?? "")],

@@ -51,12 +51,6 @@ export function Header() {
             >
               ブログ
             </Link>
-            <Link
-              href="/deals"
-              className="text-gray-700 hover:text-orange-600 font-medium transition-colors"
-            >
-              案件一覧
-            </Link>
             {session && (
               <Link
                 href="/mypage"
@@ -149,13 +143,6 @@ export function Header() {
                 className="text-gray-700 hover:text-orange-600 font-medium transition-colors px-2"
               >
                 ブログ
-              </Link>
-              <Link
-                href="/deals"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-700 hover:text-orange-600 font-medium transition-colors px-2"
-              >
-                案件一覧
               </Link>
               {session && (
                 <Link
