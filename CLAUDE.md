@@ -188,7 +188,7 @@ POST /api/track-click         - Log click + generate tracking URL with id1
 ### Essential Commands
 
 ```bash
-# Development server (http://localhost:3000)
+# Development server with Turbopack (http://localhost:3000)
 npm run dev
 
 # Production build
@@ -203,6 +203,8 @@ npm run lint
 # Type checking (TypeScript)
 npx tsc --noEmit
 ```
+
+**Note**: `npm run dev` uses Turbopack (`--turbo` flag) by default for faster HMR and build times.
 
 ### Common Development Workflows
 
@@ -330,17 +332,21 @@ The existing GAS script:
    - **BlogContent component v2.0.0** (Markdown/HTML auto-detection, state-driven rendering)
 2. ✅ Blog pages
    - Blog listing page (/blog) with pagination
-   - Blog detail page (/blog/[slug]) with SEO/OGP
-   - Category page (/category/[slug]) with filtering
+   - Blog detail page (/blog/[id]) with SEO/OGP
+   - Category page (/category/[id]) with filtering
    - Homepage update with hero section and recent blogs
 3. ✅ microCMS integration
    - Complete API setup (blogs, deals, categories)
    - Type definitions and SDK helpers
    - Documentation (docs/microcms-setup.md)
-4. ✅ SEO optimization
-   - Dynamic metadata generation
-   - Open Graph Protocol support
-   - Twitter Card support
+4. ✅ SEO optimization (2025-10-30)
+   - **Comprehensive metadata**: All pages now have complete metadata, OGP, Twitter Card, JSON-LD structured data
+   - **Homepage**: Server Component with Organization + WebSite schema (removed useScrollReveal hooks)
+   - **Auth pages**: Separate layout.tsx files for client components (login, register) with WebPage schema
+   - **Blog detail**: Article schema with dynamic metadata generation
+   - **Blog list & Category**: CollectionPage schema with Twitter Card
+   - **Root layout**: title.template, comprehensive OGP/Twitter Card/robots settings
+   - **Documentation**: Complete SEO implementation guide (docs/seo-implementation.md)
 5. ✅ CTA Shortcode Feature (Blog内CTAボタン)
    - **BlogContent component**: `[CTA:dealId]` shortcode detection and conversion to interactive buttons
    - **Markdown support**: react-markdown integration with remark-gfm and rehype-raw plugins
@@ -438,6 +444,7 @@ This project follows a strict documentation hierarchy:
 - `docs/specs/google.md`: Google Sheets structure and GAS code
 - `docs/microcms-setup.md`: microCMS API configuration guide
 - `docs/email-setup.md`: Resend email integration setup
+- `docs/seo-implementation.md`: SEO implementation guide (metadata, OGP, Twitter Card, JSON-LD)
 - `docs/guides/cta-shortcode-guide.md`: CTA shortcode usage (client-facing)
 - `docs/guides/cta-technical-guide.md`: CTA implementation details (developer-facing)
 

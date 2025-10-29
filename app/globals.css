@@ -68,3 +68,28 @@
     font-family: Arial, Helvetica, sans-serif;
   }
 }
+
+@layer utilities {
+  .reveal {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+
+  .reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .transition-transform-opacity {
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    will-change: opacity, transform;
+  }
+
+  .transition-delay-200 {
+    transition-delay: 0.2s;
+  }
+
+  .transition-delay-400 {
+    transition-delay: 0.4s;
+  }
+}

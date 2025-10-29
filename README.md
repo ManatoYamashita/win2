@@ -17,7 +17,7 @@ WIN×Ⅱ は、ASP（アフィリエイトサービスプロバイダー）の�
 ### 実装状況
 
 ✅ **Phase 1: 基盤構築 完了（100%）**:
-- Next.js 15.1.4 プロジェクト初期化（App Router、TypeScript 5 strict mode）
+- Next.js 15.5.6 プロジェクト初期化（App Router、TypeScript 5 strict mode、Turbopack）
 - TailwindCSS v3.4.1 + shadcn/ui セットアップ（Button、Input、Card、Label、Form、Toast）
 - microCMS SDK 統合（Blog、Deal、Category 型定義完了）
 - Google Sheets API 認証・ユーティリティ関数実装
@@ -36,14 +36,20 @@ WIN×Ⅱ は、ASP（アフィリエイトサービスプロバイダー）の�
 - パスワードリセット機能（forgot-password, reset-password）
 - ⏭️ Phase 2-2, 2-3: Admin Dashboard等はスキップ（優先度低）
 
-✅ **Phase 3: ブログ機能 完了（100%）**:
+✅ **Phase 3: ブログ機能・SEO最適化 完了（100%）**:
 - BlogCard、DealCTAButton、Pagination コンポーネント
 - ブログ一覧ページ（`/blog`、ページネーション対応）
-- ブログ詳細ページ（`/blog/[slug]`、SEO/OGP対応）
-- カテゴリページ（`/category/[slug]`、フィルタリング）
+- ブログ詳細ページ（`/blog/[id]`、完全SEO/OGP対応）
+- カテゴリページ（`/category/[id]`、フィルタリング）
 - トップページ更新（ヒーローセクション + 最新記事表示）
 - microCMS完全統合（blogs, deals, categories API）
 - リッチテキストコンテンツ表示、関連案件CTA表示
+- **包括的SEO実装（2025-10-30）**:
+  - 全ページにメタデータ、OGP、Twitter Card、JSON-LD構造化データ
+  - Homepage: Organization + WebSiteスキーマ（サーバーコンポーネント化）
+  - 認証ページ: WebPageスキーマ（layout.tsx）
+  - ブログ詳細: Articleスキーマ
+  - ブログ一覧/カテゴリ: CollectionPageスキーマ
 
 ⏳ **Phase 4 未着手**:
 - 案件一覧ページ（会員限定、フィルタリング）
@@ -128,6 +134,8 @@ npm run dev
 ```
 
 ブラウザで [http://localhost:3000](http://localhost:3000) を開く。
+
+**Note**: デフォルトでTurbopackが有効（`--turbo`フラグ）。高速なHMRと開発体験を提供。
 
 ### ビルド・本番起動
 
@@ -311,6 +319,7 @@ PREFIX: コミットメッセージ
 - **[docs/specs/spec.md](docs/specs/spec.md)**: プロジェクト要件定義書（必読）
 - **[docs/email-setup.md](docs/email-setup.md)**: Email送信設定ガイド（Resend）
 - **[docs/microcms-setup.md](docs/microcms-setup.md)**: microCMS設定ガイド（API作成・フィールド定義）
+- **[docs/seo-implementation.md](docs/seo-implementation.md)**: SEO実装ガイド（メタデータ、OGP、Twitter Card、JSON-LD）
 - **[docs/dev/architecture.md](docs/dev/architecture.md)**: アーキテクチャ詳細
 - **[docs/dev/branch.md](docs/dev/branch.md)**: Git ブランチ戦略
 - **[CLAUDE.md](CLAUDE.md)**: Claude Code 向けプロジェクトガイド
@@ -340,15 +349,23 @@ PREFIX: コミットメッセージ
 - [ ] Phase 2-2: Admin Dashboard（スキップ - 優先度低）
 - [ ] Phase 2-3: Advanced features（スキップ - 優先度低）
 
-### Phase 3: CMS連携・ブログ機能（✅ 100% 完了）
+### Phase 3: CMS連携・ブログ機能・SEO最適化（✅ 100% 完了）
 - [x] ブログ記事一覧ページ（/blog、ページネーション）
-- [x] ブログ詳細ページ（/blog/[slug]、SSR）
-- [x] カテゴリページ（/category/[slug]、フィルタリング）
+- [x] ブログ詳細ページ（/blog/[id]、SSR）
+- [x] カテゴリページ（/category/[id]、フィルタリング）
 - [x] BlogCard、DealCTAButton、Pagination コンポーネント
 - [x] トップページ更新（ヒーローセクション + 最新記事）
-- [x] OGP動的生成（generateMetadata）
 - [x] microCMS完全統合（API設定ガイド作成）
 - [x] リッチテキストコンテンツ表示
+- [x] **包括的SEO実装（2025-10-30）**:
+  - [x] 全ページにメタデータ、OGP、Twitter Card、JSON-LD構造化データ
+  - [x] Next.js 15 Metadata API使用
+  - [x] Homepage: Organization + WebSiteスキーマ（サーバーコンポーネント化）
+  - [x] 認証ページ: layout.tsxでWebPageスキーマ
+  - [x] ブログ詳細: Articleスキーマ
+  - [x] ブログ一覧/カテゴリ: CollectionPageスキーマ
+  - [x] ルートレイアウト: title.template、包括的robots設定
+  - [x] SEO実装ドキュメント作成（docs/seo-implementation.md）
 
 ### Phase 4: 機能拡張（未着手）
 - [ ] 案件一覧ページ（会員限定、フィルタリング）

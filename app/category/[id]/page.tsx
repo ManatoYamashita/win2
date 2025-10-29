@@ -16,6 +16,8 @@ interface CategoryPageProps {
 
 const BLOGS_PER_PAGE = 10;
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 /**
  * generateMetadata: SEO/OGP対応
  */
@@ -37,6 +39,17 @@ export async function generateMetadata({
     openGraph: {
       title: `${category.name} | WIN×Ⅱ`,
       description: category.description || `${category.name}に関する記事一覧です。`,
+      images: [`${appUrl}/ogp.jpg`],
+      type: "website",
+      url: `${appUrl}/category/${id}`,
+      siteName: "WIN×Ⅱ",
+      locale: "ja_JP",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${category.name} | WIN×Ⅱ`,
+      description: category.description || `${category.name}に関する記事一覧です。`,
+      images: [`${appUrl}/ogp.jpg`],
     },
   };
 }
@@ -74,8 +87,27 @@ export default async function CategoryPage({
 
   const totalPages = Math.ceil(totalCount / BLOGS_PER_PAGE);
 
+  const collectionPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: category.name,
+    description: category.description || `${category.name}に関する記事一覧です。`,
+    url: `${appUrl}/category/${id}`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "WIN×Ⅱ",
+      url: appUrl,
+    },
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(collectionPageSchema),
+        }}
+      />
       {/* カテゴリナビゲーションバー */}
       <CategoryNav categories={allCategories} currentCategoryId={category.id} />
 

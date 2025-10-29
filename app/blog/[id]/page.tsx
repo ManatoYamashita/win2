@@ -63,8 +63,40 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     notFound();
   }
 
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  const excerpt = extractExcerpt(blog.content, 120);
+
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: blog.title,
+    image: blog.thumbnail?.url || `${appUrl}/ogp.jpg`,
+    datePublished: blog.publishedAt || blog.createdAt,
+    dateModified: blog.updatedAt || blog.publishedAt || blog.createdAt,
+    author: {
+      "@type": "Organization",
+      name: "WIN×Ⅱ",
+      url: appUrl,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "WIN×Ⅱ",
+      logo: {
+        "@type": "ImageObject",
+        url: `${appUrl}/assets/win2/logo.webp`,
+      },
+    },
+    description: excerpt,
+  };
+
   return (
     <article className="container max-w-4xl mx-auto px-4 py-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(articleSchema),
+        }}
+      />
       {/* サムネイル画像 */}
       {blog.thumbnail && (
         <div className="relative w-full h-[400px] mb-8 rounded-lg overflow-hidden">

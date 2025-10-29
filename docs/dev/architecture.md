@@ -4,7 +4,7 @@
 
 本ドキュメントでは、WIN×Ⅱ プロジェクトの実装されたアーキテクチャの詳細を記載します。ディレクトリ構成、設定ファイル、主要な技術的決定を含みます。
 
-**最終更新日**: 2025-10-25
+**最終更新日**: 2025-02-14
 **Phase 1 実装状況**: 100% 完了
 **Phase 2 実装状況**: 100% 完了
 
@@ -75,7 +75,7 @@ win2/
 │       ├── branch.md           # Git ブランチ戦略
 │       └── architecture.md     # 本ファイル
 │
-├── public/                     # 静的ファイル
+├── public/                     # 静的ファイル（ブランドアセット: /assets/win2/logo.webp など）
 │
 ├── .env.local                  # 環境変数（秘匿、Git管理外）
 ├── .env.example                # 環境変数テンプレート
@@ -85,7 +85,7 @@ win2/
 ├── tailwind.config.ts          # TailwindCSS 設定
 ├── components.json             # shadcn/ui 設定
 ├── next.config.ts              # Next.js 設定
-├── package.json                # 依存関係・スクリプト
+├── package.json                # 依存関係・スクリプト（Turbopack デフォルト起動）
 │
 ├── CLAUDE.md                   # Claude Code 向けプロジェクトガイド
 └── README.md                   # プロジェクト README
@@ -96,7 +96,7 @@ win2/
 ## 技術スタック（実装済み）
 
 ### フロントエンド
-- **Next.js**: 15.1.4（App Router）
+- **Next.js**: 15.5.6（App Router / Turbopack をデフォルト利用）
 - **React**: 19
 - **TypeScript**: 5（strict mode、noUncheckedIndexedAccess有効）
 - **TailwindCSS**: v3.4.1（v4は将来対応予定）
@@ -107,11 +107,24 @@ win2/
 - **Google Sheets API**: googleapis v164.1.0
 - **microCMS SDK**: v3.2.0（Headless CMS）
 - **bcryptjs**: v3.0.2（パスワードハッシュ化、salt rounds: 10）
-- **Next-Auth**: v4.24.11（安定版、実装完了）
+- **Next-Auth**: v4.24.11（Credentials Provider）
 
 ### バリデーション・ユーティリティ
 - **zod**: v4.1.12（スキーマバリデーション）
 - **class-variance-authority**: v0.7.1（コンポーネントバリアント管理）
+- **tailwind-merge**: v3.3.1（Tailwind クラス結合ユーティリティ）
+
+### UI インタラクション
+- **ページトランジション**: `components/layout/page-transition.tsx` がルート遷移時のフェード演出を制御
+- **スクロールリビール**: `hooks/use-scroll-reveal.ts` と `app/globals.css` のアニメーションユーティリティでセクションのフェードインを実装
+
+---
+
+## 環境要件
+
+- 推奨 Node.js バージョン: v22.21.1（nvm 利用推奨）
+- npm v10.9.4
+- 詳細なセットアップ手順・チェックリストは `docs/dev/environment.md` を参照
 
 ---
 

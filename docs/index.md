@@ -15,7 +15,9 @@
 docs/
 ├── index.md                  ← 本ファイル（ドキュメント索引・運用ルール）
 ├── email-setup.md            ← Email送信設定ガイド（Resend, 開発環境/本番環境）
+├── resend-setup.md           ← Resend.com 詳細セットアップ手順書（DNS設定・ドメイン検証・APIキー）
 ├── microcms-setup.md         ← microCMS設定ガイド（API作成、フィールド定義、環境変数設定）
+├── seo-implementation.md     ← SEO実装ガイド（全ページのメタデータ、OGP、Twitter Card、JSON-LD）
 │
 ├── specs/                    ← プロジェクト仕様・外部連携情報
 │   ├── spec.md              ← WIN×Ⅱ プロジェクト要件定義書（システム設計・機能要件）
@@ -28,6 +30,7 @@ docs/
 │
 └── dev/                      ← 開発ワークフロー・規約
     ├── architecture.md      ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
+    ├── environment.md       ← 開発環境セットアップ（Node.js / nvm / Turbopack / 環境変数）
     └── branch.md            ← Git ブランチ戦略・CI/CD・コミット規約
 ```
 
@@ -38,7 +41,9 @@ docs/
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
 | **email-setup.md** | Email送信設定ガイド | Resend設定、開発環境用セットアップ、ドメイン取得計画、トラブルシューティング |
+| **resend-setup.md** | Resend.com詳細セットアップ手順書 | アカウント作成、ドメイン追加、DNS設定（SPF/DKIM/DMARC）、ドメイン検証、APIキー取得、テスト送信、トラブルシューティング |
 | **microcms-setup.md** | microCMS設定ガイド | API作成（blogs/deals/categories）、フィールド定義、サンプルデータ、環境変数設定、トラブルシューティング |
+| **seo-implementation.md** | SEO実装ガイド | 全ページのメタデータ、OGP、Twitter Card、JSON-LD構造化データ、検証方法、今後の改善案 |
 
 #### `specs/` - 仕様・外部連携
 
@@ -60,6 +65,7 @@ docs/
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
 | **architecture.md** | アーキテクチャ詳細 | ディレクトリ構成、TypeScript/TailwindCSS設定、実装済み機能、データフロー |
+| **environment.md** | 開発環境セットアップ | Node.js 22（nvm）、Turbopackデフォルト設定、必須コマンド、環境変数、チェックリスト |
 | **branch.md** | ブランチ戦略 | 2ブランチ管理（dev/main）、PR規約、コミットメッセージ形式、CI/CD |
 
 ### 今後追加が想定されるドキュメントカテゴリ
@@ -164,7 +170,49 @@ docs/
 
 このセクションは、ドキュメントの主要な更新を記録します。
 
+### 2025-10-30
+
+#### 全ページ包括的SEO実装完了
+- **seo-implementation.md**: 新規作成（SEO実装ガイド v1.0.0）
+  - 実装範囲: 7ページ（ホーム、ログイン、会員登録、ブログ詳細、ブログ一覧、カテゴリ、ルートレイアウト）
+  - **Phase 1**: 主要ページ（ホーム、ログイン、会員登録）のメタデータ・JSON-LD実装
+    - app/page.tsx: サーバーコンポーネント化（useScrollReveal削除）、Organization・WebSiteスキーマ
+    - app/login/layout.tsx: クライアントコンポーネント用layout作成、WebPageスキーマ
+    - app/register/layout.tsx: クライアントコンポーネント用layout作成、WebPageスキーマ
+  - **Phase 2**: ブログ関連ページのSEO拡張
+    - app/blog/[id]/page.tsx: Articleスキーマ追加（動的メタデータ生成）
+    - app/blog/page.tsx: Twitter Card + CollectionPageスキーマ追加
+    - app/category/[id]/page.tsx: OpenGraph完全実装 + Twitter Card + CollectionPageスキーマ
+  - **Phase 3**: ルートレイアウトSEO拡張
+    - app/layout.tsx: title.template設定、包括的なOGP・Twitter Card・robots設定
+  - **技術仕様**:
+    - Next.js 15 Metadata API使用
+    - 全ページで `/ogp.jpg` (1200x630px) 使用
+    - JSON-LD: Organization, WebSite, WebPage, Article, CollectionPageスキーマ
+    - robots設定: index/follow + googleBot詳細設定
+    - canonical URL設定
+  - **検証方法**: Lighthouse SEO監査、OGP検証ツール、JSON-LD検証、Rich Results Test
+  - **今後の改善案**: BreadcrumbList・FAQ・HowToスキーマ、サイトマップ生成、RSSフィード、i18n対応
+  - **ステータス**: 全ページSEO実装完了、検証待ち
+
 ### 2025-10-29
+
+#### Resend.com 詳細セットアップ手順書作成
+- **resend-setup.md**: 新規作成（Resend.com 完全セットアップガイド v1.0.0）
+  - アカウント作成手順（サインアップ、ダッシュボード確認）
+  - ドメイン追加（Region選択、ルートドメイン vs サブドメイン）
+  - **DNS設定詳細**（最重点）:
+    - SPF レコード（TXT）の設定方法と例（お名前.com、Cloudflare）
+    - DKIM レコード（TXT）の設定方法と例
+    - Return-Path レコード（CNAME）の設定方法と例
+    - DMARC レコード（TXT）のオプション設定
+    - DNS反映確認方法（dig コマンド、オンラインツール）
+  - ドメイン検証手順（緑チェックマーク確認）
+  - APIキー取得と環境変数設定
+  - テスト送信（会員登録、パスワードリセット）
+  - トラブルシューティング（5つの問題パターンと対策）
+  - チェックリスト、所要時間、参考リンク
+  - **ステータス**: 本番環境用DNS設定ガイド完成
 
 #### ブログ機能の完全統合とorigin/devブランチマージ（Phase 3完了）
 - **feature/blog-markdown-styling と origin/dev のマージ**

@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 /**
@@ -18,6 +19,42 @@ import { Button } from "@/components/ui/button";
 export function Header() {
   const { data: session, status } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const navigation = useMemo(() => {
+    const items = [
+      { href: "/", label: "トップページ", isActive: pathname === "/" },
+      {
+        href: "/blog",
+        label: "ブログ",
+        isActive: pathname.startsWith("/blog") || pathname.startsWith("/category"),
+      },
+    ];
+
+    items.push(
+      session
+        ? {
+            href: "/mypage",
+            label: "プロフィール",
+            isActive: pathname.startsWith("/mypage"),
+          }
+        : {
+            href: "/login",
+            label: "ログイン",
+            isActive: pathname === "/login",
+          }
+    );
+
+    return items;
+  }, [pathname, session]);
+
+  const getLinkClasses = (isActive: boolean) =>
+    [
+      "font-medium transition-colors inline-flex items-center",
+      isActive
+        ? "text-orange-600 border-b-2 border-orange-500 pb-1"
+        : "text-gray-700 hover:text-orange-600",
+    ].join(" ");
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -45,26 +82,11 @@ export function Header() {
 
           {/* デスクトップナビゲーション */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link
-              href="/"
-              className="text-gray-700 hover:text-orange-600 font-medium transition-colors"
-            >
-              トップページ
-            </Link>
-            <Link
-              href="/blog"
-              className="text-gray-700 hover:text-orange-600 font-medium transition-colors"
-            >
-              ブログ
-            </Link>
-            {session && (
-              <Link
-                href="/mypage"
-                className="text-gray-700 hover:text-orange-600 font-medium transition-colors"
-              >
-                プロフィール
+            {navigation.map((item) => (
+              <Link key={item.href} href={item.href} className={getLinkClasses(item.isActive)}>
+                {item.label}
               </Link>
-            )}
+            ))}
           </nav>
 
           {/* ログインボタン / ログアウトボタン */}
@@ -136,29 +158,16 @@ export function Header() {
         {isMobileMenuOpen && (
           <div className="md:hidden py-4 border-t">
             <nav className="flex flex-col space-y-4">
-              <Link
-                href="/"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-700 hover:text-orange-600 font-medium transition-colors px-2"
-              >
-                トップページ
-              </Link>
-              <Link
-                href="/blog"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="text-gray-700 hover:text-orange-600 font-medium transition-colors px-2"
-              >
-                ブログ
-              </Link>
-              {session && (
+              {navigation.map((item) => (
                 <Link
-                  href="/mypage"
+                  key={item.href}
+                  href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="text-gray-700 hover:text-orange-600 font-medium transition-colors px-2"
+                  className={`${getLinkClasses(item.isActive)} px-2`}
                 >
-                  プロフィール
+                  {item.label}
                 </Link>
-              )}
+              ))}
 
               {/* モバイルログインボタン */}
               <div className="pt-4 border-t">

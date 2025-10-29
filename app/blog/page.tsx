@@ -4,12 +4,25 @@ import { BlogCard } from "@/components/blog/blog-card";
 import { Pagination } from "@/components/ui/pagination";
 import { CategoryNav } from "@/components/blog/category-nav";
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export const metadata: Metadata = {
   title: "ブログ一覧 | WIN×Ⅱ",
   description: "会員制アフィリエイトブログWIN×Ⅱのブログ記事一覧ページです。お得な案件情報や攻略法を発信しています。",
   openGraph: {
     title: "ブログ一覧 | WIN×Ⅱ",
     description: "会員制アフィリエイトブログWIN×Ⅱのブログ記事一覧ページです。お得な案件情報や攻略法を発信しています。",
+    images: [`${appUrl}/ogp.jpg`],
+    type: "website",
+    url: `${appUrl}/blog`,
+    siteName: "WIN×Ⅱ",
+    locale: "ja_JP",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ブログ一覧 | WIN×Ⅱ",
+    description: "会員制アフィリエイトブログWIN×Ⅱのブログ記事一覧ページです。お得な案件情報や攻略法を発信しています。",
+    images: [`${appUrl}/ogp.jpg`],
   },
 };
 
@@ -42,8 +55,27 @@ export default async function BlogListPage({ searchParams }: BlogListPageProps) 
 
   const totalPages = Math.ceil(totalCount / BLOGS_PER_PAGE);
 
+  const collectionPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "ブログ一覧",
+    description: "会員制アフィリエイトブログWIN×Ⅱのブログ記事一覧ページ",
+    url: `${appUrl}/blog`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "WIN×Ⅱ",
+      url: appUrl,
+    },
+  };
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(collectionPageSchema),
+        }}
+      />
       {/* カテゴリナビゲーションバー */}
       <CategoryNav categories={categories} />
 
