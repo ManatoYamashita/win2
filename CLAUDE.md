@@ -295,9 +295,9 @@ The existing GAS script:
 
 **Do not modify GAS** unless explicitly requested.
 
-## Phase 1 Implementation Status
+## Implementation Status
 
-### ✅ Completed (85%)
+### Phase 1: 基盤構築 ✅ Completed (100%)
 1. ✅ Environment setup (Next.js 15, TailwindCSS v3, TypeScript)
 2. ✅ shadcn/ui initialization (Button, Input, Card, Label components)
 3. ✅ microCMS SDK setup with complete type definitions (Blog, Deal, Category)
@@ -306,13 +306,48 @@ The existing GAS script:
 6. ✅ Environment variables configuration (.env.local, .env.example)
 7. ✅ Next-Auth v4.24.11 setup with CredentialsProvider (v5互換性問題によりダウングレード)
 8. ✅ Member registration API implementation (/api/register)
+9. ✅ Login functionality and session management
+10. ✅ /api/track-click implementation with proper id1 tracking
+11. ✅ Member dashboard with conversion history (/mypage, /mypage/history)
 
-### ⏳ Pending
-9. ⏳ Login functionality and session management
-10. ⏳ Blog listing and detail pages
-11. ⏳ **Critical**: /api/track-click implementation with proper id1 tracking
-12. ⏳ Member dashboard with conversion history (/mypage, /mypage/history)
-13. ⏳ Deal listing page (member-only)
+### Phase 2: 認証・会員機能 ✅ Completed (Phase 2-1 only)
+1. ✅ Email verification system (Resend integration)
+   - Verification token generation with JWT
+   - Email templates and sending
+   - Token validation and email update in Google Sheets
+2. ✅ Password reset flow (forgot-password, reset-password pages)
+   - Password reset token generation
+   - Email notification
+   - Password update functionality
+3. ⏭️ Phase 2-2 Admin Dashboard - **Skipped** (not critical)
+4. ⏭️ Phase 2-3 Advanced features - **Skipped** (not critical)
+
+### Phase 3: ブログ機能 ✅ Completed (100%)
+1. ✅ Blog components
+   - BlogCard component (thumbnail, title, excerpt, category badges)
+   - DealCTAButton component (tracking + redirect)
+   - Pagination component (smart page numbering)
+   - **BlogContent component v2.0.0** (Markdown/HTML auto-detection, state-driven rendering)
+2. ✅ Blog pages
+   - Blog listing page (/blog) with pagination
+   - Blog detail page (/blog/[slug]) with SEO/OGP
+   - Category page (/category/[slug]) with filtering
+   - Homepage update with hero section and recent blogs
+3. ✅ microCMS integration
+   - Complete API setup (blogs, deals, categories)
+   - Type definitions and SDK helpers
+   - Documentation (docs/microcms-setup.md)
+4. ✅ SEO optimization
+   - Dynamic metadata generation
+   - Open Graph Protocol support
+   - Twitter Card support
+5. ✅ CTA Shortcode Feature (Blog内CTAボタン)
+   - **BlogContent component**: `[CTA:dealId]` shortcode detection and conversion to interactive buttons
+   - **Markdown support**: react-markdown integration with remark-gfm and rehype-raw plugins
+   - **Google Sheets integration**: Deal master column mapping fixes (A=affiliateUrl, B=dealId)
+   - **GAS automation**: onEdit trigger for auto-filling deal name, ASP name, and default values
+   - **Documentation**: Client guide (docs/guides/cta-shortcode-guide.md) and technical spec (docs/guides/cta-technical-guide.md)
+   - **Click tracking**: Full integration with /api/track-click (id1 + eventId parameters)
 
 ## Environment Variables Setup
 
@@ -368,14 +403,21 @@ When implementing tracking functionality:
 4. Manually verify click log appears in Google Sheets
 5. Test end-to-end with A8.net test account
 
-## Future Enhancements (Phase 2)
+## Future Enhancements
 
-- Email verification
-- Password reset
+### Phase 4 (Planned)
+- Deal listing page (member-only) with filtering
+- Advanced search functionality for blogs and deals
+- User profile page with avatar upload
+- Email notification settings
+
+### Phase 5 (Optional)
+- Admin dashboard for content management
 - Subdomain support (gambling/fortune-telling categories)
 - Agency/referral system with tiered cashback
-- Admin dashboard
-- Multiple ASP support expansion
+- Multiple ASP support expansion (AFB, もしも, バリュコマ)
+- Analytics dashboard (conversion rates, popular deals)
+- A/B testing for blog CTAs
 
 ## Documentation System
 
