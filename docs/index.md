@@ -14,11 +14,17 @@
 ```text
 docs/
 ├── index.md                  ← 本ファイル（ドキュメント索引・運用ルール）
+├── email-setup.md            ← Email送信設定ガイド（Resend, 開発環境/本番環境）
+├── microcms-setup.md         ← microCMS設定ガイド（API作成、フィールド定義、環境変数設定）
 │
 ├── specs/                    ← プロジェクト仕様・外部連携情報
 │   ├── spec.md              ← WIN×Ⅱ プロジェクト要件定義書（システム設計・機能要件）
 │   ├── google.md            ← Google Sheets (win2_master) 構成・GAS仕様
 │   └── asp.md               ← ASP認証情報（A8.net, AFB, もしも, バリュコマ）
+│
+├── guides/                   ← ユーザー/開発者向けガイド
+│   ├── cta-shortcode-guide.md    ← CTAショートコード使用ガイド（クライアント向け）
+│   └── cta-technical-guide.md    ← CTAショートコード技術仕様（開発者向け）
 │
 └── dev/                      ← 開発ワークフロー・規約
     ├── architecture.md      ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
@@ -27,6 +33,13 @@ docs/
 
 ### ドキュメント概要
 
+#### ルートレベル - 環境設定・運用
+
+| ファイル | 内容 | 主要トピック |
+|---------|------|------------|
+| **email-setup.md** | Email送信設定ガイド | Resend設定、開発環境用セットアップ、ドメイン取得計画、トラブルシューティング |
+| **microcms-setup.md** | microCMS設定ガイド | API作成（blogs/deals/categories）、フィールド定義、サンプルデータ、環境変数設定、トラブルシューティング |
+
 #### `specs/` - 仕様・外部連携
 
 | ファイル | 内容 | 主要トピック |
@@ -34,6 +47,13 @@ docs/
 | **spec.md** | プロジェクト要件定義書 | 技術スタック、データフロー、API設計、画面設計、開発フェーズ |
 | **google.md** | Google Sheets構成 | 会員リスト、クリックログ、成果データ、GASコード |
 | **asp.md** | ASP認証情報 | A8.net, AFB, もしも, バリューコマース のログイン情報 |
+
+#### `guides/` - ユーザー/開発者向けガイド
+
+| ファイル | 内容 | 主要トピック |
+|---------|------|------------|
+| **cta-shortcode-guide.md** | CTAショートコード使用ガイド | 案件登録手順（Google Sheets）、ブログ記事でのショートコード使用方法、トラッキング仕組み、FAQ、トラブルシューティング |
+| **cta-technical-guide.md** | CTAショートコード技術仕様 | システムアーキテクチャ、BlogContentコンポーネント実装、/api/track-click仕様、GAS自動化、デバッグ手法、テスト戦略、パフォーマンス・セキュリティ |
 
 #### `dev/` - 開発規約
 
@@ -143,6 +163,61 @@ docs/
 ## 更新履歴
 
 このセクションは、ドキュメントの主要な更新を記録します。
+
+### 2025-10-27
+- **Phase 3 CTA機能 実装完了**
+  - `guides/cta-shortcode-guide.md`: 新規作成（クライアント向けCTAショートコード使用ガイド v1.0.0）
+    - Google Sheetsへの案件登録手順（2フィールドのみ入力、残り5フィールドは自動入力）
+    - microCMSブログ記事内でのショートコード使用方法 `[CTA:dealId]`
+    - トラッキング仕組みの解説（会員/非会員の識別、eventID生成）
+    - FAQ とトラブルシューティング
+  - `guides/cta-technical-guide.md`: 新規作成（開発者向けCTA技術仕様 v1.0.0）
+    - システムアーキテクチャ図とデータフロー
+    - BlogContentコンポーネントの実装詳細（Markdown/HTML自動判定、State駆動レンダリング）
+    - /api/track-click の実装仕様
+    - Google Sheets API統合とGAS自動化の詳細
+    - デバッグ手法、テスト戦略、パフォーマンス最適化、セキュリティ考慮事項
+  - `specs/google.md`: カラムマッピング修正（v1.1.0）
+    - 案件マスタのカラム構造を実装に合わせて修正（A=アフィリエイトURL, B=案件ID）
+    - GASコードのonEdit監視カラムを修正（D列→A列）
+    - 全てのヘッダーを日本語に統一
+  - `lib/sheets.ts`, `types/sheets.ts`: カラムマッピング修正
+    - getDealById関数のB列検索修正
+    - カラムインデックスを正しいマッピングに修正
+  - `components/blog/blog-content.tsx`: 完全リファクタリング（v2.0.0）
+    - State駆動レンダリングに変更（dangerouslySetInnerHTML前にショートコード変換）
+    - Markdown/HTML自動判定機能追加（react-markdown, remark-gfm, rehype-raw導入）
+    - イベントハンドラーのライフサイクル管理を改善
+  - **ステータス:** CTA機能完全実装完了、動作確認待ち
+
+### 2025-10-26
+- **Phase 3 ブログ機能 実装完了**
+  - `microcms-setup.md`: 新規作成（microCMS完全セットアップガイド v1.0.0）
+    - 3つのAPI（blogs, deals, categories）の詳細なフィールド定義
+    - サンプルデータとベストプラクティス
+    - トラブルシューティングガイド
+  - 実装したコンポーネント・ページ:
+    - BlogCard, DealCTAButton, Pagination コンポーネント
+    - ブログ一覧（/blog）、詳細（/blog/[slug]）、カテゴリ（/category/[slug]）ページ
+    - トップページ更新（ヒーローセクション + 最新記事表示）
+  - SEO/OGP対応、ページネーション、レスポンシブデザイン完備
+  - **ステータス:** 実装完了、microCMSへのコンテンツ登録待ち
+
+- **Phase 2-1 Email Verification & Password Reset 開発環境テスト完了**
+  - `email-setup.md`: トラブルシューティング追加（v1.0.1）
+    - 環境変数の設定ミス（`RESEND_FROM_EMAIL` 未設定、`NEXT_PUBLIC_APP_URL` 誤設定）の解決方法を追加
+    - 開発環境でのメール送信テスト完了を確認
+  - **ステータス:** 開発環境テスト完了、本番用ドメイン取得待ち
+
+### 2025-10-25
+- **Phase 2-1 Email Verification & Password Reset 実装完了**
+  - `email-setup.md`: 新規作成（Email送信設定の完全ガイド v1.0.0）
+    - Resend開発環境セットアップ手順
+    - 将来の本番環境移行計画（ドメイン取得、DNS設定）
+    - トラブルシューティングガイド
+    - メール送信の技術仕様
+  - `index.md`: email-setup.md への参照追加、ドキュメント概要更新
+  - **重要:** 現在は開発環境用（`onboarding@resend.dev`）で稼働中、本番用ドメイン取得が必要
 
 ### 2025-01-25
 - **Phase 1 実装状況を反映**

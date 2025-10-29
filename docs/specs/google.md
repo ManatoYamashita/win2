@@ -16,6 +16,7 @@ E: 生年月日 (YYYY-MM-DD)
 F: 郵便番号
 G: 電話番号
 H: 登録日時 (ISO8601)
+I: emailVerified (ISO8601)
 ```
 
 **重要:**
@@ -23,34 +24,101 @@ H: 登録日時 (ISO8601)
 - H列「登録日時」は必須（ISO8601形式のタイムスタンプ）
 - 生年月日はYYYY-MM-DD形式で格納
 
+### 案件マスタ
+
+**列構成:**
+```
+A: アフィリエイトURL (例: "https://px.a8.net/...")
+B: 案件ID (例: "a8-creditcard-001")
+C: 案件名 (例: "楽天カード")
+D: ASP名 (例: "A8.net")
+E: 報酬額 (例: 10000)
+F: キャッシュバック率 (例: 0.20 = 20%)
+G: 有効/無効 (TRUE/FALSE)
+```
+
+**重要:**
+- B列「案件ID」は一意である必要があります（主キー）
+- A列「アフィリエイトURL」には `/api/track-click` で `?id1={trackingId}&eventId={eventId}` パラメータが自動付与されます
+- G列「有効/無効」が FALSE の案件は `/api/track-click` で取得されません
+- E列「報酬額」とF列「キャッシュバック率」は参考値です（実際の計算はGASで行われます）
+- C列「案件名」とD列「ASP名」はGASが自動入力しますが、クライアント様が編集可能です
+
+**クライアント様の入力項目:**
+1. **A列「アフィリエイトURL」** - ASPから取得したURL（必須）
+2. **B列「案件ID」** - 任意の一意なID（必須、例: `a8-rakuten-card`）
+
+**GAS自動入力項目:**
+- **C列「案件名」** - URLのページタイトルから自動取得（取得失敗時は「不明なタイトル」）
+- **D列「ASP名」** - URLパターンから自動判定（A8.net, AFB, もしも, バリューコマース）
+- **E列「報酬額」** - デフォルト値 0
+- **F列「キャッシュバック率」** - デフォルト値 0.20 (20%)
+- **G列「有効/無効」** - デフォルト値 TRUE
+
+**使用例:**
+```
+アフィリエイトURL: https://px.a8.net/svt/ejp?a8mat=XXXXX
+案件ID: a8-rakuten-card
+案件名: 楽天カード（自動取得）
+ASP名: A8.net（自動判定）
+報酬額: 0（デフォルト）
+キャッシュバック率: 0.20（デフォルト）
+有効/無効: TRUE（デフォルト）
+```
+
 ### クリックログ
 
-| 日時
- | 会員ID
- | 案件名
- |
-| --- | --- | --- |
+**列構成:**
+```
+A: 日時 (ISO8601形式)
+B: 会員ID (memberId or guest:UUID)
+C: 案件名 (dealName)
+D: 案件ID (dealId)
+E: イベントID (eventId) ← 新規追加（UUID v4）
+```
+
+**重要:**
+- E列「イベントID」は各クリック毎にユニークなUUID v4を生成
+- ASPへのトラッキングURLに `?id1={memberId}&eventId={eventId}` として付与
+- 成果CSV取込時に `eventId` で完全に紐付け可能（同じ会員の複数クリックを区別できる）
+
+| 日時 | 会員ID | 案件名 | 案件ID | イベントID |
+| --- | --- | --- | --- | --- |
 
 ### 成果データ
 
-| 氏名
- | 案件名
- | 承認状況
- | キャッシュバック金額
- | memberId(参考)
- | 原始報酬額(参考)
- | メモ
- |
-| --- | --- | --- | --- | --- | --- | --- |
+**列構成:**
+```
+A: 氏名
+B: 案件名
+C: 承認状況
+D: キャッシュバック金額
+E: memberId(参考)
+F: イベントID(参考) ← 新規追加
+G: 原始報酬額(参考)
+H: メモ
+```
 
-### 成果**CSV_RAW**
+| 氏名 | 案件名 | 承認状況 | キャッシュバック金額 | memberId(参考) | イベントID(参考) | 原始報酬額(参考) | メモ |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 
-| id
- | dealName
- | reward
- | status
- |
-| --- | --- | --- | --- |
+### 成果CSV_RAW
+
+**列構成:**
+```
+A: id1 (memberId or guest:UUID)
+B: eventId (クリック時に生成されたUUID) ← 新規追加
+C: dealName
+D: reward
+E: status
+```
+
+**重要:**
+- ASPの成果CSVに `eventId` パラメータが含まれていることが前提
+- A8.netなどの主要ASPは、URLパラメータを保持して返却します
+
+| id1 | eventId | dealName | reward | status |
+| --- | --- | --- | --- | --- |
 
 ### Google Apps Script
 
@@ -398,5 +466,164 @@ H: 登録日時 (ISO8601)
       }
       return map;
     }
-    
+
+    ```
+
+### Google Apps Script（案件マスタ用）
+
+- `deal-auto-fill.gs`
+
+    ```jsx
+    /**
+     * 案件マスタ - 自動入力補助スクリプト
+     * -------------------------------------------------------------------
+     * 機能:
+     *  - アフィリエイトURL (A列) が編集されたときに自動実行
+     *  - 案件名: URLからページタイトルを自動取得（取得失敗時は「不明なタイトル」）
+     *  - ASP名: URLから自動判定（A8.net, AFB, もしも, バリューコマース）
+     *  - 報酬額, キャッシュバック率, 有効/無効: デフォルト値を自動入力
+     *
+     * 列構成:
+     *  A: アフィリエイトURL (編集検知対象)
+     *  B: 案件ID
+     *  C: 案件名 (自動入力)
+     *  D: ASP名 (自動入力)
+     *  E: 報酬額 (デフォルト値)
+     *  F: キャッシュバック率 (デフォルト値)
+     *  G: 有効/無効 (デフォルト値)
+     */
+
+    /**
+     * セルが編集されたときに自動実行
+     *
+     * 注意: この関数は手動実行できません。
+     * 実際にセルを編集したときのみ、イベントオブジェクト e が渡されます。
+     */
+    function onEdit(e) {
+      const sheet = e.source.getActiveSheet();
+
+      // 「案件マスタ」シートのみで動作
+      if (sheet.getName() !== '案件マスタ') return;
+
+      const row = e.range.getRow();
+      if (row === 1) return; // ヘッダー行は無視
+
+      const editedColumn = e.range.getColumn();
+
+      // A列（アフィリエイトURL）が編集されたら、自動処理を実行
+      if (editedColumn === 1) {
+        const affiliateUrl = sheet.getRange(row, 1).getValue();
+
+        if (affiliateUrl) {
+          // 1. 案件名を自動取得（URLからページタイトルを取得）
+          const dealName = fetchPageTitle(affiliateUrl);
+          const finalDealName = dealName || '不明なタイトル';
+
+          // C列（案件名）が空の場合のみ自動入力
+          if (!sheet.getRange(row, 3).getValue()) {
+            sheet.getRange(row, 3).setValue(finalDealName);
+          }
+
+          // 2. ASP名を自動判定
+          const aspName = detectASP(affiliateUrl);
+
+          // D列（ASP名）が空の場合のみ自動入力
+          if (aspName && !sheet.getRange(row, 4).getValue()) {
+            sheet.getRange(row, 4).setValue(aspName);
+          }
+        }
+      }
+
+      // デフォルト値の自動入力
+      autoFillDefaults(sheet, row);
+    }
+
+    /**
+     * URLからページタイトルを取得
+     */
+    function fetchPageTitle(url) {
+      try {
+        // URLにアクセスしてHTMLを取得
+        const response = UrlFetchApp.fetch(url, {
+          muteHttpExceptions: true,
+          followRedirects: true,
+        });
+
+        if (response.getResponseCode() !== 200) {
+          console.log('Failed to fetch URL: ' + url);
+          return '';
+        }
+
+        const html = response.getContentText();
+
+        // <title>タグからタイトルを抽出
+        const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/i);
+        if (titleMatch && titleMatch[1]) {
+          let title = titleMatch[1].trim();
+
+          // 不要な文字列を除去（例: " | サービス名", " - サイト名"）
+          title = title.replace(/[\|｜\-—–]\s*.+$/, '').trim();
+
+          // HTMLエンティティをデコード
+          title = decodeHTMLEntities(title);
+
+          return title;
+        }
+
+        return '';
+      } catch (error) {
+        console.log('Error fetching title: ' + error.message);
+        return '';
+      }
+    }
+
+    /**
+     * HTMLエンティティをデコード
+     */
+    function decodeHTMLEntities(text) {
+      const entities = {
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&quot;': '"',
+        '&#39;': "'",
+        '&nbsp;': ' ',
+      };
+
+      return text.replace(/&[a-z]+;|&#\d+;/gi, function(match) {
+        return entities[match] || match;
+      });
+    }
+
+    /**
+     * URLからASP名を自動判定
+     */
+    function detectASP(url) {
+      if (!url) return '';
+      if (url.includes('a8.net')) return 'A8.net';
+      if (url.includes('afi-b.com') || url.includes('afb.com')) return 'AFB';
+      if (url.includes('moshimo.com')) return 'もしも';
+      if (url.includes('valuecommerce.com')) return 'バリューコマース';
+      return '';
+    }
+
+    /**
+     * デフォルト値を自動入力
+     */
+    function autoFillDefaults(sheet, row) {
+      // E列（rewardAmount）が空ならデフォルト値 0
+      if (!sheet.getRange(row, 5).getValue()) {
+        sheet.getRange(row, 5).setValue(0);
+      }
+
+      // F列（cashbackRate）が空ならデフォルト値 20%
+      if (!sheet.getRange(row, 6).getValue()) {
+        sheet.getRange(row, 6).setValue(0.20);
+      }
+
+      // G列（isActive）が空ならTRUE
+      if (!sheet.getRange(row, 7).getValue()) {
+        sheet.getRange(row, 7).setValue('TRUE');
+      }
+    }
     ```
