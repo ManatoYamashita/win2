@@ -16,27 +16,40 @@ WIN×Ⅱ は、ASP（アフィリエイトサービスプロバイダー）の�
 
 ### 実装状況
 
-✅ **Phase 1 完了（100%）**:
+✅ **Phase 1: 基盤構築 完了（100%）**:
 - Next.js 15.1.4 プロジェクト初期化（App Router、TypeScript 5 strict mode）
 - TailwindCSS v3.4.1 + shadcn/ui セットアップ（Button、Input、Card、Label、Form、Toast）
 - microCMS SDK 統合（Blog、Deal、Category 型定義完了）
 - Google Sheets API 認証・ユーティリティ関数実装
 - 基本レイアウトコンポーネント（Header、Footer、SessionProvider）
-- Next-Auth v5 基盤設定完了
+- Next-Auth v4.24.11 セットアップ（CredentialsProvider）
+- `/api/track-click` 実装（id1トラッキング、guest UUID対応）
 
-✅ **Phase 2 完了（100%）**:
+✅ **Phase 2: 認証・会員機能 完了（Phase 2-1のみ実装）**:
 - 会員登録機能（Zod バリデーション + react-hook-form）
 - 会員登録 API（`/api/register`、bcrypt パスワードハッシュ化）
-- ログイン/ログアウト機能（Next-Auth v5 CredentialsProvider）
+- ログイン/ログアウト機能（Next-Auth v4 CredentialsProvider）
 - 認証保護ミドルウェア（`/mypage/*`、`/deals/*` 保護）
 - マイページ実装（登録情報表示、サイドナビゲーション）
-- 会員情報取得 API（`/api/members/me`）
+- 会員情報取得/更新 API（`/api/members/me`）
+- Email認証システム（Resend統合、トークン検証）
+- パスワードリセット機能（forgot-password, reset-password）
+- ⏭️ Phase 2-2, 2-3: Admin Dashboard等はスキップ（優先度低）
 
-⏳ **未実装**:
-- ブログ記事一覧・詳細ページ（Phase 3）
-- 案件一覧ページ（Phase 4）
-- クリック追跡API（Phase 4）
-- 申込履歴表示（Phase 4）
+✅ **Phase 3: ブログ機能 完了（100%）**:
+- BlogCard、DealCTAButton、Pagination コンポーネント
+- ブログ一覧ページ（`/blog`、ページネーション対応）
+- ブログ詳細ページ（`/blog/[slug]`、SEO/OGP対応）
+- カテゴリページ（`/category/[slug]`、フィルタリング）
+- トップページ更新（ヒーローセクション + 最新記事表示）
+- microCMS完全統合（blogs, deals, categories API）
+- リッチテキストコンテンツ表示、関連案件CTA表示
+
+⏳ **Phase 4 未着手**:
+- 案件一覧ページ（会員限定、フィルタリング）
+- 詳細検索機能
+- ユーザープロフィール編集
+- 通知設定
 
 ---
 
@@ -144,21 +157,55 @@ npx tsc --noEmit
 win2/
 ├── app/                    # Next.js 15 App Router
 │   ├── layout.tsx          # ルートレイアウト
-│   ├── page.tsx            # トップページ
-│   └── globals.css         # グローバルCSS
+│   ├── page.tsx            # トップページ（Phase 3更新: ヒーロー + 最新記事）
+│   ├── globals.css         # グローバルCSS
+│   ├── blog/               # ブログ関連ページ（Phase 3）
+│   │   ├── page.tsx        # ブログ一覧（ページネーション）
+│   │   └── [slug]/page.tsx # ブログ詳細（SEO/OGP対応）
+│   ├── category/           # カテゴリページ（Phase 3）
+│   │   └── [slug]/page.tsx # カテゴリ別記事一覧
+│   ├── login/              # ログインページ（Phase 2）
+│   ├── register/           # 会員登録ページ（Phase 2）
+│   ├── verify-email/       # Email認証ページ（Phase 2）
+│   ├── forgot-password/    # パスワードリセット要求（Phase 2）
+│   ├── reset-password/     # パスワードリセット（Phase 2）
+│   ├── mypage/             # マイページ（Phase 2）
+│   │   ├── page.tsx        # 登録情報表示
+│   │   └── history/page.tsx # 申込履歴
+│   └── api/                # API Routes
+│       ├── auth/[...nextauth]/route.ts  # Next-Auth endpoints
+│       ├── register/route.ts            # 会員登録API
+│       ├── members/me/route.ts          # 会員情報API
+│       ├── track-click/route.ts         # クリック追跡API
+│       ├── verify-email/route.ts        # Email認証トークン検証
+│       └── reset-password/route.ts      # パスワードリセット
 │
 ├── components/             # Reactコンポーネント
+│   ├── blog/               # ブログコンポーネント（Phase 3）
+│   │   └── blog-card.tsx   # ブログカード
+│   ├── deal/               # 案件コンポーネント（Phase 3）
+│   │   └── deal-cta-button.tsx # CTAボタン（トラッキング付き）
 │   ├── providers/          # React Context Providers
 │   │   └── session-provider.tsx  # Next-Auth SessionProvider
 │   └── ui/                 # shadcn/ui コンポーネント
+│       ├── button.tsx      # ボタン
+│       ├── card.tsx        # カード
+│       ├── form.tsx        # フォーム
+│       ├── pagination.tsx  # ページネーション（Phase 3）
+│       └── ...             # その他UIコンポーネント
 │
 ├── lib/                    # ユーティリティ・API関数
 │   ├── googleapis.ts       # Google Sheets 認証
 │   ├── sheets.ts           # Sheets 操作関数
 │   ├── microcms.ts         # microCMS クライアント
 │   ├── auth.ts             # Next-Auth 設定
+│   ├── guest-uuid.ts       # Guest UUID管理（Phase 1）
+│   ├── email.ts            # Email送信（Resend、Phase 2）
+│   ├── tokens.ts           # JWT トークン生成（Phase 2）
 │   ├── validations/        # Zod バリデーションスキーマ
-│   └── utils.ts            # shadcn/ui ユーティリティ
+│   │   ├── auth.ts         # 認証関連スキーマ
+│   │   └── member.ts       # 会員情報スキーマ
+│   └── utils.ts            # ユーティリティ（cn, formatDate等）
 │
 ├── hooks/                  # React カスタムフック
 │   └── use-toast.ts        # Toast通知フック
@@ -171,6 +218,8 @@ win2/
 │
 ├── docs/                   # プロジェクトドキュメント
 │   ├── index.md            # ドキュメント索引
+│   ├── email-setup.md      # Email送信設定（Phase 2）
+│   ├── microcms-setup.md   # microCMS設定（Phase 3）
 │   ├── specs/              # 要件定義・仕様
 │   │   ├── spec.md         # 要件定義書
 │   │   ├── google.md       # Google Sheets 構成
@@ -260,6 +309,8 @@ PREFIX: コミットメッセージ
 
 - **[docs/index.md](docs/index.md)**: ドキュメント索引（このファイルから開始）
 - **[docs/specs/spec.md](docs/specs/spec.md)**: プロジェクト要件定義書（必読）
+- **[docs/email-setup.md](docs/email-setup.md)**: Email送信設定ガイド（Resend）
+- **[docs/microcms-setup.md](docs/microcms-setup.md)**: microCMS設定ガイド（API作成・フィールド定義）
 - **[docs/dev/architecture.md](docs/dev/architecture.md)**: アーキテクチャ詳細
 - **[docs/dev/branch.md](docs/dev/branch.md)**: Git ブランチ戦略
 - **[CLAUDE.md](CLAUDE.md)**: Claude Code 向けプロジェクトガイド
@@ -268,39 +319,50 @@ PREFIX: コミットメッセージ
 
 ## 開発フェーズ
 
-### Phase 1: 環境構築・基盤実装（100% 完了）
+### Phase 1: 環境構築・基盤実装（✅ 100% 完了）
 - [x] Next.js 15 プロジェクト初期化
 - [x] TailwindCSS + shadcn/ui セットアップ
 - [x] microCMS SDK 統合
 - [x] Google Sheets API 認証・ユーティリティ実装
 - [x] 基本レイアウトコンポーネント
-- [x] Next-Auth v5 基盤設定
+- [x] Next-Auth v4 基盤設定
+- [x] クリック追跡API（/api/track-click）
 
-### Phase 2: 認証・会員機能（100% 完了）
+### Phase 2: 認証・会員機能（✅ Phase 2-1 完了）
 - [x] 会員登録API + フォーム（Zod + react-hook-form）
-- [x] ログイン/ログアウト（Next-Auth v5 CredentialsProvider）
+- [x] ログイン/ログアウト（Next-Auth v4 CredentialsProvider）
 - [x] 認証保護ミドルウェア
 - [x] マイページ（登録情報表示、サイドナビゲーション）
-- [ ] 登録情報編集（Phase 3 で実装予定）
-- [ ] 申込履歴表示（Phase 4 で実装予定）
+- [x] 会員情報取得/更新API（/api/members/me）
+- [x] Email認証システム（Resend統合）
+- [x] パスワードリセット機能
+- [x] 申込履歴表示（/mypage/history）
+- [ ] Phase 2-2: Admin Dashboard（スキップ - 優先度低）
+- [ ] Phase 2-3: Advanced features（スキップ - 優先度低）
 
-### Phase 3: CMS連携・ブログ機能（未着手）
-- ブログ記事一覧（ISR）・詳細ページ（SSG）
-- カテゴリフィルタリング
-- OGP動的生成、sitemap.xml自動生成
+### Phase 3: CMS連携・ブログ機能（✅ 100% 完了）
+- [x] ブログ記事一覧ページ（/blog、ページネーション）
+- [x] ブログ詳細ページ（/blog/[slug]、SSR）
+- [x] カテゴリページ（/category/[slug]、フィルタリング）
+- [x] BlogCard、DealCTAButton、Pagination コンポーネント
+- [x] トップページ更新（ヒーローセクション + 最新記事）
+- [x] OGP動的生成（generateMetadata）
+- [x] microCMS完全統合（API設定ガイド作成）
+- [x] リッチテキストコンテンツ表示
 
-### Phase 4: ASP案件・追跡機能（未着手）
-- 案件一覧ページ（会員限定）
-- クリック追跡API（/api/track-click）
-- guest:UUID 永続化ロジック
-- 記事内CTA統合
+### Phase 4: 機能拡張（未着手）
+- [ ] 案件一覧ページ（会員限定、フィルタリング）
+- [ ] 詳細検索機能（ブログ・案件）
+- [ ] ユーザープロフィール編集
+- [ ] Email通知設定
+- [ ] sitemap.xml自動生成
 
 ### Phase 5: テスト・最適化（未着手）
-- A8.net テストアカウント動作確認
-- レスポンシブデザイン調整
-- Lighthouseパフォーマンス最適化（目標: 90+）
-- セキュリティ監査
-- 本番デプロイ（Vercel）
+- [ ] A8.net テストアカウント動作確認
+- [ ] レスポンシブデザイン調整
+- [ ] Lighthouseパフォーマンス最適化（目標: 90+）
+- [ ] セキュリティ監査
+- [ ] 本番デプロイ（Vercel）
 
 ---
 
