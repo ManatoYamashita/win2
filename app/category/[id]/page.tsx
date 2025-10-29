@@ -1,8 +1,9 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getBlogs, getCategoryById } from "@/lib/microcms";
+import { getBlogs, getCategoryById, getCategories } from "@/lib/microcms";
 import { BlogCard } from "@/components/blog/blog-card";
 import { Pagination } from "@/components/ui/pagination";
+import { CategoryNav } from "@/components/blog/category-nav";
 
 interface CategoryPageProps {
   params: Promise<{
@@ -60,56 +61,65 @@ export default async function CategoryPage({
     notFound();
   }
 
-  // カテゴリIDでフィルタリングしてブログ一覧を取得
-  // NOTE: categoryは単一参照なので、category[equals]を使用
-  const { contents: blogs, totalCount } = await getBlogs({
-    limit: BLOGS_PER_PAGE,
-    offset,
-    filters: `category[equals]${category.id}`,
-  });
+  // カテゴリIDでフィルタリングしてブログ一覧とカテゴリ一覧を取得
+  // NOTE: categoryは配列なので、category[contains]を使用
+  const [{ contents: blogs, totalCount }, { contents: allCategories }] = await Promise.all([
+    getBlogs({
+      limit: BLOGS_PER_PAGE,
+      offset,
+      filters: `category[contains]${category.id}`,
+    }),
+    getCategories({ limit: 100 }),
+  ]);
 
   const totalPages = Math.ceil(totalCount / BLOGS_PER_PAGE);
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-8">
-      {/* カテゴリヘッダー */}
-      <div className="mb-8">
-        <div className="inline-block px-4 py-2 mb-4 text-sm font-semibold text-orange-600 bg-orange-100 rounded">
-          カテゴリ
-        </div>
-        <h1 className="text-4xl font-bold mb-2 text-gray-900">{category.name}</h1>
-        {category.description && (
-          <p className="text-lg text-gray-600 mb-2">{category.description}</p>
-        )}
-        <p className="text-gray-600">
-          {totalCount}件の記事があります
-        </p>
-      </div>
+    <div>
+      {/* カテゴリナビゲーションバー */}
+      <CategoryNav categories={allCategories} currentCategoryId={category.id} />
 
-      {/* ブログ記事がない場合 */}
-      {blogs.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-600 text-lg">
-            このカテゴリの記事はまだありません
+      {/* コンテンツ */}
+      <div className="container max-w-6xl mx-auto px-4 py-8">
+        {/* カテゴリヘッダー */}
+        <div className="mb-8">
+          <div className="inline-block px-4 py-2 mb-4 text-sm font-semibold text-orange-600 bg-orange-100 rounded">
+            カテゴリ
+          </div>
+          <h1 className="text-4xl font-bold mb-2 text-gray-900">{category.name}</h1>
+          {category.description && (
+            <p className="text-lg text-gray-600 mb-2">{category.description}</p>
+          )}
+          <p className="text-gray-600">
+            {totalCount}件の記事があります
           </p>
         </div>
-      ) : (
-        <>
-          {/* ブログカードのグリッド表示 */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {blogs.map((blog) => (
-              <BlogCard key={blog.id} blog={blog} />
-            ))}
-          </div>
 
-          {/* ページネーション */}
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            basePath={`/category/${id}`}
-          />
-        </>
-      )}
+        {/* ブログ記事がない場合 */}
+        {blogs.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 text-lg">
+              このカテゴリの記事はまだありません
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* ブログカードの縦並び表示 */}
+            <div className="flex flex-col gap-6 mb-8">
+              {blogs.map((blog) => (
+                <BlogCard key={blog.id} blog={blog} />
+              ))}
+            </div>
+
+            {/* ページネーション */}
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              basePath={`/category/${id}`}
+            />
+          </>
+        )}
+      </div>
     </div>
   );
 }
