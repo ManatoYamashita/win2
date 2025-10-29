@@ -1,22 +1,29 @@
+'use client';
+
 import Image from "next/image";
 import Link from "next/link";
+import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 
-type Stat = {
-  label: string;
-  value: string;
-  description: string;
-};
-
-type SimpleCard = {
+type ServiceFeature = {
   title: string;
   description: string;
-  icon?: string;
+  image: string;
+};
+
+type MeritPoint = {
+  image: string;
+  alt: string;
+};
+
+type AchievementCard = {
+  image: string;
+  alt: string;
 };
 
 type Testimonial = {
-  quote: string;
+  image: string;
   name: string;
-  attribute: string;
+  description: string;
 };
 
 type Faq = {
@@ -24,391 +31,530 @@ type Faq = {
   answer: string;
 };
 
-const heroStats: Stat[] = [
+const serviceFeatures: ServiceFeature[] = [
   {
-    label: "掲載ジャンル数",
-    value: "300カテゴリ",
-    description: "生活・金融・キャリアなど多彩に網羅",
+    title: "保険の無料相談",
+    description: "ライフステージに合わせた最適な保険選びを無料でサポート。",
+    image: "/assets/images/保険の無料相談.webp",
   },
   {
-    label: "提携ASP数",
-    value: "30社+",
-    description: "大手ASPと直接連携して成果管理",
+    title: "不動産査定サービス",
+    description: "売却査定から住み替えまで、専門スタッフが丁寧に対応。",
+    image: "/assets/images/不動産査定サービス.webp",
   },
   {
-    label: "会員登録完了まで",
-    value: "最短5分",
-    description: "フォーム入力だけですぐ利用開始",
-  },
-];
-
-const painPoints: SimpleCard[] = [
-  {
-    title: "日常の固定費がかさんでいる",
-    description:
-      "保険や通信費の見直しに興味はあっても、比較や申込が面倒で後回しにしていませんか？",
+    title: "エンタメサブスク特集",
+    description: "お得なサブスクリプション情報を厳選してご紹介。",
+    image: "/assets/images/エンタメサブスク特集.webp",
   },
   {
-    title: "副業で成果が伸びない",
-    description:
-      "ブログやSNSでアフィリエイトに挑戦してみたものの、成果が安定しないと感じていませんか？",
-  },
-  {
-    title: "情報がバラバラで判断しづらい",
-    description:
-      "お得なキャンペーンやキャッシュバック情報を探しても、結局どれがお得かわからないままになっていませんか？",
+    title: "転職支援サポート",
+    description: "キャリアアップを目指す方に最適な転職支援サービスを提供。",
+    image: "/assets/images/転職支援サポート.webp",
   },
 ];
 
-const servicePillars: SimpleCard[] = [
+const meritPoints: MeritPoint[] = [
   {
-    title: "各種保険",
-    description: "生命・医療・車まで専門アドバイザーが比較サポート。",
-    icon: "➕",
+    image: "/assets/images/point1.webp",
+    alt: "POINT01 保険・不動産など多彩なジャンルに対応",
   },
   {
-    title: "不動産",
-    description: "賃貸・マイホーム購入まで、条件に合わせた案件を紹介。",
-    icon: "🏠",
+    image: "/assets/images/point2.webp",
+    alt: "POINT02 成果報酬型のキャッシュバック",
   },
   {
-    title: "エンタメ",
-    description: "動画配信・サブスク・旅行など日常を楽しむお得情報をピックアップ。",
-    icon: "🎬",
-  },
-  {
-    title: "転職",
-    description: "キャリアアップに直結する求人を厳選。成果に応じた特典付き。",
-    icon: "💼",
+    image: "/assets/images/point3.webp",
+    alt: "POINT03 専門家によるサポート",
   },
 ];
 
-const serviceHighlights: SimpleCard[] = [
+const achievementCards: AchievementCard[] = [
   {
-    title: "専門スタッフによる案件選定",
-    description:
-      "審査済みの優良案件だけを掲載。日々更新される最新情報も見逃しません。",
+    image: "/assets/images/掲載ジャンル数.webp",
+    alt: "掲載ジャンル数 20カテゴリー以上",
   },
   {
-    title: "成果状況をリアルタイム確認",
-    description:
-      "成果反映をダッシュボードで可視化。承認状況やキャッシュバック額も即座に把握できます。",
-  },
-  {
-    title: "ワンクリックで申込管理",
-    description:
-      "WIN×Ⅱの専用リンクから申し込むだけ。成果の紐付けと支払管理をまとめて代行します。",
-  },
-  {
-    title: "パートナー専用サポート",
-    description:
-      "掲載メディアや紹介パートナー向けに、集客施策やクリエイティブの相談窓口を設置しています。",
-  },
-];
-
-const achievements: SimpleCard[] = [
-  {
-    title: "20カテゴリー以上",
-    description: "ライフイベントごとに最適なサービスを整理しています。",
-  },
-  {
-    title: "掲載案件500件+",
-    description: "キャッシュバック対象の厳選案件を継続的に追加しています。",
+    image: "/assets/images/無料掲載サービス数.webp",
+    alt: "無料掲載サービス数 500件以上",
   },
 ];
 
 const testimonials: Testimonial[] = [
   {
-    quote:
+    image: "/assets/images/comment-20-woman.webp",
+    name: "20代・女性（会社員）",
+    description:
       "複数のサービスを一度に比較できて、最適な保険が見つかりました。キャッシュバックも嬉しいです。",
-    name: "30代・女性",
-    attribute: "会社員",
   },
   {
-    quote:
+    image: "/assets/images/comment-30-man.webp",
+    name: "30代・男性（会社員）",
+    description:
       "副業として活用していますが、アドバイスが丁寧で成果率が上がりました。情報量の多さが決め手です。",
-    name: "20代・男性",
-    attribute: "Web制作フリーランス",
   },
   {
-    quote:
-      "住み替えの相談で利用しましたが、担当者のレスポンスが非常に早く安心して任せられました。",
-    name: "40代・女性",
-    attribute: "自営業",
+    image: "/assets/images/comment-40-woman.webp",
+    name: "40代・女性（自営業）",
+    description:
+      "住み替え相談で利用しましたが、担当者のレスポンスが非常に早く安心して任せられました。",
+  },
+  {
+    image: "/assets/images/comment-50-man.webp",
+    name: "50代・男性（自営業）",
+    description:
+      "いろんなサービスを検討できて、ここだけで完結できるのが便利！",
   },
 ];
 
-const faqs: Faq[] = [
+const faqList: Faq[] = [
   {
-    question: "登録すると料金は発生しますか？",
-    answer:
-      "すべて無料でご利用いただけます。成果報酬の一部をキャッシュバックとして還元しています。",
+    question: "掲載するのに費用はかかりますか？",
+    answer: "はい、掲載は完全無料です。安心してサービスをご利用ください。",
   },
   {
-    question: "どのような案件が掲載されていますか？",
+    question: "どんなサービスが掲載されていますか？",
     answer:
-      "保険・金融・不動産・転職・生活サービスなど、暮らしに役立つジャンルを中心に掲載しています。",
+      "保険・不動産・エンタメ・転職など、暮らしのお悩みを解決する多彩なジャンルのサービスを掲載しています。",
   },
   {
-    question: "スマートフォンからでも利用できますか？",
+    question: "スマートフォンでも利用できますか？",
     answer:
-      "もちろんです。スマートフォン・タブレット・PC いずれの環境でも快適にお使いいただけます。",
+      "もちろんです。PC・スマートフォン・タブレットのすべてに最適化されています。",
   },
 ];
-
-function SectionTitle({ subtitle, title }: { subtitle: string; title: string }) {
-  return (
-    <header className="text-center space-y-3">
-      <p className="text-sm font-semibold uppercase tracking-[0.3em] text-orange-500">
-        {subtitle}
-      </p>
-      <h2 className="text-3xl font-bold text-slate-900 md:text-4xl">{title}</h2>
-    </header>
-  );
-}
-
-function StatCard({ stat }: { stat: Stat }) {
-  return (
-    <div className="space-y-2 rounded-2xl border border-orange-100 bg-white/90 p-6 text-center shadow-sm">
-      <p className="text-sm font-semibold text-orange-500">{stat.label}</p>
-      <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-      <p className="text-sm text-slate-600">{stat.description}</p>
-    </div>
-  );
-}
-
-function PillarCard({ card }: { card: SimpleCard }) {
-  return (
-    <div className="flex flex-col items-center gap-3 rounded-2xl bg-white/90 p-6 text-center shadow-sm ring-1 ring-slate-100">
-      {card.icon ? (
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-orange-50 text-2xl">
-          <span aria-hidden>{card.icon}</span>
-        </div>
-      ) : null}
-      <p className="text-lg font-semibold text-slate-900">{card.title}</p>
-      <p className="text-sm leading-relaxed text-slate-600">{card.description}</p>
-    </div>
-  );
-}
-
-function HighlightCard({ card }: { card: SimpleCard }) {
-  return (
-    <div className="flex flex-col gap-3 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
-      <p className="text-lg font-semibold text-slate-900">{card.title}</p>
-      <p className="text-sm leading-relaxed text-slate-600">{card.description}</p>
-    </div>
-  );
-}
-
-function AchievementCard({ card }: { card: SimpleCard }) {
-  return (
-    <div className="rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-slate-100">
-      <p className="text-3xl font-bold text-orange-500">{card.title}</p>
-      <p className="mt-3 text-sm leading-relaxed text-slate-600">{card.description}</p>
-    </div>
-  );
-}
-
-function TestimonialCard({ testimonial }: { testimonial: Testimonial }) {
-  return (
-    <figure className="flex h-full flex-col justify-between rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
-      <blockquote className="text-sm leading-relaxed text-slate-700">
-        “{testimonial.quote}”
-      </blockquote>
-      <figcaption className="mt-4 text-right text-xs font-medium text-slate-500">
-        {testimonial.name}（{testimonial.attribute}）
-      </figcaption>
-    </figure>
-  );
-}
-
-function FaqCard({ faq }: { faq: Faq }) {
-  return (
-    <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
-      <p className="text-sm font-semibold text-orange-500">Q. {faq.question}</p>
-      <p className="mt-3 text-sm leading-relaxed text-slate-600">A. {faq.answer}</p>
-    </div>
-  );
-}
 
 export default function Home() {
   return (
-    <main className="bg-slate-50 text-slate-900">
-      <div className="mx-auto max-w-6xl px-4 pb-24 pt-16 md:px-6 lg:px-8">
-        <section className="relative overflow-hidden rounded-[40px] bg-gradient-to-br from-orange-50 via-white to-orange-100 px-6 py-14 shadow-lg md:px-12 md:py-16">
-          <div className="grid gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center">
-            <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/70 px-4 py-2 text-xs font-medium uppercase tracking-[0.25em] text-orange-500 shadow-sm">
-                Win×Ⅱ Official
-              </div>
-              <h1 className="text-4xl font-bold leading-tight md:text-5xl">
-                暮らしをもっとお得に、もっとスマートに。
-              </h1>
-              <p className="text-base leading-relaxed text-slate-600 md:text-lg">
-                WIN×Ⅱは生活を豊かにするサービスをワンストップで選べるキャッシュバック型プラットフォームです。提携ASPと連携した成果管理で、あなたの暮らしをアップデートします。
-              </p>
-              <div className="flex flex-wrap items-center gap-4">
-                <Link
-                  href="/register"
-                  className="rounded-full bg-orange-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-orange-200 transition hover:bg-orange-600"
-                >
-                  無料メンバー登録をはじめる
-                </Link>
-                <Link
-                  href="/login"
-                  className="rounded-full border border-orange-400 px-6 py-3 text-sm font-semibold text-orange-500 transition hover:bg-orange-50"
-                >
-                  ログイン
-                </Link>
-              </div>
-              <div className="grid gap-4 pt-6 sm:grid-cols-3">
-                {heroStats.map((stat) => (
-                  <StatCard key={stat.label} stat={stat} />
-                ))}
-              </div>
-            </div>
-            <div className="relative mx-auto max-w-md rounded-[32px] bg-white/70 p-6 shadow-xl backdrop-blur">
-              <div className="relative flex aspect-[3/4] items-center justify-center overflow-hidden rounded-3xl bg-gradient-to-br from-orange-100 to-orange-200">
-                <Image
-                  src="/assets/win2/icon.webp"
-                  alt="WIN×Ⅱロゴ"
-                  width={280}
-                  height={280}
-                  className="h-36 w-36 md:h-48 md:w-48"
-                />
-              </div>
-              <p className="mt-4 text-center text-sm text-slate-500">
-                ※ 画像はイメージです。正式なビジュアルは順次追加予定です。
-              </p>
-            </div>
-          </div>
-        </section>
+    <main className="bg-[#f8f5f2] text-slate-900">
+      <HeroSection />
+      <ProblemSection />
+      <ServiceIntroSection />
+      <MeritSection />
+      <HighlightSection />
+      <AchievementSection />
+      <FreeSection />
+      <TestimonialsSection />
+      <FaqSection />
+      <BottomCtaSection />
+    </main>
+  );
+}
 
-        <section className="mt-24 space-y-12">
-          <SectionTitle subtitle="Challenges" title="こんなお悩み、ありませんか？" />
-          <div className="grid gap-6 md:grid-cols-3">
-            {painPoints.map((card) => (
-              <div key={card.title} className="h-full rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-100">
-                <p className="text-lg font-semibold text-slate-900">{card.title}</p>
-                <p className="mt-3 text-sm leading-relaxed text-slate-600">{card.description}</p>
-              </div>
-            ))}
-          </div>
-          <div className="rounded-3xl bg-gradient-to-r from-orange-400 to-orange-500 px-6 py-10 text-center text-white shadow-lg md:px-12">
-            <h3 className="text-2xl font-semibold md:text-3xl">その悩み、WIN×Ⅱが解決します！</h3>
-            <p className="mt-3 text-sm md:text-base">
-              キャッシュバック・情報提供・専門家サポートを組み合わせた新しい暮らし支援サービスです。
+function HeroSection() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
+
+  return (
+    <section
+      ref={ref}
+      className={`relative bg-gradient-to-b from-[#fff7f2] to-[#fdeee3] py-20 transition-transform-opacity ${
+        isVisible ? "reveal-visible" : "reveal"
+      }`}
+    >
+      <div className="absolute inset-0">
+        <Image
+          src="/assets/images/office-super-blur.webp"
+          alt="背景イメージ"
+          fill
+          className="object-cover opacity-70"
+          priority
+        />
+      </div>
+      <div className="relative mx-auto flex max-w-6xl flex-col-reverse gap-12 px-4 md:flex-row md:items-center md:px-6 lg:px-8">
+        <div className="max-w-xl space-y-8">
+          <div>
+            <p className="text-sm font-semibold tracking-[0.3em] text-orange-500">WIN×Ⅱ</p>
+            <h1 className="mt-4 text-4xl font-bold leading-tight md:text-5xl">
+              暮らしをもっとお得に、
+              <br />
+              もっとスマートに。
+            </h1>
+            <p className="mt-6 text-base leading-relaxed text-slate-700 md:text-lg">
+              WIN×Ⅱは暮らしを支えるサービスをワンストップで選べるキャッシュバック付きプラットフォームです。掲載ジャンルは保険・不動産・エンタメ・転職など多彩。専門スタッフがあなたの暮らしをアップデートします。
             </p>
+          </div>
+          <div className="flex flex-wrap gap-4">
+            <StatPill image="/assets/images/掲載ジャンル数30以上.webp" alt="掲載ジャンル数30以上" />
+            <StatPill image="/assets/images/無料掲載サービス数.webp" alt="無料掲載サービス数500以上" />
+            <StatPill image="/assets/images/win2-is-.webp" alt="最短5日で成果反映" />
+          </div>
+          <div className="flex flex-wrap items-center gap-4">
             <Link
               href="/register"
-              className="mt-6 inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-orange-500 transition hover:bg-orange-100"
+              className="rounded-full bg-[#f05972] px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-[#f05972]/30 transition hover:bg-[#d44760]"
             >
-              メンバー登録で特典を受け取る
-            </Link>
-          </div>
-        </section>
-
-        <section className="mt-24 space-y-12">
-          <SectionTitle subtitle="Services" title="WIN×Ⅱはこんなサービスです" />
-          <p className="mx-auto max-w-3xl text-center text-sm leading-relaxed text-slate-600 md:text-base">
-            保険・不動産・エンタメ・転職の4カテゴリを中心に、生活をアップデートする情報をワンストップでご提供します。各カテゴリで専任スタッフが案件を厳選し、成果につながる導線を設計しています。
-          </p>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            {servicePillars.map((pillar) => (
-              <PillarCard key={pillar.title} card={pillar} />
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-24 space-y-12">
-          <SectionTitle subtitle="Merits" title="暮らしを変える多彩なメリット" />
-          <div className="grid gap-6 md:grid-cols-2">
-            {serviceHighlights.map((highlight) => (
-              <HighlightCard key={highlight.title} card={highlight} />
-            ))}
-          </div>
-          <div className="rounded-3xl bg-orange-50 px-6 py-10 text-center md:px-12">
-            <p className="text-lg font-semibold text-orange-500 md:text-xl">
-              掲載サービス・活用シーンは今後も拡大予定！
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-slate-600 md:text-base">
-              WIN×Ⅱなら暮らしに必要な情報をまとめてチェックし、成果とキャッシュバックを逃しません。
-            </p>
-          </div>
-        </section>
-
-        <section className="mt-24 space-y-12">
-          <SectionTitle subtitle="Achievements" title="WIN×Ⅱの実績" />
-          <div className="grid gap-6 md:grid-cols-2">
-            {achievements.map((item) => (
-              <AchievementCard key={item.title} card={item} />
-            ))}
-          </div>
-          <div className="rounded-3xl bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 py-10 text-center text-white md:px-12">
-            <p className="text-lg font-semibold md:text-xl">
-              ご利用料金はすべて無料。成果が発生した際も追加費用は一切かかりません。
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-slate-300 md:text-base">
-              成果報酬のうち一定割合をキャッシュバックとして還元。安心して継続利用いただけます。
-            </p>
-          </div>
-        </section>
-
-        <section className="mt-24 space-y-12">
-          <SectionTitle subtitle="Voices" title="ご利用者様の声" />
-          <div className="grid gap-6 md:grid-cols-3">
-            {testimonials.map((item, index) => (
-              <TestimonialCard key={`${item.name}-${index}`} testimonial={item} />
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-24 space-y-12">
-          <SectionTitle subtitle="FAQ" title="よくある質問" />
-          <div className="grid gap-6 md:grid-cols-3">
-            {faqs.map((faq, index) => (
-              <FaqCard key={`${faq.question}-${index}`} faq={faq} />
-            ))}
-          </div>
-        </section>
-
-        <section className="mt-24 rounded-3xl bg-gradient-to-br from-orange-500 via-orange-400 to-orange-500 px-6 py-12 text-center text-white shadow-lg md:px-12">
-          <h2 className="text-3xl font-bold md:text-4xl">いますぐ、暮らしをアップデートしませんか？</h2>
-          <p className="mt-4 text-sm leading-relaxed md:text-base">
-            WIN×Ⅱの会員登録は無料。提携ASPとの連携で安心・安全に成果とキャッシュバックを受け取れます。
-          </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/register"
-              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-orange-500 transition hover:bg-orange-100"
-            >
-              無料メンバー登録はこちら
+              メンバー登録を無料ではじめる
             </Link>
             <Link
               href="/login"
-              className="rounded-full border border-white/70 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+              className="rounded-full border border-[#f05972] px-8 py-3 text-sm font-semibold text-[#f05972] transition hover:bg-[#fef0f3]"
             >
               ログイン
             </Link>
           </div>
-        </section>
-      </div>
-      <footer className="border-t border-slate-200 bg-white/80">
-        <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 text-center text-xs text-slate-500 md:flex-row md:items-center md:justify-between md:px-6 lg:px-8">
-          <p>© {new Date().getFullYear()} WIN×Ⅱ. All rights reserved.</p>
-          <nav className="flex flex-wrap justify-center gap-4">
-            <Link href="/blog" className="transition hover:text-orange-500">
-              ブログ
-            </Link>
-            <Link href="/register" className="transition hover:text-orange-500">
-              新規登録
-            </Link>
-            <Link href="/login" className="transition hover:text-orange-500">
-              ログイン
-            </Link>
-          </nav>
         </div>
-      </footer>
-    </main>
+        <div className="relative mx-auto w-full max-w-md">
+          <Image
+            src="/assets/images/woman.webp"
+            alt="メインビジュアル"
+            width={520}
+            height={600}
+            className="w-full object-contain"
+            priority
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function StatPill({ image, alt }: { image: string; alt: string }) {
+  return (
+    <div className="flex h-24 min-w-[140px] flex-1 items-center justify-center rounded-full bg-white/80 px-6 shadow-md">
+      <Image src={image} alt={alt} width={160} height={80} className="h-16 w-auto object-contain" />
+    </div>
+  );
+}
+
+function ProblemSection() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
+
+  return (
+    <section
+      ref={ref}
+      className={`relative bg-white py-24 transition-transform-opacity ${
+        isVisible ? "reveal-visible" : "reveal"
+      }`}
+    >
+      <div className="absolute inset-0">
+        <Image
+          src="/assets/images/problem-opacity-white.webp"
+          alt="背景"
+          fill
+          className="object-cover opacity-80"
+        />
+      </div>
+      <div className="relative mx-auto flex max-w-5xl flex-col items-center gap-12 px-4 text-center md:px-6 lg:px-8">
+        <Image
+          src="/assets/images/problems.webp"
+          alt="こんなお悩みありませんか？"
+          width={760}
+          height={360}
+          className="w-full max-w-3xl object-contain"
+        />
+        <div className="rounded-full bg-[#f05972] px-10 py-3 text-sm font-semibold text-white shadow-md">
+          そんな時こそ WIN×Ⅱ の出番です！
+        </div>
+        <Link
+          href="/register"
+          className="rounded-full bg-[#f05972] px-12 py-3 text-sm font-semibold text-white shadow-md shadow-[#f05972]/20 transition hover:bg-[#d44760]"
+        >
+          メンバー登録でお得な情報を受け取る
+        </Link>
+      </div>
+    </section>
+  );
+}
+
+function ServiceIntroSection() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
+
+  return (
+    <section
+      ref={ref}
+      className={`bg-[#fffaf4] py-24 transition-transform-opacity ${
+        isVisible ? "reveal-visible" : "reveal"
+      }`}
+    >
+      <div className="mx-auto flex max-w-5xl flex-col items-center gap-12 px-4 text-center md:px-6 lg:px-8">
+        <Image
+          src="/assets/images/win2-is.webp"
+          alt="WIN×Ⅱはどんなサービス？"
+          width={720}
+          height={420}
+          className="w-full max-w-4xl object-contain"
+        />
+        <div className="grid gap-6 md:grid-cols-4">
+          {["各種保険", "不動産", "エンタメ", "転職"].map((item) => (
+            <div
+              key={item}
+              className="rounded-3xl bg-white px-6 py-4 text-sm font-semibold text-orange-500 shadow-[0_10px_25px_rgba(255,165,118,0.25)]"
+            >
+              {item}
+            </div>
+          ))}
+        </div>
+        <Image
+          src="/assets/images/ワンストップwin2.webp"
+          alt="ワンストップ"
+          width={720}
+          height={340}
+          className="w-full max-w-3xl object-contain"
+        />
+      </div>
+    </section>
+  );
+}
+
+function MeritSection() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
+
+  return (
+    <section
+      ref={ref}
+      className={`bg-white py-24 transition-transform-opacity ${
+        isVisible ? "reveal-visible" : "reveal"
+      }`}
+    >
+      <div className="mx-auto max-w-6xl space-y-12 px-4 md:px-6 lg:px-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold text-[#f48a3c] md:text-4xl">WIN×Ⅱでのメリット</h2>
+          <p className="mt-4 text-sm text-slate-600 md:text-base">
+            暮らしを変えるヒントが一つに集まる。WIN×Ⅱだからできる3つのポイントをご紹介します。
+          </p>
+        </div>
+        <div className="grid gap-8 md:grid-cols-3">
+          {meritPoints.map((point) => (
+            <div
+              key={point.alt}
+              className="rounded-[32px] bg-gradient-to-b from-white to-[#fdf5ef] p-6 shadow-[0_12px_30px_rgba(255,180,140,0.2)]"
+            >
+              <Image
+                src={point.image}
+                alt={point.alt}
+                width={280}
+                height={320}
+                className="mx-auto w-full max-w-[240px] object-contain"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HighlightSection() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
+
+  return (
+    <section
+      ref={ref}
+      className={`bg-[#f0f6fb] py-24 transition-transform-opacity ${
+        isVisible ? "reveal-visible" : "reveal"
+      }`}
+    >
+      <div className="mx-auto max-w-6xl space-y-12 px-4 md:px-6 lg:px-8">
+        <div className="text-center">
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-orange-500">
+            掲載サービス・活用シーン
+          </p>
+          <h2 className="mt-3 text-3xl font-bold md:text-4xl">暮らしを変える多彩なサービス</h2>
+          <p className="mt-4 text-sm text-slate-600 md:text-base">
+            生活のあらゆるシーンで活用できるサービスを厳選して掲載。WIN×Ⅱなら、お得な情報が一目で見つかります。
+          </p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {serviceFeatures.map((feature) => (
+            <div
+              key={feature.title}
+              className="flex h-full flex-col rounded-[32px] bg-white/70 p-6 shadow-[0_15px_30px_rgba(0,0,0,0.08)] backdrop-blur"
+            >
+              <Image
+                src={feature.image}
+                alt={feature.title}
+                width={320}
+                height={220}
+                className="mb-5 w-full object-contain"
+              />
+              <h3 className="text-lg font-semibold text-slate-900">{feature.title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">{feature.description}</p>
+            </div>
+          ))}
+        </div>
+        <div className="text-center">
+          <Link
+            href="/register"
+            className="inline-flex items-center justify-center rounded-full bg-[#f05972] px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-[#f05972]/20 transition hover:bg-[#d44760]"
+          >
+            メンバー登録で最新情報を受け取る
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function AchievementSection() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
+
+  return (
+    <section
+      ref={ref}
+      className={`bg-[#fffaf4] py-24 transition-transform-opacity ${
+        isVisible ? "reveal-visible" : "reveal"
+      }`}
+    >
+      <div className="mx-auto max-w-5xl space-y-12 px-4 text-center md:px-6 lg:px-8">
+        <h2 className="text-3xl font-bold text-[#f48a3c] md:text-4xl">実績・掲載数</h2>
+        <div className="grid gap-8 md:grid-cols-2">
+          {achievementCards.map((card) => (
+            <div
+              key={card.alt}
+              className="rounded-[32px] bg-white px-6 py-10 shadow-[0_15px_35px_rgba(255,180,140,0.25)]"
+            >
+              <Image
+                src={card.image}
+                alt={card.alt}
+                width={320}
+                height={280}
+                className="mx-auto w-full max-w-[260px] object-contain"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FreeSection() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
+
+  return (
+    <section
+      ref={ref}
+      className={`bg-gradient-to-b from-[#f9f9f9] via-white to-[#f9f9f9] py-16 transition-transform-opacity ${
+        isVisible ? "reveal-visible" : "reveal"
+      }`}
+    >
+      <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 text-center md:px-6">
+        <h2 className="text-2xl font-bold text-[#f05972] md:text-3xl">ご利用料金はすべて無料！</h2>
+        <p className="text-sm leading-relaxed text-slate-600 md:text-base">
+          WIN×Ⅱは、紹介するサービスの成果報酬の一部を還元することで、掲載企業・利用者ともにメリットある仕組みを提供しています。ご利用に際して追加の費用は一切発生いたしません。
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function TestimonialsSection() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
+
+  return (
+    <section
+      ref={ref}
+      className={`bg-white py-24 transition-transform-opacity ${
+        isVisible ? "reveal-visible" : "reveal"
+      }`}
+    >
+      <div className="mx-auto max-w-5xl space-y-10 px-4 md:px-6 lg:px-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold md:text-4xl">ご利用者様の声</h2>
+          <p className="mt-3 text-sm text-slate-600 md:text-base">
+            WIN×Ⅱをご利用いただいた皆さまから、たくさんのお喜びの声をいただいています。
+          </p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2">
+          {testimonials.map((testimonial) => (
+            <div
+              key={testimonial.name}
+              className="flex gap-4 rounded-[24px] bg-[#f6f6f6] p-6 shadow-[0_10px_25px_rgba(0,0,0,0.05)]"
+            >
+              <Image
+                src={testimonial.image}
+                alt={testimonial.name}
+                width={80}
+                height={80}
+                className="h-14 w-14 flex-shrink-0 rounded-full object-cover"
+              />
+              <div className="space-y-2 text-left">
+                <p className="text-sm leading-relaxed text-slate-700">{testimonial.description}</p>
+                <p className="text-xs font-semibold text-slate-500">{testimonial.name}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FaqSection() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
+
+  return (
+    <section
+      ref={ref}
+      className={`bg-[#fff7f0] py-24 transition-transform-opacity ${
+        isVisible ? "reveal-visible" : "reveal"
+      }`}
+    >
+      <div className="mx-auto max-w-5xl space-y-10 px-4 md:px-6 lg:px-8">
+        <div className="text-center">
+          <h2 className="text-3xl font-bold md:text-4xl">よくあるご質問</h2>
+          <p className="mt-3 text-sm text-slate-600 md:text-base">
+            WIN×Ⅱに寄せられるご質問を Q&A 形式でまとめました。ご不明点があればお気軽にお問い合わせください。
+          </p>
+        </div>
+        <div className="space-y-6">
+          {faqList.map((faq, index) => (
+            <div
+              key={faq.question}
+              className="flex flex-col gap-4 rounded-[24px] bg-white p-6 shadow-[0_10px_25px_rgba(0,0,0,0.05)] md:flex-row md:items-start"
+            >
+              <div className="flex items-start gap-3">
+                <Image src="/assets/images/q.webp" alt="Q" width={36} height={36} />
+                <div>
+                  <p className="font-semibold text-slate-900">{faq.question}</p>
+                  <div className="mt-3 flex items-start gap-3 text-sm text-slate-600 md:text-base">
+                    <Image src="/assets/win2/icon.webp" alt="A" width={32} height={32} />
+                    <span>{faq.answer}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="hidden h-full w-px bg-slate-100 md:block" />
+              <span className="mt-2 self-start rounded-full bg-[#fef3eb] px-4 py-1 text-xs font-semibold text-orange-500 md:mt-0">
+                Q{index + 1}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BottomCtaSection() {
+  const { ref, isVisible } = useScrollReveal<HTMLElement>();
+
+  return (
+    <section
+      ref={ref}
+      className={`bg-gradient-to-r from-[#f05972] to-[#f48a3c] py-16 transition-transform-opacity ${
+        isVisible ? "reveal-visible" : "reveal"
+      }`}
+    >
+      <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 text-center text-white md:px-6">
+        <h2 className="text-3xl font-bold md:text-4xl">いますぐ WIN×Ⅱ をはじめましょう</h2>
+        <p className="text-sm leading-relaxed text-white/90 md:text-base">
+          暮らしをもっとお得に、もっとスマートに。WIN×Ⅱの無料メンバー登録で最新情報とキャッシュバック特典を手に入れてください。
+        </p>
+        <div className="flex flex-wrap justify-center gap-4">
+          <Link
+            href="/register"
+            className="rounded-full bg-white px-10 py-3 text-sm font-semibold text-[#f05972] transition hover:bg-white/90"
+          >
+            無料メンバー登録はこちら
+          </Link>
+          <Link
+            href="/blog"
+            className="rounded-full border border-white/70 px-10 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+          >
+            ブログで最新情報を見る
+          </Link>
+        </div>
+      </div>
+    </section>
   );
 }

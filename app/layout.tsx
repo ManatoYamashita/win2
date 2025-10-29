@@ -4,6 +4,7 @@ import { SessionProvider } from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
+import { PageTransition } from "@/components/layout/page-transition";
 
 export const metadata: Metadata = {
   title: "WIN×Ⅱ - アフィリエイトブログプラットフォーム",
@@ -19,13 +20,13 @@ export default function RootLayout({
     <html lang="ja">
       <body>
         <SessionProvider>
-          <div className="min-h-screen flex flex-col">
+          <PageTransition>
             <Header />
             <main className="flex-1">
               {children}
             </main>
             <Footer />
-          </div>
+          </PageTransition>
           <Toaster />
         </SessionProvider>
       </body>
