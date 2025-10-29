@@ -163,20 +163,35 @@ export function BlogContent({ content }: BlogContentProps) {
     }
   };
 
-  const proseClasses = `prose prose-lg max-w-none mb-12
-    prose-headings:text-gray-900
-    prose-h2:text-2xl prose-h2:font-bold prose-h2:mt-8 prose-h2:mb-4 prose-h2:border-b prose-h2:border-orange-200 prose-h2:pb-2
-    prose-h3:text-xl prose-h3:font-semibold prose-h3:mt-6 prose-h3:mb-3
-    prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-4
-    prose-a:text-orange-600 prose-a:no-underline hover:prose-a:underline
-    prose-strong:text-gray-900 prose-strong:font-semibold
-    prose-ul:list-disc prose-ul:pl-6 prose-ul:mb-4
-    prose-ol:list-decimal prose-ol:pl-6 prose-ol:mb-4
-    prose-li:text-gray-700 prose-li:mb-2
-    prose-img:rounded-lg prose-img:shadow-md
-    prose-blockquote:border-l-4 prose-blockquote:border-orange-400 prose-blockquote:pl-4 prose-blockquote:italic prose-blockquote:text-gray-600
-    prose-code:text-orange-600 prose-code:bg-orange-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:content-[''] prose-code:after:content-['']
-    prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:p-4 prose-pre:rounded-lg prose-pre:overflow-x-auto`;
+  // Prose classes with @tailwindcss/typography plugin
+  // Customized for orange brand theme and optimal readability
+  const proseClasses = `
+    prose prose-lg max-w-none mb-12
+    prose-headings:text-gray-900 prose-headings:font-bold
+    prose-h1:text-4xl prose-h1:mt-0 prose-h1:mb-6
+    prose-h2:text-3xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:border-b-2 prose-h2:border-orange-200 prose-h2:pb-3
+    prose-h3:text-2xl prose-h3:mt-8 prose-h3:mb-3
+    prose-h4:text-xl prose-h4:mt-6 prose-h4:mb-2
+    prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-6
+    prose-a:text-orange-600 prose-a:font-medium prose-a:no-underline hover:prose-a:underline hover:prose-a:text-orange-700 prose-a:transition-colors
+    prose-strong:text-gray-900 prose-strong:font-bold
+    prose-em:text-gray-800 prose-em:italic
+    prose-ul:my-6 prose-ul:list-disc prose-ul:pl-6
+    prose-ol:my-6 prose-ol:list-decimal prose-ol:pl-6
+    prose-li:text-gray-700 prose-li:my-2 prose-li:leading-relaxed
+    prose-img:rounded-xl prose-img:shadow-lg prose-img:my-8
+    prose-figure:my-8
+    prose-figcaption:text-center prose-figcaption:text-sm prose-figcaption:text-gray-600 prose-figcaption:mt-2
+    prose-blockquote:border-l-4 prose-blockquote:border-orange-500 prose-blockquote:pl-6 prose-blockquote:my-6 prose-blockquote:italic prose-blockquote:text-gray-700 prose-blockquote:bg-orange-50 prose-blockquote:py-4 prose-blockquote:rounded-r-lg
+    prose-code:text-orange-600 prose-code:bg-orange-50 prose-code:px-2 prose-code:py-1 prose-code:rounded prose-code:text-sm prose-code:font-mono prose-code:before:content-[''] prose-code:after:content-['']
+    prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:p-6 prose-pre:rounded-xl prose-pre:overflow-x-auto prose-pre:my-6 prose-pre:shadow-lg
+    prose-pre:code:bg-transparent prose-pre:code:text-gray-100 prose-pre:code:p-0
+    prose-table:my-6 prose-table:border-collapse
+    prose-thead:border-b-2 prose-thead:border-gray-300
+    prose-th:px-4 prose-th:py-3 prose-th:text-left prose-th:font-semibold prose-th:text-gray-900
+    prose-td:px-4 prose-td:py-3 prose-td:border-b prose-td:border-gray-200
+    prose-hr:my-8 prose-hr:border-gray-300
+  `.trim();
 
   // Markdownの場合はReactMarkdownでレンダリング
   if (isMarkdown) {

@@ -32,11 +32,16 @@ export function BlogCard({ blog }: BlogCardProps) {
 
         <CardHeader>
           {/* カテゴリバッジ */}
-          {blog.category && (
+          {blog.category && blog.category.length > 0 && (
             <div className="flex gap-2 mb-2">
-              <span className="inline-block px-2 py-1 text-xs font-semibold text-orange-600 bg-orange-100 rounded">
-                {blog.category.name}
-              </span>
+              {blog.category.slice(0, 2).map((cat) => (
+                <span
+                  key={cat.id}
+                  className="inline-block px-2 py-1 text-xs font-semibold text-orange-600 bg-orange-100 rounded"
+                >
+                  {cat.name}
+                </span>
+              ))}
             </div>
           )}
 

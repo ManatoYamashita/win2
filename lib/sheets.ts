@@ -322,10 +322,10 @@ export async function getResultsByMemberId(memberId: string): Promise<ResultRow[
         name: row[0] || "",
         dealName: row[1] || "",
         status: row[2] || "",
-        cashbackAmount: parseFloat(row[3] ?? "0") || 0,
+        cashbackAmount: parseFloat(row[3] || "0") || 0,
         memberId: row[4] || "",
-        originalReward: parseFloat(row[5] ?? "0") || 0,
-        memo: row[6],
+        originalReward: parseFloat(row[5] || "0") || 0,
+        memo: row[6] || "",
       }));
 
     return results;

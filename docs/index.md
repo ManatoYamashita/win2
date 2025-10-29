@@ -164,6 +164,37 @@ docs/
 
 このセクションは、ドキュメントの主要な更新を記録します。
 
+### 2025-10-29
+
+#### ブログ機能の完全統合とorigin/devブランチマージ（Phase 3完了）
+- **feature/blog-markdown-styling と origin/dev のマージ**
+  - Phase 2（メール認証、パスワードリセット機能）の実装を保持
+  - Phase 3（ブログ機能）の実装を統合
+  - コンフリクト解決: app/page.tsx, package.json, blog関連ファイル, lib/utils.ts, lib/sheets.ts, docs/index.md
+- **feature/phase2-advanced-features からブログ機能を統合**
+  - `app/blog/page.tsx`: ブログ一覧ページ（ページネーション対応）
+  - `app/blog/[id]/page.tsx`: ブログ詳細ページ（SEO/OGP対応）
+  - `app/category/[id]/page.tsx`: カテゴリページ（フィルタリング対応）
+  - `components/blog/blog-card.tsx`: ブログカードコンポーネント
+  - `components/deal/deal-cta-button.tsx`: 案件CTAボタンコンポーネント
+  - `components/ui/pagination.tsx`: ページネーションコンポーネント
+  - `lib/blog-utils.ts`: ブログユーティリティ（excerpt生成）
+  - `lib/utils.ts`: formatDate関数追加（日本語日付フォーマット）
+  - `app/page.tsx`: トップページはorigin/devの詳細なコンテンツを採用
+  - **型修正**: Blog.category を Category[] 配列型に対応
+  - **ステータス**: Phase 2 + Phase 3 統合完了、microCMS連携確認済み
+
+#### Markdownパース機能の完全化とスタイリング最適化
+- **@tailwindcss/typography プラグイン統合**
+  - `tailwind.config.ts`: typographyプラグインを追加
+  - `components/blog/blog-content.tsx`: proseクラスをオレンジテーマに最適化
+    - 見出し（H1-H6）のスタイリング強化
+    - リスト（ul/ol）、引用（blockquote）のデザイン改善
+    - コードブロック（inline/block）のシンタックスハイライト対応
+    - テーブル、画像、リンクのレスポンシブ対応
+  - `react-markdown`, `remark-gfm`, `rehype-raw`: Phase 2依存関係と共存
+  - `lib/sheets.ts`: TypeScript型エラー修正（parseFloat型安全性向上）
+  - **ステータス**: Markdown表示機能完全対応、スタイリング最適化完了
 ### 2025-10-27
 - **Phase 3 CTA機能 実装完了**
   - `guides/cta-shortcode-guide.md`: 新規作成（クライアント向けCTAショートコード使用ガイド v1.0.0）

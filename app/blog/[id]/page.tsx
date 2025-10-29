@@ -80,14 +80,17 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       )}
 
       {/* カテゴリバッジ */}
-      {blog.category && (
+      {blog.category && blog.category.length > 0 && (
         <div className="flex gap-2 mb-4">
-          <Link
-            href={`/category/${blog.category.id}`}
-            className="inline-block px-3 py-1 text-sm font-semibold text-orange-600 bg-orange-100 rounded hover:bg-orange-200 transition-colors"
-          >
-            {blog.category.name}
-          </Link>
+          {blog.category.map((cat) => (
+            <Link
+              key={cat.id}
+              href={`/category/${cat.id}`}
+              className="inline-block px-3 py-1 text-sm font-semibold text-orange-600 bg-orange-100 rounded hover:bg-orange-200 transition-colors"
+            >
+              {cat.name}
+            </Link>
+          ))}
         </div>
       )}
 
@@ -129,16 +132,19 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       */}
 
       {/* カテゴリリンク（フッター） */}
-      {blog.category && (
+      {blog.category && blog.category.length > 0 && (
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-sm text-gray-600 mb-2">関連カテゴリ:</p>
           <div className="flex flex-wrap gap-2">
-            <Link
-              href={`/category/${blog.category.id}`}
-              className="inline-block px-3 py-1 text-sm text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
-            >
-              {blog.category.name}
-            </Link>
+            {blog.category.map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/category/${cat.id}`}
+                className="inline-block px-3 py-1 text-sm text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+              >
+                {cat.name}
+              </Link>
+            ))}
           </div>
         </div>
       )}
