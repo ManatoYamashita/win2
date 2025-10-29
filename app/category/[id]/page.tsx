@@ -62,12 +62,12 @@ export default async function CategoryPage({
   }
 
   // カテゴリIDでフィルタリングしてブログ一覧とカテゴリ一覧を取得
-  // NOTE: categoryは配列なので、category[contains]を使用
+  // categoryフィールドは単一参照のため equals を使用
   const [{ contents: blogs, totalCount }, { contents: allCategories }] = await Promise.all([
     getBlogs({
       limit: BLOGS_PER_PAGE,
       offset,
-      filters: `category[contains]${category.id}`,
+      filters: `category[equals]${category.id}`,
     }),
     getCategories({ limit: 100 }),
   ]);
