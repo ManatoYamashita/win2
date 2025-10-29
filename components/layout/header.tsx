@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 /**
  * 共通Headerコンポーネント
@@ -22,8 +22,12 @@ export function Header() {
   const pathname = usePathname();
 
   const navigation = useMemo(() => {
-    const items = [
-      { href: "/", label: "トップページ", isActive: pathname === "/" },
+    const items: Array<{ href: string; label: string; isActive: boolean }> = [
+      {
+        href: "/",
+        label: "トップページ",
+        isActive: pathname === "/",
+      },
       {
         href: "/blog",
         label: "ブログ",
@@ -31,30 +35,38 @@ export function Header() {
       },
     ];
 
-    items.push(
-      session
-        ? {
-            href: "/mypage",
-            label: "プロフィール",
-            isActive: pathname.startsWith("/mypage"),
-          }
-        : {
-            href: "/login",
-            label: "ログイン",
-            isActive: pathname === "/login",
-          }
-    );
+    if (session) {
+      items.push({
+        href: "/mypage",
+        label: "マイページ",
+        isActive: pathname.startsWith("/mypage"),
+      });
+      items.push({
+        href: "#logout",
+        label: "ログアウト",
+        isActive: false,
+      });
+    } else {
+      items.push({
+        href: "/register",
+        label: "新規登録",
+        isActive: pathname === "/register",
+      });
+      items.push({
+        href: "/login",
+        label: "ログイン",
+        isActive: pathname === "/login",
+      });
+    }
 
     return items;
   }, [pathname, session]);
 
   const getLinkClasses = (isActive: boolean) =>
-    [
-      "font-medium transition-colors inline-flex items-center",
-      isActive
-        ? "text-orange-600 border-b-2 border-orange-500 pb-1"
-        : "text-gray-700 hover:text-orange-600",
-    ].join(" ");
+    cn(
+      "relative inline-flex items-center text-[14px] font-medium text-slate-600 transition-colors",
+      isActive ? "text-[#f26f36]" : "hover:text-[#f26f36]"
+    );
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
@@ -65,146 +77,90 @@ export function Header() {
   };
 
   return (
-    <header className="bg-white border-b shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* ロゴ */}
-          <Link href="/" className="flex items-center" aria-label="WIN×Ⅱ トップページ">
-            <Image
-              src="/assets/win2/logo.webp"
-              alt="WIN×Ⅱ"
-              width={140}
-              height={40}
-              className="h-8 w-auto object-contain transition-transform hover:scale-105"
-              priority
-            />
-          </Link>
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-[#ffe1cc]">
+      <div className="mx-auto flex max-w-[1100px] items-center justify-between px-4 py-4 lg:px-6">
+        <Link href="/" className="flex items-center gap-3" aria-label="WIN×Ⅱ トップページ">
+          <Image
+            src="/assets/win2/logo.webp"
+            alt="WIN×Ⅱ"
+            width={140}
+            height={40}
+            className="h-8 w-auto object-contain"
+            priority
+          />
+          <span className="hidden text-sm font-semibold tracking-[0.35em] text-[#f26f36] md:inline">
+            OFFICIAL
+          </span>
+        </Link>
 
-          {/* デスクトップナビゲーション */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => (
+        <nav className="hidden items-center gap-7 md:flex">
+          {navigation.map((item) =>
+            item.href === "#logout" ? (
+              <button
+                key="logout"
+                type="button"
+                onClick={handleSignOut}
+                className="text-[14px] font-medium text-slate-600 transition hover:text-[#f26f36]"
+              >
+                ログアウト
+              </button>
+            ) : (
               <Link key={item.href} href={item.href} className={getLinkClasses(item.isActive)}>
                 {item.label}
               </Link>
-            ))}
-          </nav>
+            )
+          )}
+        </nav>
 
-          {/* ログインボタン / ログアウトボタン */}
-          <div className="hidden md:flex items-center space-x-4">
-            {status === "loading" ? (
-              <div className="h-10 w-24 bg-gray-200 animate-pulse rounded" />
-            ) : session ? (
-              <>
-                <span className="text-sm text-gray-600">
-                  {session.user?.email}
-                </span>
-                <Button
-                  onClick={handleSignOut}
-                  variant="outline"
-                  className="border-orange-600 text-orange-600 hover:bg-orange-50"
+        <button
+          onClick={toggleMobileMenu}
+          className="rounded-md p-2 md:hidden"
+          aria-label="メニューを開く"
+        >
+          {isMobileMenuOpen ? (
+            <svg className="h-6 w-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="h-6 w-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
+      </div>
+      {isMobileMenuOpen && (
+        <div className="border-t border-[#ffe1cc] bg-white/95 px-4 py-4 md:hidden">
+          <nav className="flex flex-col gap-4 text-sm text-slate-600">
+            {navigation.map((item) =>
+              item.href === "#logout" ? (
+                <button
+                  key="logout-mobile"
+                  type="button"
+                  onClick={() => {
+                    handleSignOut();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left font-medium transition hover:text-[#f26f36]"
                 >
                   ログアウト
-                </Button>
-              </>
-            ) : (
-              <Button
-                asChild
-                className="bg-orange-600 hover:bg-orange-700 text-white"
-              >
-                <Link href="/login">ログイン</Link>
-              </Button>
-            )}
-          </div>
-
-          {/* モバイルハンバーガーメニュー */}
-          <button
-            onClick={toggleMobileMenu}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            aria-label="メニューを開く"
-          >
-            {isMobileMenuOpen ? (
-              <svg
-                className="w-6 h-6 text-gray-700"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            ) : (
-              <svg
-                className="w-6 h-6 text-gray-700"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
-            )}
-          </button>
-        </div>
-
-        {/* モバイルメニュー */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t">
-            <nav className="flex flex-col space-y-4">
-              {navigation.map((item) => (
+                </button>
+              ) : (
                 <Link
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`${getLinkClasses(item.isActive)} px-2`}
+                  className={getLinkClasses(item.isActive)}
                 >
                   {item.label}
                 </Link>
-              ))}
-
-              {/* モバイルログインボタン */}
-              <div className="pt-4 border-t">
-                {session ? (
-                  <>
-                    <span className="text-sm text-gray-600 px-2 block mb-2">
-                      {session.user?.email}
-                    </span>
-                    <Button
-                      onClick={() => {
-                        handleSignOut();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      variant="outline"
-                      className="w-full border-orange-600 text-orange-600 hover:bg-orange-50"
-                    >
-                      ログアウト
-                    </Button>
-                  </>
-                ) : (
-                  <Button
-                    asChild
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white"
-                  >
-                    <Link
-                      href="/login"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      ログイン
-                    </Link>
-                  </Button>
-                )}
-              </div>
-            </nav>
-          </div>
-        )}
-      </div>
+              )
+            )}
+            {status === "loading" && (
+              <span className="text-xs text-slate-400">読み込み中...</span>
+            )}
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
