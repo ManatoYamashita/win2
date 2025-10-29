@@ -15,6 +15,7 @@
 docs/
 ├── index.md                  ← 本ファイル（ドキュメント索引・運用ルール）
 ├── email-setup.md            ← Email送信設定ガイド（Resend, 開発環境/本番環境）
+├── resend-setup.md           ← Resend.com 詳細セットアップ手順書（DNS設定・ドメイン検証・APIキー）
 ├── microcms-setup.md         ← microCMS設定ガイド（API作成、フィールド定義、環境変数設定）
 │
 ├── specs/                    ← プロジェクト仕様・外部連携情報
@@ -28,6 +29,7 @@ docs/
 │
 └── dev/                      ← 開発ワークフロー・規約
     ├── architecture.md      ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
+    ├── environment.md       ← 開発環境セットアップ（Node.js / nvm / Turbopack / 環境変数）
     └── branch.md            ← Git ブランチ戦略・CI/CD・コミット規約
 ```
 
@@ -38,6 +40,7 @@ docs/
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
 | **email-setup.md** | Email送信設定ガイド | Resend設定、開発環境用セットアップ、ドメイン取得計画、トラブルシューティング |
+| **resend-setup.md** | Resend.com詳細セットアップ手順書 | アカウント作成、ドメイン追加、DNS設定（SPF/DKIM/DMARC）、ドメイン検証、APIキー取得、テスト送信、トラブルシューティング |
 | **microcms-setup.md** | microCMS設定ガイド | API作成（blogs/deals/categories）、フィールド定義、サンプルデータ、環境変数設定、トラブルシューティング |
 
 #### `specs/` - 仕様・外部連携
@@ -60,6 +63,7 @@ docs/
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
 | **architecture.md** | アーキテクチャ詳細 | ディレクトリ構成、TypeScript/TailwindCSS設定、実装済み機能、データフロー |
+| **environment.md** | 開発環境セットアップ | Node.js 22（nvm）、Turbopackデフォルト設定、必須コマンド、環境変数、チェックリスト |
 | **branch.md** | ブランチ戦略 | 2ブランチ管理（dev/main）、PR規約、コミットメッセージ形式、CI/CD |
 
 ### 今後追加が想定されるドキュメントカテゴリ
@@ -165,6 +169,23 @@ docs/
 このセクションは、ドキュメントの主要な更新を記録します。
 
 ### 2025-10-29
+
+#### Resend.com 詳細セットアップ手順書作成
+- **resend-setup.md**: 新規作成（Resend.com 完全セットアップガイド v1.0.0）
+  - アカウント作成手順（サインアップ、ダッシュボード確認）
+  - ドメイン追加（Region選択、ルートドメイン vs サブドメイン）
+  - **DNS設定詳細**（最重点）:
+    - SPF レコード（TXT）の設定方法と例（お名前.com、Cloudflare）
+    - DKIM レコード（TXT）の設定方法と例
+    - Return-Path レコード（CNAME）の設定方法と例
+    - DMARC レコード（TXT）のオプション設定
+    - DNS反映確認方法（dig コマンド、オンラインツール）
+  - ドメイン検証手順（緑チェックマーク確認）
+  - APIキー取得と環境変数設定
+  - テスト送信（会員登録、パスワードリセット）
+  - トラブルシューティング（5つの問題パターンと対策）
+  - チェックリスト、所要時間、参考リンク
+  - **ステータス**: 本番環境用DNS設定ガイド完成
 
 #### ブログ機能の完全統合とorigin/devブランチマージ（Phase 3完了）
 - **feature/blog-markdown-styling と origin/dev のマージ**
