@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
@@ -29,7 +29,6 @@ import { useToast } from "@/hooks/use-toast";
 import { loginSchema, LoginInput } from "@/lib/validations/auth";
 
 function LoginPageContent() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -69,8 +68,8 @@ function LoginPageContent() {
         description: "マイページにリダイレクトしています...",
       });
 
-      router.push(callbackUrl);
-      router.refresh();
+      // セッション更新を確実にするため、window.location.href でリダイレクト
+      window.location.href = callbackUrl;
     } catch (error) {
       console.error("Login error:", error);
       toast({
