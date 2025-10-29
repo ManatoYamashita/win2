@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 /**
@@ -16,10 +17,14 @@ export function Footer() {
       <div className="container mx-auto px-4 py-8">
         {/* ロゴ */}
         <div className="flex justify-center mb-4">
-          <Link href="/" className="flex items-center">
-            <span className="text-3xl font-bold text-gray-500 hover:text-gray-600 transition-colors">
-              WIN×Ⅱ
-            </span>
+          <Link href="/" className="flex items-center" aria-label="WIN×Ⅱ トップページ">
+            <Image
+              src="/assets/win2/logo.webp"
+              alt="WIN×Ⅱ"
+              width={160}
+              height={46}
+              className="h-10 w-auto object-contain opacity-80 transition-opacity hover:opacity-100"
+            />
           </Link>
         </div>
 

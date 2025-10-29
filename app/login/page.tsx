@@ -68,7 +68,8 @@ function LoginPageContent() {
         description: "マイページにリダイレクトしています...",
       });
 
-      // セッション更新を確実にするため、window.location.href でリダイレクト
+      // Cookie設定完了を待機してからリダイレクト（本番環境でのタイミング問題対応）
+      await new Promise(resolve => setTimeout(resolve, 300));
       window.location.href = callbackUrl;
     } catch (error) {
       console.error("Login error:", error);
@@ -77,7 +78,6 @@ function LoginPageContent() {
         title: "エラー",
         description: "予期しないエラーが発生しました",
       });
-    } finally {
       setIsLoading(false);
     }
   };
