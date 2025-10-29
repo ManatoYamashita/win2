@@ -5,6 +5,7 @@ import { sheets, SPREADSHEET_ID, isGoogleSheetsConfigured } from "./googleapis";
  */
 export const SHEET_NAMES = {
   MEMBERS: "会員リスト",
+  DEALS: "案件マスタ",
   CLICK_LOG: "クリックログ",
   RESULT_DATA: "成果データ",
   RESULT_CSV_RAW: "成果CSV_RAW",
@@ -36,18 +37,41 @@ export interface MemberRow {
 }
 
 /**
+ * 案件マスタ型定義
+ * シート構成:
+ * A: アフィリエイトURL
+ * B: 案件ID (一意)
+ * C: 案件名
+ * D: ASP名
+ * E: 報酬額
+ * F: キャッシュバック率 (例: 0.20 = 20%)
+ * G: 有効/無効 (TRUE/FALSE)
+ */
+export interface DealRow {
+  dealId: string;
+  dealName: string;
+  aspName: string;
+  affiliateUrl: string;
+  rewardAmount: number;
+  cashbackRate: number;
+  isActive: boolean;
+}
+
+/**
  * クリックログ型定義
  * シート構成:
  * A: 日時 (ISO8601)
  * B: memberId (or guest:UUID)
  * C: 案件名
  * D: 案件ID (dealId)
+ * E: イベントID (eventId) - UUID v4
  */
 export interface ClickLogRow {
   timestamp: string;
   memberId: string;
   dealName: string;
   dealId: string;
+  eventId: string;
 }
 
 /**
@@ -253,6 +277,7 @@ export async function addClickLog(log: ClickLogRow): Promise<void> {
     log.memberId,
     log.dealName,
     log.dealId,
+    log.eventId,
   ];
 
   await appendToSheet(SHEET_NAMES.CLICK_LOG, values);
@@ -264,7 +289,7 @@ export async function addClickLog(log: ClickLogRow): Promise<void> {
  */
 export async function getClickLogsByMemberId(memberId: string): Promise<ClickLogRow[]> {
   try {
-    const rows = await readSheet(SHEET_NAMES.CLICK_LOG, "A2:D");
+    const rows = await readSheet(SHEET_NAMES.CLICK_LOG, "A2:E");
 
     const logs = rows
       .filter(row => row[1] === memberId)
@@ -273,6 +298,7 @@ export async function getClickLogsByMemberId(memberId: string): Promise<ClickLog
         memberId: row[1] || "",
         dealName: row[2] || "",
         dealId: row[3] || "",
+        eventId: row[4] || "",
       }));
 
     return logs;
@@ -296,10 +322,10 @@ export async function getResultsByMemberId(memberId: string): Promise<ResultRow[
         name: row[0] || "",
         dealName: row[1] || "",
         status: row[2] || "",
-        cashbackAmount: parseFloat(row[3] ?? "0") || 0,
+        cashbackAmount: parseFloat(row[3] || "0") || 0,
         memberId: row[4] || "",
-        originalReward: parseFloat(row[5] ?? "0") || 0,
-        memo: row[6],
+        originalReward: parseFloat(row[5] || "0") || 0,
+        memo: row[6] || "",
       }));
 
     return results;
@@ -341,6 +367,78 @@ export async function updateMemberEmailVerified(
     console.log(`Updated emailVerified for member ${memberId} to ${verified}`);
   } catch (error) {
     console.error("Error updating member email verified status:", error);
+    throw error;
+  }
+}
+
+// ========================================
+// 案件マスタ関連の関数
+// ========================================
+
+/**
+ * 案件マスタから案件情報を取得（dealIdで検索）
+ * @param dealId 案件ID
+ * @returns 案件情報（見つからない場合はnull）
+ */
+export async function getDealById(dealId: string): Promise<DealRow | null> {
+  try {
+    const rows = await readSheet(SHEET_NAMES.DEALS, "A2:G");
+
+    // B列（案件ID）で検索
+    const dealRow = rows.find(row => row[1] === dealId);
+
+    if (!dealRow) {
+      return null;
+    }
+
+    // G列（有効/無効）がTRUEの案件のみ返す
+    const isActive = dealRow[6] === "TRUE" || dealRow[6] === "true";
+    if (!isActive) {
+      console.log(`Deal ${dealId} is inactive`);
+      return null;
+    }
+
+    return {
+      dealId: dealRow[1] || "",           // B列: 案件ID
+      dealName: dealRow[2] || "",         // C列: 案件名
+      aspName: dealRow[3] || "",          // D列: ASP名
+      affiliateUrl: dealRow[0] || "",     // A列: アフィリエイトURL
+      rewardAmount: parseFloat(dealRow[4] ?? "0") || 0,     // E列: 報酬額
+      cashbackRate: parseFloat(dealRow[5] ?? "0.2") || 0.2, // F列: キャッシュバック率
+      isActive: true, // Already filtered above
+    };
+  } catch (error) {
+    console.error("Error getting deal by ID:", error);
+    throw error;
+  }
+}
+
+/**
+ * 案件マスタから全ての有効な案件を取得
+ * @returns 有効な案件一覧（有効/無効 = TRUEのもののみ）
+ */
+export async function getAllActiveDeals(): Promise<DealRow[]> {
+  try {
+    const rows = await readSheet(SHEET_NAMES.DEALS, "A2:G");
+
+    const deals = rows
+      .filter(row => {
+        const isActive = row[6] === "TRUE" || row[6] === "true";
+        return isActive && row[1]; // B列（案件ID）が存在し、有効/無効がTRUE
+      })
+      .map(row => ({
+        dealId: row[1] || "",           // B列: 案件ID
+        dealName: row[2] || "",         // C列: 案件名
+        aspName: row[3] || "",          // D列: ASP名
+        affiliateUrl: row[0] || "",     // A列: アフィリエイトURL
+        rewardAmount: parseFloat(row[4] ?? "0") || 0,     // E列: 報酬額
+        cashbackRate: parseFloat(row[5] ?? "0.2") || 0.2, // F列: キャッシュバック率
+        isActive: true,
+      }));
+
+    return deals;
+  } catch (error) {
+    console.error("Error getting all active deals:", error);
     throw error;
   }
 }
