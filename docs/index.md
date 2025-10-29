@@ -195,7 +195,6 @@ docs/
   - `react-markdown`, `remark-gfm`, `rehype-raw`: Phase 2依存関係と共存
   - `lib/sheets.ts`: TypeScript型エラー修正（parseFloat型安全性向上）
   - **ステータス**: Markdown表示機能完全対応、スタイリング最適化完了
-
 ### 2025-10-27
 - **Phase 3 CTA機能 実装完了**
   - `guides/cta-shortcode-guide.md`: 新規作成（クライアント向けCTAショートコード使用ガイド v1.0.0）
