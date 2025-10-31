@@ -116,6 +116,7 @@ export function LandingPage() {
     <main className="bg-[#fef4ea] text-slate-900">
       <HeroSection />
       <ProblemSection />
+      <IntroductionBoxSection />
       <ServiceSection />
       <MeritSection />
       <HighlightSection />
@@ -210,36 +211,132 @@ function ProblemSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="relative bg-white py-24">
-      <div className="absolute inset-0">
-        <Image
-          src="/assets/images/problem.webp"
-          alt="背景テクスチャ"
-          fill
-          className="object-cover opacity-90"
-        />
-      </div>
+    <section className="relative bg-[#f5f1ed] py-16">
       <div
         ref={ref}
         className={cn(
-          "relative mx-auto flex max-w-[1000px] flex-col items-center gap-8 px-6 text-center lg:px-8",
+          "mx-auto max-w-[1200px] px-6",
           "transition-transform-opacity",
           isVisible ? "reveal-visible" : "reveal"
         )}
       >
-        <Image
-          src="/assets/images/problems-paragraph.webp"
-          alt="こんなお悩みありませんか？"
-          width={900}
-          height={500}
-          className="w-full max-w-[850px] object-contain"
-        />
-        <Link
-          href="/register"
-          className="rounded-full bg-[#f05972] px-12 py-3 text-sm font-semibold text-white shadow-md shadow-[#f05972]/20 transition hover:bg-[#d9475e]"
-        >
-          メンバー登録でお得な情報を受け取る
-        </Link>
+        {/* 見出し */}
+        <div className="mb-12 text-center">
+          <h2 className="flex flex-wrap items-center justify-center gap-2 text-2xl font-bold md:text-3xl lg:text-4xl">
+            <span className="inline-block rounded-full border-2 border-[#f26f36] bg-white px-4 py-1 text-[#f26f36]">
+              日常で
+            </span>
+            <span>こんな</span>
+            <span className="text-[#f26f36]">お悩み</span>
+            <span>、ありませんか？</span>
+          </h2>
+        </div>
+
+        {/* 3カラムレイアウト */}
+        <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[180px_1fr_180px] lg:grid-cols-[220px_1fr_220px]">
+          {/* 左：悩む人の画像 */}
+          <div className="flex justify-center">
+            <div className="relative h-40 w-40 overflow-hidden rounded-full md:h-44 md:w-44 lg:h-52 lg:w-52">
+              <Image
+                src="/assets/images/problem.webp"
+                alt="悩む人"
+                fill
+                className="object-cover grayscale"
+              />
+            </div>
+          </div>
+
+          {/* 中央：お悩みリスト */}
+          <div className="space-y-3 text-left text-sm md:text-base">
+            <p className="leading-relaxed">
+              • 保険料高い気がするけど、
+              <span className="font-semibold text-[#f26f36]">どこをどう見直せばいいか分からない</span>
+            </p>
+            <p className="leading-relaxed">
+              • 不動産の価値を知りたいけど、
+              <span className="font-semibold text-[#f26f36]">査定って難しそう</span>
+              で不安
+            </p>
+            <p className="leading-relaxed">
+              • <span className="font-semibold text-[#f26f36]">転職したい</span>
+              けど、どのサービスが自分に合っているのか分からない
+            </p>
+            <p className="leading-relaxed">
+              • サブスクやキャンペーンが多すぎて、
+              <span className="font-semibold text-[#f26f36]">どれがお得か比べられない</span>
+            </p>
+            <p className="leading-relaxed">
+              • <span className="font-semibold text-[#f26f36]">生活費をもっと節約したい</span>
+              けど、何から始めればいいか迷ってる
+            </p>
+          </div>
+
+          {/* 右：女性画像 */}
+          <div className="flex justify-center">
+            <div className="relative h-56 w-40 md:h-64 md:w-44 lg:h-80 lg:w-52">
+              <Image
+                src="/assets/images/woman.webp"
+                alt="案内スタッフ"
+                fill
+                className="object-contain"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 下部オレンジ帯 */}
+        <div className="relative -mx-6 mt-12 overflow-hidden bg-gradient-to-r from-[#f05972] to-[#f48a3c] py-6 text-center md:-mx-0 md:rounded-2xl">
+          <p className="text-lg font-bold text-white md:text-xl">そんな時こそ</p>
+          <p className="mt-1 text-2xl font-bold md:text-3xl">
+            <span className="text-[#fff44f]">WIN×Ⅱ</span>
+            <span className="text-white">の出番です！</span>
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function IntroductionBoxSection() {
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+
+  return (
+    <section className="bg-white py-16">
+      <div
+        ref={ref}
+        className={cn(
+          "mx-auto max-w-[900px] px-6",
+          "transition-transform-opacity",
+          isVisible ? "reveal-visible" : "reveal"
+        )}
+      >
+        {/* 吹き出しボックス */}
+        <div className="relative rounded-[40px] border-4 border-[#f26f36] bg-white p-8 shadow-[0_20px_50px_rgba(242,111,54,0.2)] md:p-10">
+          {/* 上部三角形（オレンジ帯からの矢印効果） */}
+          <div className="absolute -top-6 left-1/2 h-12 w-12 -translate-x-1/2 rotate-45 border-l-4 border-t-4 border-[#f26f36] bg-white" />
+
+          <div className="relative z-10 space-y-4 text-center">
+            <p className="text-base leading-relaxed md:text-lg">保険・不動産・転職・エンタメなど</p>
+            <p className="text-base leading-relaxed md:text-lg">
+              暮らしに関わる
+              <span className="font-bold text-[#f26f36]">多彩な情報を1つのサイトでまとめて比較・検討</span>
+            </p>
+            <p className="text-base leading-relaxed md:text-lg">
+              できるから、「知らなかった」で損する前に、
+              <span className="font-bold text-[#f26f36]">最適な選択肢が見つかります！</span>
+            </p>
+          </div>
+        </div>
+
+        {/* CTAボタン */}
+        <div className="mt-8 text-center">
+          <Link
+            href="/register"
+            className="inline-block rounded-full bg-gradient-to-r from-[#f05972] to-[#f26f36] px-12 py-4 text-base font-bold text-white shadow-lg shadow-[#f05972]/30 transition hover:opacity-90 md:text-lg"
+          >
+            メルマガ会員登録はこちら
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -253,19 +350,26 @@ function ServiceSection() {
       <div
         ref={ref}
         className={cn(
-          "mx-auto flex max-w-[1080px] flex-col items-center gap-10 px-6 text-center lg:px-8",
+          "mx-auto max-w-[1080px] px-6 lg:px-8",
           "transition-transform-opacity",
           isVisible ? "reveal-visible" : "reveal"
         )}
       >
-        <Image
-          src="/assets/images/win2-is-bibble.webp"
-          alt="WIN×Ⅱはどんなサービス？"
-          width={980}
-          height={520}
-          className="w-full max-w-[880px] object-contain"
-        />
-        <div className="flex flex-wrap justify-center gap-4">
+        {/* 見出し：WIN×Ⅱは どんなサービス？ */}
+        <div className="mb-12 flex flex-col items-center justify-center gap-6 md:flex-row md:gap-4">
+          <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#f05972] to-[#f48a3c] shadow-lg md:h-32 md:w-32 lg:h-36 lg:w-36">
+            <span className="text-center text-xl font-bold leading-tight text-white md:text-2xl">
+              WIN×Ⅱ
+              <br />は
+            </span>
+          </div>
+          <h2 className="text-3xl font-bold md:text-4xl lg:text-5xl">
+            どんな<span className="text-[#f26f36]">サービス</span>？
+          </h2>
+        </div>
+
+        {/* カテゴリボタン */}
+        <div className="mb-10 flex flex-wrap justify-center gap-4">
           {serviceCategories.map((category) => (
             <div
               key={category}
