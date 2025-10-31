@@ -147,10 +147,16 @@ export function LandingPage() {
 }
 
 function HeroSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  const { ref } = useScrollReveal<HTMLDivElement>();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsMounted(true), 150);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <section className="relative -mb-32 overflow-visible bg-gradient-to-b from-win2-surface-cream-320 via-white to-win2-surface-cream-150 pb-32 md:-mb-40 md:pb-40">
+    <section className="relative -mb-32 overflow-visible bg-gradient-to-b from-win2-surface-cream-320 via-white to-win2-surface-cream-150 pb-32 md:-mb-40 md:pb-44">
       <div className="absolute inset-0">
         <Image
           src="/assets/images/office-super-blur.webp"
@@ -163,12 +169,12 @@ function HeroSection() {
       <div
         ref={ref}
         className={cn(
-          "relative z-10 mx-auto flex max-w-[1100px] flex-col-reverse gap-12 px-6 pt-24 md:flex-row md:items-center lg:px-8",
+          "relative z-10 mx-auto flex max-w-[1100px] flex-col gap-12 px-6 pt-24 md:flex-row md:items-center lg:px-8",
           "transition-transform-opacity",
-          isVisible ? "reveal-visible" : "reveal"
+          isMounted ? "reveal-visible" : "reveal"
         )}
       >
-        <div className="max-w-xl space-y-8">
+        <div className="relative z-40 max-w-xl space-y-8">
           <div className="space-y-3">
             <p className="text-sm font-semibold tracking-[0.35em] text-win2-accent-gold">WIN×Ⅱ</p>
             <h1 className="text-4xl font-bold leading-tight text-win2-neutral-950 md:text-5xl">
@@ -198,7 +204,7 @@ function HeroSection() {
           <div className="flex flex-wrap items-center gap-4">
             <Link
               href="/register"
-              className="rounded-full bg-win2-accent-rose px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark"
+              className="rounded-full bg-win2-primary-orage px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-primary-orage/25 transition hover:bg-win2-accent-amber"
             >
               メンバー登録（無料）はこちら
             </Link>
@@ -210,7 +216,7 @@ function HeroSection() {
             </Link>
           </div>
         </div>
-        <div className="relative mx-auto w-full max-w-[420px] md:max-w-[460px]">
+        <div className="relative z-20 mx-auto w-full max-w-[420px] md:max-w-[460px]">
           <Image
             src="/assets/images/woman.webp"
             alt="メインビジュアル"
@@ -221,6 +227,7 @@ function HeroSection() {
           />
         </div>
       </div>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent via-win2-surface-stone-100/80 to-win2-surface-stone-100 md:h-32 md:via-win2-surface-stone-100/90" />
     </section>
   );
 }
@@ -298,6 +305,7 @@ function ProblemSection() {
                 fill
                 className="object-contain"
               />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-win2-surface-stone-100" />
             </div>
           </div>
         </div>
@@ -441,7 +449,7 @@ function ServiceSection() {
             </div>
           ))}
         </div>
-        <div className="relative mx-auto w-full max-w-[640px] pt-24 lg:max-w-[720px]">
+        <div className="relative mx-auto w-full max-w-[900px] pt-24 lg:max-w-[1080px]">
           <div className="overflow-hidden rounded-[32px] bg-win2-surface-cream-50">
             {isVideoError ? (
               <Image
