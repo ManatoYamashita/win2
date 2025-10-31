@@ -63,8 +63,8 @@ export default function RootLayout({
     <html lang="ja" suppressHydrationWarning>
       <body>
         <SessionProvider>
+          <Header />
           <PageTransition>
-            <Header />
             <main className="flex-1">
               {children}
             </main>
