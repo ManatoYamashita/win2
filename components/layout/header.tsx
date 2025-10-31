@@ -1,0 +1,166 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
+import { useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
+
+/**
+ * 共通Headerコンポーネント
+ *
+ * 機能:
+ * - WIN×II ロゴ表示
+ * - ナビゲーションリンク（トップページ、ブログ、案件一覧、プロフィール）
+ * - ログイン/ログアウト状態の切り替え
+ * - レスポンシブ対応（モバイルでハンバーガーメニュー）
+ */
+export function Header() {
+  const { data: session, status } = useSession();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const navigation = useMemo(() => {
+    const items: Array<{ href: string; label: string; isActive: boolean }> = [
+      {
+        href: "/",
+        label: "トップページ",
+        isActive: pathname === "/",
+      },
+      {
+        href: "/blog",
+        label: "ブログ",
+        isActive: pathname.startsWith("/blog") || pathname.startsWith("/category"),
+      },
+    ];
+
+    if (session) {
+      items.push({
+        href: "/mypage",
+        label: "マイページ",
+        isActive: pathname.startsWith("/mypage"),
+      });
+      items.push({
+        href: "#logout",
+        label: "ログアウト",
+        isActive: false,
+      });
+    } else {
+      items.push({
+        href: "/register",
+        label: "新規登録",
+        isActive: pathname === "/register",
+      });
+      items.push({
+        href: "/login",
+        label: "ログイン",
+        isActive: pathname === "/login",
+      });
+    }
+
+    return items;
+  }, [pathname, session]);
+
+  const getLinkClasses = (isActive: boolean) =>
+    cn(
+      "relative inline-flex items-center text-[14px] font-medium text-slate-600 transition-colors",
+      isActive ? "text-[#f26f36]" : "hover:text-[#f26f36]"
+    );
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleSignOut = async () => {
+    await signOut({ callbackUrl: "/" });
+  };
+
+  return (
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-[#ffe1cc]">
+      <div className="mx-auto flex max-w-[1100px] items-center justify-between px-4 py-4 lg:px-6">
+        <Link href="/" className="flex items-center gap-3" aria-label="WIN×Ⅱ トップページ">
+          <Image
+            src="/assets/win2/logo.webp"
+            alt="WIN×Ⅱ"
+            width={140}
+            height={40}
+            className="h-8 w-auto object-contain"
+            priority
+          />
+          <span className="hidden text-sm font-semibold tracking-[0.35em] text-[#f26f36] md:inline">
+            OFFICIAL
+          </span>
+        </Link>
+
+        <nav className="hidden items-center gap-7 md:flex">
+          {navigation.map((item) =>
+            item.href === "#logout" ? (
+              <button
+                key="logout"
+                type="button"
+                onClick={handleSignOut}
+                className="text-[14px] font-medium text-slate-600 transition hover:text-[#f26f36]"
+              >
+                ログアウト
+              </button>
+            ) : (
+              <Link key={item.href} href={item.href} className={getLinkClasses(item.isActive)}>
+                {item.label}
+              </Link>
+            )
+          )}
+        </nav>
+
+        <button
+          onClick={toggleMobileMenu}
+          className="rounded-md p-2 md:hidden"
+          aria-label="メニューを開く"
+        >
+          {isMobileMenuOpen ? (
+            <svg className="h-6 w-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg className="h-6 w-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          )}
+        </button>
+      </div>
+      {isMobileMenuOpen && (
+        <div className="border-t border-[#ffe1cc] bg-white/95 px-4 py-4 md:hidden">
+          <nav className="flex flex-col gap-4 text-sm text-slate-600">
+            {navigation.map((item) =>
+              item.href === "#logout" ? (
+                <button
+                  key="logout-mobile"
+                  type="button"
+                  onClick={() => {
+                    handleSignOut();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-left font-medium transition hover:text-[#f26f36]"
+                >
+                  ログアウト
+                </button>
+              ) : (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={getLinkClasses(item.isActive)}
+                >
+                  {item.label}
+                </Link>
+              )
+            )}
+            {status === "loading" && (
+              <span className="text-xs text-slate-400">読み込み中...</span>
+            )}
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+}
