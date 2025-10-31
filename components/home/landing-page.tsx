@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
@@ -51,21 +51,21 @@ const meritItems = [
     title: "幅広いジャンルを網羅",
     description:
       "保険・不動産・転職・エンタメ・生活サービスなど、暮らしに関わる情報を総合的にカバー。",
-    image: "/assets/images/merit-icon-01.webp",
+    image: "/assets/images/graph-icon.webp",
   },
   {
     number: "02",
     title: "比較・検討が一目でわかる",
     description:
       "各種サービス情報をまとめて掲載。自分に合った選択肢がスムーズに見つかります。",
-    image: "/assets/images/merit-icon-02.webp",
+    image: "/assets/images/insight-icon.webp",
   },
   {
     number: "03",
     title: "無料で使える安心設計",
     description:
       "多くのサービスが無料で利用可能。初めての方でも安心して活用できます。",
-    image: "/assets/images/merit-icon-03.webp",
+    image: "/assets/images/free-icon.webp",
   },
 ];
 
@@ -86,24 +86,28 @@ const testimonials = [
     gender: "女性",
     comment: "保険の見直しで年間5万円も節約できました！比較がとても簡単で助かりました。",
     rating: 5,
+    avatar: "/assets/images/woman-icon.webp",
   },
   {
     age: "30代",
     gender: "男性",
     comment: "転職サービスの情報が充実していて、自分に合った求人が見つかりました。サポートも丁寧でした。",
     rating: 5,
+    avatar: "/assets/images/man-icon.webp",
   },
   {
     age: "40代",
     gender: "女性",
     comment: "不動産査定がこんなに簡単にできるとは思いませんでした。対応も迅速で信頼できました。",
     rating: 5,
+    avatar: "/assets/images/old-woman-icon.webp",
   },
   {
     age: "50代",
     gender: "男性",
     comment: "エンタメサブスクの比較ができて、無駄な契約を整理できました。家計に優しいサービスです。",
     rating: 5,
+    avatar: "/assets/images/old-man-icon.webp",
   },
 ];
 
@@ -358,6 +362,39 @@ function IntroductionBoxSection() {
 
 function ServiceSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [hasPlayed, setHasPlayed] = useState(false);
+
+  useEffect(() => {
+    const videoNode = videoRef.current;
+    if (!videoNode) return;
+
+    if (isVisible && !hasPlayed) {
+      void videoNode
+        .play()
+        .then(() => setHasPlayed(true))
+        .catch(() => {
+          // 自動再生がブロックされた場合はフォールバックとして最後のフレームを表示
+          videoNode.currentTime = videoNode.duration;
+          setHasPlayed(true);
+        });
+    }
+  }, [isVisible, hasPlayed]);
+
+  useEffect(() => {
+    const videoNode = videoRef.current;
+    if (!videoNode) return;
+
+    const handleEnded = () => {
+      videoNode.pause();
+      videoNode.currentTime = videoNode.duration;
+    };
+
+    videoNode.addEventListener("ended", handleEnded);
+    return () => {
+      videoNode.removeEventListener("ended", handleEnded);
+    };
+  }, []);
 
   return (
     <section className="bg-[#fffaf4] py-24">
@@ -396,20 +433,20 @@ function ServiceSection() {
           ))}
         </div>
         <div className="relative mx-auto w-full max-w-[560px] pt-20">
-          <Image
-            src="/assets/images/onestop-circle-text.webp"
-            alt="WIN×Ⅱはワンストップで暮らしを支える"
-            width={360}
-            height={360}
-            className="absolute left-1/2 top-0 w-48 -translate-x-1/2 -translate-y-1/2 object-contain md:w-56 lg:w-64"
-          />
-          <Image
-            src="/assets/images/onestop-figure.webp"
-            alt="暮らしを支える4つのカテゴリ"
-            width={720}
-            height={540}
-            className="w-full object-contain"
-          />
+          <div className="overflow-hidden rounded-[32px] border border-[#ffe1cc] bg-[#fffaf4]">
+            <video
+              ref={videoRef}
+              className="block w-full object-cover"
+              playsInline
+              preload="metadata"
+              muted
+              loop={false}
+              controls={false}
+              aria-label="WIN×Ⅱのサービス紹介"
+            >
+              <source src="/assets/images/what-is-win2.webm" type="video/webm" />
+            </video>
+          </div>
         </div>
       </div>
     </section>
@@ -607,9 +644,14 @@ function TestimonialsSection() {
 
               {/* ユーザー情報 */}
               <div className="relative mb-4 flex items-center gap-3">
-                {/* アバター */}
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#f26f36] to-[#f48a3c] text-2xl shadow-md">
-                  {testimonial.gender === "女性" ? "👩" : "👨"}
+                {/* アバター画像 */}
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full shadow-md ring-2 ring-[#f26f36]/20">
+                  <Image
+                    src={testimonial.avatar}
+                    alt={`${testimonial.age} ${testimonial.gender}`}
+                    fill
+                    className="object-cover"
+                  />
                 </div>
                 <div>
                   {/* 年齢・性別バッジ */}
