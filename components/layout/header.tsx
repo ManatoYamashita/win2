@@ -150,7 +150,7 @@ export function Header() {
 
       <aside
         className={cn(
-          "fixed inset-y-0 right-0 z-[90] w-full max-w-[320px] translate-x-full bg-white shadow-[-12px_0_36px_rgba(24,25,28,0.16)] transition-transform duration-300 md:hidden",
+          "fixed inset-y-0 right-0 z-[90] w-full translate-x-full bg-white shadow-[-12px_0_36px_rgba(24,25,28,0.16)] transition-transform duration-300 md:hidden",
           isMobileMenuOpen && "translate-x-0"
         )}
         aria-hidden={!isMobileMenuOpen}
@@ -168,7 +168,7 @@ export function Header() {
             </svg>
           </button>
         </div>
-        <nav className="flex h-[calc(100%-4rem)] flex-col gap-6 overflow-y-auto px-5 py-6 text-sm text-slate-600">
+        <nav className="flex h-[calc(100%-4rem)] flex-col justify-between overflow-y-auto px-5 py-6 text-sm text-slate-600">
           <div className="space-y-4">
             {navigation.map((item) => (
               <Link
