@@ -51,21 +51,21 @@ const meritItems = [
     title: "幅広いジャンルを網羅",
     description:
       "保険・不動産・転職・エンタメ・生活サービスなど、暮らしに関わる情報を総合的にカバー。",
-    icon: "📊",
+    image: "/assets/images/merit-icon-01.webp",
   },
   {
     number: "02",
     title: "比較・検討が一目でわかる",
     description:
       "各種サービス情報をまとめて掲載。自分に合った選択肢がスムーズに見つかります。",
-    icon: "🔍",
+    image: "/assets/images/merit-icon-02.webp",
   },
   {
     number: "03",
     title: "無料で使える安心設計",
     description:
       "多くのサービスが無料で利用可能。初めての方でも安心して活用できます。",
-    icon: "✨",
+    image: "/assets/images/merit-icon-03.webp",
   },
 ];
 
@@ -146,7 +146,7 @@ function HeroSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#fff7f2] via-white to-[#ffeade]">
+    <section className="relative overflow-visible bg-gradient-to-b from-[#fff7f2] via-white to-[#ffeade]">
       <div className="absolute inset-0">
         <Image
           src="/assets/images/office-super-blur.webp"
@@ -159,7 +159,7 @@ function HeroSection() {
       <div
         ref={ref}
         className={cn(
-          "relative mx-auto flex max-w-[1100px] flex-col-reverse gap-12 px-6 pb-20 pt-24 md:flex-row md:items-center lg:px-8",
+          "relative z-10 mx-auto flex max-w-[1100px] flex-col-reverse gap-12 px-6 pb-20 pt-24 md:flex-row md:items-center lg:px-8",
           "transition-transform-opacity",
           isVisible ? "reveal-visible" : "reveal"
         )}
@@ -225,7 +225,7 @@ function ProblemSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="relative bg-[#f5f1ed] py-16">
+    <section className="relative z-20 bg-[#f5f1ed] py-16">
       <div
         ref={ref}
         className={cn(
@@ -452,8 +452,17 @@ function MeritSection() {
                 </div>
               </div>
 
-              {/* アイコン */}
-              <div className="relative mb-4 flex justify-center text-5xl">{item.icon}</div>
+              {/* アイコン画像 */}
+              <div className="relative mb-6 flex justify-center">
+                <div className="relative h-24 w-24">
+                  <Image
+                    src={item.image}
+                    alt={`${item.title}のアイコン`}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
 
               {/* タイトル */}
               <div className="relative mb-4">
