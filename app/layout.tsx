@@ -58,12 +58,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Suppress hydration mismatches caused by dev tools injecting CSS variables on the root element.
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
       <body>
         <SessionProvider>
+          <Header />
           <PageTransition>
-            <Header />
             <main className="flex-1">
               {children}
             </main>

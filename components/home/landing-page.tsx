@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
@@ -27,39 +28,44 @@ const serviceCategories = ["各種保険", "不動産", "エンタメ", "転職"
 
 const serviceFeatures = [
   {
-    title: "保険の無料相談",
-    description: "ライフステージに合わせた最適な保険プランをご提案します。",
     image: "/assets/images/保険の無料相談.webp",
+    alt: "保険の無料相談",
   },
   {
-    title: "不動産査定サービス",
-    description: "売却・住み替えまで専門スタッフがしっかりサポートします。",
     image: "/assets/images/不動産査定サービス.webp",
+    alt: "不動産査定サービス",
   },
   {
-    title: "エンタメサブスク特集",
-    description: "動画配信・音楽など、お得なサブスク情報を厳選してお届け。",
     image: "/assets/images/エンタメサブスク特集.webp",
+    alt: "エンタメサブスク特集",
   },
   {
-    title: "転職支援サポート",
-    description: "キャリアアップを目指す方に最適な求人とノウハウをご紹介。",
     image: "/assets/images/転職支援サポート.webp",
+    alt: "転職支援サポート",
   },
 ];
 
-const meritImages = [
+const meritItems = [
   {
-    image: "/assets/images/point1.webp",
-    alt: "POINT01 保険・不動産など多彩なジャンルに対応",
+    number: "01",
+    title: "幅広いジャンルを網羅",
+    description:
+      "保険・不動産・転職・エンタメ・生活サービスなど、暮らしに関わる情報を総合的にカバー。",
+    image: "/assets/images/graph-icon.webp",
   },
   {
-    image: "/assets/images/point2.webp",
-    alt: "POINT02 成果報酬型のキャッシュバック",
+    number: "02",
+    title: "比較・検討が一目でわかる",
+    description:
+      "各種サービス情報をまとめて掲載。自分に合った選択肢がスムーズに見つかります。",
+    image: "/assets/images/insight-icon.webp",
   },
   {
-    image: "/assets/images/point3.webp",
-    alt: "POINT03 専門家によるサポート",
+    number: "03",
+    title: "無料で使える安心設計",
+    description:
+      "多くのサービスが無料で利用可能。初めての方でも安心して活用できます。",
+    image: "/assets/images/free-icon.webp",
   },
 ];
 
@@ -76,20 +82,32 @@ const achievementImages = [
 
 const testimonials = [
   {
-    image: "/assets/images/comment-20-woman.webp",
-    alt: "20代女性の声",
+    age: "20代",
+    gender: "女性",
+    comment: "保険の見直しで年間5万円も節約できました！比較がとても簡単で助かりました。",
+    rating: 5,
+    avatar: "/assets/images/woman-icon.webp",
   },
   {
-    image: "/assets/images/comment-30-man.webp",
-    alt: "30代男性の声",
+    age: "30代",
+    gender: "男性",
+    comment: "転職サービスの情報が充実していて、自分に合った求人が見つかりました。サポートも丁寧でした。",
+    rating: 5,
+    avatar: "/assets/images/man-icon.webp",
   },
   {
-    image: "/assets/images/comment-40-woman.webp",
-    alt: "40代女性の声",
+    age: "40代",
+    gender: "女性",
+    comment: "不動産査定がこんなに簡単にできるとは思いませんでした。対応も迅速で信頼できました。",
+    rating: 5,
+    avatar: "/assets/images/old-woman-icon.webp",
   },
   {
-    image: "/assets/images/comment-50-man.webp",
-    alt: "50代男性の声",
+    age: "50代",
+    gender: "男性",
+    comment: "エンタメサブスクの比較ができて、無駄な契約を整理できました。家計に優しいサービスです。",
+    rating: 5,
+    avatar: "/assets/images/old-man-icon.webp",
   },
 ];
 
@@ -113,9 +131,10 @@ const faqItems = [
 
 export function LandingPage() {
   return (
-    <main className="bg-[#fef4ea] text-slate-900">
+    <main className="bg-win2-surface-cream-100 text-slate-900">
       <HeroSection />
       <ProblemSection />
+      <IntroductionBoxSection />
       <ServiceSection />
       <MeritSection />
       <HighlightSection />
@@ -128,10 +147,16 @@ export function LandingPage() {
 }
 
 function HeroSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  const { ref } = useScrollReveal<HTMLDivElement>();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsMounted(true), 150);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#fff7f2] via-white to-[#ffeade]">
+    <section className="relative -mb-32 overflow-visible bg-gradient-to-b from-win2-surface-cream-320 via-white to-win2-surface-cream-150 pb-32 md:-mb-40 md:pb-44">
       <div className="absolute inset-0">
         <Image
           src="/assets/images/office-super-blur.webp"
@@ -144,17 +169,17 @@ function HeroSection() {
       <div
         ref={ref}
         className={cn(
-          "relative mx-auto flex max-w-[1100px] flex-col-reverse gap-12 px-6 pb-20 pt-24 md:flex-row md:items-center lg:px-8",
+          "relative z-10 mx-auto flex max-w-[1100px] flex-col gap-12 px-6 pt-24 md:flex-row md:items-center lg:px-8",
           "transition-transform-opacity",
-          isVisible ? "reveal-visible" : "reveal"
+          isMounted ? "reveal-visible" : "reveal"
         )}
       >
-        <div className="max-w-xl space-y-8">
+        <div className="relative z-40 max-w-xl space-y-8">
           <div className="space-y-3">
-            <p className="text-sm font-semibold tracking-[0.35em] text-[#f5a623]">WIN×Ⅱ</p>
-            <h1 className="text-4xl font-bold leading-tight text-[#1c1c1c] md:text-5xl">
+            <p className="text-sm font-semibold tracking-[0.35em] text-win2-accent-gold">WIN×Ⅱ</p>
+            <h1 className="text-4xl font-bold leading-tight text-win2-neutral-950 md:text-5xl">
               暮らしを
-              <span className="text-[#f26f36]">もっとお得に</span>
+              <span className="text-win2-primary-orage">もっとお得に</span>
               <br />
               もっとスマートに。
             </h1>
@@ -168,8 +193,8 @@ function HeroSection() {
                 key={stat.title}
                 className="flex min-w-[160px] flex-1 flex-col items-center rounded-[28px] bg-white/90 px-5 py-4 text-center shadow-[0_10px_22px_rgba(240,130,90,0.18)] backdrop-blur"
               >
-                <p className="text-xs font-semibold text-[#f26f36]">{stat.title}</p>
-                <p className="mt-2 text-2xl font-bold text-[#1c1c1c]">
+                <p className="text-xs font-semibold text-win2-primary-orage">{stat.title}</p>
+                <p className="mt-2 text-2xl font-bold text-win2-neutral-950">
                   {stat.value}
                   <span className="ml-1 text-base font-semibold text-slate-600">{stat.unit}</span>
                 </p>
@@ -179,19 +204,19 @@ function HeroSection() {
           <div className="flex flex-wrap items-center gap-4">
             <Link
               href="/register"
-              className="rounded-full bg-[#f05972] px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-[#f05972]/25 transition hover:bg-[#d9475e]"
+              className="rounded-full bg-win2-primary-orage px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-primary-orage/25 transition hover:bg-win2-accent-amber"
             >
               メンバー登録（無料）はこちら
             </Link>
             <Link
               href="/login"
-              className="rounded-full border border-[#f05972] px-10 py-3 text-sm font-semibold text-[#f05972] transition hover:bg-[#fff0f3]"
+              className="rounded-full border border-win2-accent-rose px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-win2-surface-rose-100"
             >
               ログイン
             </Link>
           </div>
         </div>
-        <div className="relative mx-auto w-full max-w-[420px] md:max-w-[460px]">
+        <div className="relative z-20 mx-auto w-full max-w-[420px] md:max-w-[460px]">
           <Image
             src="/assets/images/woman.webp"
             alt="メインビジュアル"
@@ -202,6 +227,7 @@ function HeroSection() {
           />
         </div>
       </div>
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent via-win2-surface-stone-100/80 to-win2-surface-stone-100 md:h-32 md:via-win2-surface-stone-100/90" />
     </section>
   );
 }
@@ -210,36 +236,133 @@ function ProblemSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="relative bg-white py-24">
-      <div className="absolute inset-0">
-        <Image
-          src="/assets/images/problem-opacity-white.webp"
-          alt="背景テクスチャ"
-          fill
-          className="object-cover opacity-90"
-        />
-      </div>
+    <section className="relative z-20 bg-win2-surface-stone-100 pb-16 pt-40 md:pt-48">
       <div
         ref={ref}
         className={cn(
-          "relative mx-auto flex max-w-[1000px] flex-col items-center gap-8 px-6 text-center lg:px-8",
+          "mx-auto max-w-[1200px] px-6",
           "transition-transform-opacity",
           isVisible ? "reveal-visible" : "reveal"
         )}
       >
-        <Image
-          src="/assets/images/problems.webp"
-          alt="こんなお悩みありませんか？"
-          width={900}
-          height={500}
-          className="w-full max-w-[850px] object-contain"
-        />
-        <Link
-          href="/register"
-          className="rounded-full bg-[#f05972] px-12 py-3 text-sm font-semibold text-white shadow-md shadow-[#f05972]/20 transition hover:bg-[#d9475e]"
-        >
-          メンバー登録でお得な情報を受け取る
-        </Link>
+        {/* 見出し */}
+        <div className="mb-12 text-center">
+          <h2 className="flex flex-wrap items-center justify-center gap-2 text-2xl font-bold md:text-3xl lg:text-4xl">
+            <span className="inline-block rounded-full border-2 border-win2-primary-orage bg-white px-4 py-1 text-win2-primary-orage">
+              日常で
+            </span>
+            <span>こんな</span>
+            <span className="text-win2-primary-orage">お悩み</span>
+            <span>、ありませんか？</span>
+          </h2>
+        </div>
+
+        {/* 3カラムレイアウト */}
+        <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-[180px_1fr_180px] lg:grid-cols-[220px_1fr_220px]">
+          {/* 左：悩む人の画像 */}
+          <div className="flex justify-center">
+            <div className="relative h-40 w-40 overflow-hidden rounded-full md:h-44 md:w-44 lg:h-52 lg:w-52">
+              <Image
+                src="/assets/images/problem.webp"
+                alt="悩む人"
+                fill
+                className="object-cover grayscale"
+              />
+            </div>
+          </div>
+
+          {/* 中央：お悩みリスト */}
+          <div className="space-y-3 text-left text-sm md:text-base">
+            <p className="leading-relaxed">
+              • 保険料高い気がするけど、
+              <span className="font-semibold text-win2-primary-orage">どこをどう見直せばいいか分からない</span>
+            </p>
+            <p className="leading-relaxed">
+              • 不動産の価値を知りたいけど、
+              <span className="font-semibold text-win2-primary-orage">査定って難しそう</span>
+              で不安
+            </p>
+            <p className="leading-relaxed">
+              • <span className="font-semibold text-win2-primary-orage">転職したい</span>
+              けど、どのサービスが自分に合っているのか分からない
+            </p>
+            <p className="leading-relaxed">
+              • サブスクやキャンペーンが多すぎて、
+              <span className="font-semibold text-win2-primary-orage">どれがお得か比べられない</span>
+            </p>
+            <p className="leading-relaxed">
+              • <span className="font-semibold text-win2-primary-orage">生活費をもっと節約したい</span>
+              けど、何から始めればいいか迷ってる
+            </p>
+          </div>
+
+          {/* 右：女性画像 */}
+          <div className="flex justify-center">
+            <div className="relative h-56 w-40 md:h-64 md:w-44 lg:h-80 lg:w-52">
+              <Image
+                src="/assets/images/woman.webp"
+                alt="案内スタッフ"
+                fill
+                className="object-contain"
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-win2-surface-stone-100" />
+            </div>
+          </div>
+        </div>
+
+        {/* 下部オレンジ帯 */}
+        <div className="relative -mx-6 mt-12 overflow-hidden bg-gradient-to-r from-win2-accent-rose to-win2-accent-amber py-6 text-center md:-mx-0 md:rounded-2xl">
+          <p className="text-lg font-bold text-white md:text-xl">そんな時こそ</p>
+          <p className="mt-1 text-2xl font-bold md:text-3xl">
+            <span className="text-win2-accent-sun">WIN×Ⅱ</span>
+            <span className="text-white">の出番です！</span>
+          </p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function IntroductionBoxSection() {
+  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+
+  return (
+    <section className="bg-white py-16">
+      <div
+        ref={ref}
+        className={cn(
+          "mx-auto max-w-[900px] px-6",
+          "transition-transform-opacity",
+          isVisible ? "reveal-visible" : "reveal"
+        )}
+      >
+        {/* 吹き出しボックス */}
+        <div className="relative rounded-[40px] border-4 border-win2-primary-orage bg-white p-8 shadow-[0_20px_50px_rgba(242,111,54,0.2)] md:p-10">
+          {/* 上部三角形（オレンジ帯からの矢印効果） */}
+          <div className="absolute -top-6 left-1/2 h-12 w-12 -translate-x-1/2 rotate-45 border-l-4 border-t-4 border-win2-primary-orage bg-white" />
+
+          <div className="relative z-10 space-y-4 text-center">
+            <p className="text-base leading-relaxed md:text-lg">保険・不動産・転職・エンタメなど</p>
+            <p className="text-base leading-relaxed md:text-lg">
+              暮らしに関わる
+              <span className="font-bold text-win2-primary-orage">多彩な情報を1つのサイトでまとめて比較・検討</span>
+            </p>
+            <p className="text-base leading-relaxed md:text-lg">
+              できるから、「知らなかった」で損する前に、
+              <span className="font-bold text-win2-primary-orage">最適な選択肢が見つかります！</span>
+            </p>
+          </div>
+        </div>
+
+        {/* CTAボタン */}
+        <div className="mt-8 text-center">
+          <Link
+            href="/register"
+            className="inline-block rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-12 py-4 text-base font-bold text-white shadow-lg shadow-win2-accent-rose/30 transition hover:opacity-90 md:text-lg"
+          >
+            メルマガ会員登録はこちら
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -247,41 +370,119 @@ function ProblemSection() {
 
 function ServiceSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [hasPlayed, setHasPlayed] = useState(false);
+  const [isVideoError, setIsVideoError] = useState(false);
+
+  useEffect(() => {
+    if (isVideoError) return;
+
+    const videoNode = videoRef.current;
+    if (!videoNode) return;
+
+    if (isVisible && !hasPlayed) {
+      void videoNode
+        .play()
+        .then(() => setHasPlayed(true))
+        .catch(() => {
+          // 自動再生がブロックされた場合はフォールバックとして最後のフレームを表示
+          const fallbackTime = Number.isFinite(videoNode.duration)
+            ? videoNode.duration
+            : 0;
+          videoNode.currentTime = fallbackTime;
+          setHasPlayed(true);
+        });
+    }
+  }, [isVisible, hasPlayed, isVideoError]);
+
+  useEffect(() => {
+    if (isVideoError) return;
+
+    const videoNode = videoRef.current;
+    if (!videoNode) return;
+
+    const handleEnded = () => {
+      videoNode.pause();
+      const endTime = Number.isFinite(videoNode.duration) ? videoNode.duration : 0;
+      videoNode.currentTime = endTime;
+    };
+
+    videoNode.addEventListener("ended", handleEnded);
+    return () => {
+      videoNode.removeEventListener("ended", handleEnded);
+    };
+  }, [isVideoError]);
 
   return (
-    <section className="bg-[#fffaf4] py-24">
+    <section className="bg-win2-surface-cream-50 py-24">
       <div
         ref={ref}
         className={cn(
-          "mx-auto flex max-w-[1080px] flex-col items-center gap-10 px-6 text-center lg:px-8",
+          "mx-auto max-w-[1080px] px-6 lg:px-8",
           "transition-transform-opacity",
           isVisible ? "reveal-visible" : "reveal"
         )}
       >
-        <Image
-          src="/assets/images/win2-is.webp"
-          alt="WIN×Ⅱはどんなサービス？"
-          width={980}
-          height={520}
-          className="w-full max-w-[880px] object-contain"
-        />
-        <div className="flex flex-wrap justify-center gap-4">
+        {/* 見出し：WIN×Ⅱは どんなサービス？ */}
+        <div className="mb-12 flex flex-col items-center justify-center gap-6 md:flex-row md:gap-4">
+          <Image
+            src="/assets/images/win2-is-bibble.webp"
+            alt="WIN×Ⅱは"
+            width={180}
+            height={180}
+            className="h-28 w-28 shrink-0 object-contain md:h-32 md:w-32 lg:h-36 lg:w-36"
+            priority
+          />
+          <h2 className="text-3xl font-bold md:text-4xl lg:text-5xl">
+            どんな<span className="text-win2-primary-orage">サービス</span>？
+          </h2>
+        </div>
+
+        {/* カテゴリボタン */}
+        <div className="mb-10 flex flex-wrap justify-center gap-4">
           {serviceCategories.map((category) => (
             <div
               key={category}
-              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#f26f36] shadow-[0_12px_30px_rgba(242,111,54,0.18)]"
+              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-win2-primary-orage shadow-[0_12px_30px_rgba(242,111,54,0.18)]"
             >
               {category}
             </div>
           ))}
         </div>
-        <Image
-          src="/assets/images/ワンストップwin2.webp"
-          alt="ワンストップで暮らしをサポート"
-          width={720}
-          height={420}
-          className="w-full max-w-[540px] object-contain"
-        />
+        <div className="relative mx-auto w-full max-w-[900px] pt-24 lg:max-w-[1080px]">
+          <div className="overflow-hidden rounded-[32px] bg-win2-surface-cream-50">
+            {isVideoError ? (
+              <Image
+                src="/assets/images/onestop-figure.webp"
+                alt="暮らしを支える4つのカテゴリ"
+                width={720}
+                height={540}
+                className="w-full object-contain"
+              />
+            ) : (
+              <video
+                ref={videoRef}
+                className="block w-full object-cover"
+                playsInline
+                preload="metadata"
+                muted
+                loop={false}
+                controls={false}
+                aria-label="WIN×Ⅱのサービス紹介"
+                poster="/assets/images/onestop-figure.webp"
+                onError={() => setIsVideoError(true)}
+              >
+                <source src="/assets/images/what-is-win2.webm" type="video/webm" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/assets/images/onestop-figure.webp"
+                  alt="暮らしを支える4つのカテゴリ"
+                  className="block w-full object-contain"
+                />
+              </video>
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -301,24 +502,52 @@ function MeritSection() {
         )}
       >
         <div className="space-y-3">
-          <h2 className="text-3xl font-bold text-[#f48a3c] md:text-4xl">WIN×Ⅱでのメリット</h2>
+          <h2 className="text-3xl font-bold text-win2-accent-amber md:text-4xl">WIN×Ⅱでのメリット</h2>
           <p className="text-sm text-slate-600 md:text-base">
             暮らしを変えるヒントが一つに集まる。WIN×Ⅱだからできる 3 つのポイントをご紹介します。
           </p>
         </div>
         <div className="grid gap-8 md:grid-cols-3">
-          {meritImages.map((item) => (
+          {meritItems.map((item) => (
             <div
-              key={item.alt}
-              className="rounded-[32px] bg-[#fffaf4] p-6 shadow-[0_18px_42px_rgba(244,138,60,0.22)]"
+              key={item.number}
+              className="group relative overflow-hidden rounded-[32px] bg-white p-8 shadow-[0_18px_42px_rgba(244,138,60,0.22)] transition-all duration-300 hover:scale-105 hover:shadow-[0_24px_54px_rgba(244,138,60,0.32)]"
             >
-              <Image
-                src={item.image}
-                alt={item.alt}
-                width={420}
-                height={300}
-                className="mx-auto w-full max-w-[320px] object-contain"
-              />
+              {/* 背景グラデーション装飾 */}
+              <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-gradient-to-br from-win2-primary-orage/10 to-win2-accent-amber/10 blur-3xl" />
+
+              {/* POINT バッジ */}
+              <div className="relative mb-6 flex justify-center">
+                <div className="flex h-20 w-20 flex-col items-center justify-center rounded-full bg-gradient-to-br from-win2-primary-orage to-win2-accent-amber text-xs font-bold text-white shadow-lg shadow-win2-primary-orage/30">
+                  <span className="text-[10px] tracking-wider">POINT</span>
+                  <span className="text-2xl">{item.number}</span>
+                </div>
+              </div>
+
+              {/* アイコン画像 */}
+              <div className="relative mb-6 flex justify-center">
+                <div className="relative h-24 w-24">
+                  <Image
+                    src={item.image}
+                    alt={`${item.title}のアイコン`}
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+              </div>
+
+              {/* タイトル */}
+              <div className="relative mb-4">
+                <h3 className="text-center text-lg font-bold text-win2-primary-orage md:text-xl">
+                  {item.title}
+                </h3>
+                <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-win2-primary-orage to-win2-accent-amber" />
+              </div>
+
+              {/* 説明文 */}
+              <p className="relative text-center text-sm leading-relaxed text-slate-700 md:text-base">
+                {item.description}
+              </p>
             </div>
           ))}
         </div>
@@ -331,17 +560,29 @@ function HighlightSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="bg-[#f0f6fb] py-24">
+    <section className="relative bg-win2-surface-sky-50 py-24">
+      {/* City background image */}
+      <div className="absolute inset-0">
+        <Image
+          src="/assets/images/city.webp"
+          alt="都市背景"
+          fill
+          className="object-cover opacity-30"
+        />
+      </div>
+      {/* Gradient overlay for better text readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-win2-surface-sky-50/80 to-win2-surface-sky-50/90" />
+
       <div
         ref={ref}
         className={cn(
-          "mx-auto max-w-[1100px] space-y-12 px-6 text-center lg:px-8",
+          "relative mx-auto max-w-[1100px] space-y-12 px-6 text-center lg:px-8",
           "transition-transform-opacity",
           isVisible ? "reveal-visible" : "reveal"
         )}
       >
         <div className="space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#f26f36]">
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-win2-primary-orage">
             掲載サービス・活用シーン
           </p>
           <h2 className="text-3xl font-bold md:text-4xl">暮らしを変える多彩なサービス</h2>
@@ -351,25 +592,20 @@ function HighlightSection() {
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {serviceFeatures.map((feature) => (
-            <div
-              key={feature.title}
-              className="flex h-full flex-col rounded-[28px] bg-white/90 p-6 text-left shadow-[0_16px_34px_rgba(0,0,0,0.1)] backdrop-blur"
-            >
+            <div key={feature.alt} className="overflow-hidden rounded-[28px] shadow-[0_16px_34px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:scale-105">
               <Image
                 src={feature.image}
-                alt={feature.title}
+                alt={feature.alt}
                 width={320}
                 height={240}
-                className="mb-4 w-full object-contain"
+                className="h-full w-full object-cover"
               />
-              <h3 className="text-lg font-semibold text-[#1c1c1c]">{feature.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{feature.description}</p>
             </div>
           ))}
         </div>
         <Link
           href="/register"
-          className="inline-flex items-center justify-center rounded-full bg-[#f05972] px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-[#f05972]/25 transition hover:bg-[#d9475e]"
+          className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark"
         >
           無料メンバー登録で最新情報を受け取る
         </Link>
@@ -382,7 +618,7 @@ function AchievementSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="bg-[#fffaf4] py-24">
+    <section className="bg-win2-surface-cream-50 py-24">
       <div
         ref={ref}
         className={cn(
@@ -391,7 +627,7 @@ function AchievementSection() {
           isVisible ? "reveal-visible" : "reveal"
         )}
       >
-        <h2 className="text-3xl font-bold text-[#f48a3c] md:text-4xl">実績・掲載数</h2>
+        <h2 className="text-3xl font-bold text-win2-accent-amber md:text-4xl">実績・掲載数</h2>
         <div className="grid gap-8 md:grid-cols-2">
           {achievementImages.map((achievement) => (
             <div
@@ -435,16 +671,41 @@ function TestimonialsSection() {
         <div className="grid gap-6 md:grid-cols-2">
           {testimonials.map((testimonial, index) => (
             <div
-              key={`${testimonial.alt}-${index}`}
-              className="rounded-[24px] bg-[#f8f8f8] p-6 shadow-[0_12px_28px_rgba(0,0,0,0.06)]"
+              key={`${testimonial.age}-${testimonial.gender}-${index}`}
+              className="group relative rounded-[24px] bg-gradient-to-br from-win2-surface-cream-320 to-white p-6 text-left shadow-[0_12px_28px_rgba(0,0,0,0.06)] transition-all duration-300 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
             >
-              <Image
-                src={testimonial.image}
-                alt={testimonial.alt}
-                width={780}
-                height={240}
-                className="w-full object-contain"
-              />
+              {/* 引用符デザイン */}
+              <div className="absolute top-4 left-4 text-6xl font-serif text-win2-primary-orage/20">&ldquo;</div>
+
+              {/* ユーザー情報 */}
+              <div className="relative mb-4 flex items-center gap-3">
+                {/* アバター画像 */}
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full shadow-md ring-2 ring-win2-primary-orage/20">
+                  <Image
+                    src={testimonial.avatar}
+                    alt={`${testimonial.age} ${testimonial.gender}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div>
+                  {/* 年齢・性別バッジ */}
+                  <div className="inline-block rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-accent-amber px-3 py-1 text-xs font-semibold text-white">
+                    {testimonial.age} {testimonial.gender}
+                  </div>
+                  {/* 星評価 */}
+                  <div className="mt-1 text-sm">
+                    {Array.from({ length: testimonial.rating }).map((_, i) => (
+                      <span key={i} className="text-[#ffd700]">⭐</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* コメント */}
+              <p className="relative z-10 text-sm leading-relaxed text-slate-700 md:text-base">
+                {testimonial.comment}
+              </p>
             </div>
           ))}
         </div>
@@ -455,9 +716,14 @@ function TestimonialsSection() {
 
 function FaqSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const toggleFaq = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
 
   return (
-    <section className="bg-[#fff7f0] py-24">
+    <section className="bg-win2-surface-cream-300 py-24">
       <div
         ref={ref}
         className={cn(
@@ -472,26 +738,68 @@ function FaqSection() {
             ご不明な点があれば、お気軽にお問い合わせください。
           </p>
         </div>
-        <div className="space-y-6 text-left">
-          {faqItems.map((item, index) => (
-            <div
-              key={item.question}
-              className="rounded-[24px] bg-white p-6 shadow-[0_12px_26px_rgba(0,0,0,0.08)]"
-            >
-              <div className="flex items-start gap-3">
-                <Image src="/assets/images/q.webp" alt="Q" width={40} height={40} />
-                <div className="space-y-3">
-                  <p className="text-sm font-semibold text-[#f26f36]">
-                    Q{index + 1}. {item.question}
-                  </p>
-                  <div className="flex items-start gap-3 text-sm leading-relaxed text-slate-600 md:text-base">
-                    <Image src="/assets/win2/icon.webp" alt="A" width={32} height={32} />
-                    <span>{item.answer}</span>
+        <div className="space-y-4 text-left">
+          {faqItems.map((item, index) => {
+            const isOpen = openIndex === index;
+            return (
+              <div
+                key={item.question}
+                className="overflow-hidden rounded-[24px] bg-white shadow-[0_12px_26px_rgba(0,0,0,0.08)] transition-all duration-300 hover:shadow-[0_18px_36px_rgba(0,0,0,0.14)]"
+              >
+                {/* 質問部分（クリック可能） */}
+                <button
+                  onClick={() => toggleFaq(index)}
+                  className="flex w-full items-start gap-3 p-6 text-left transition-colors hover:bg-win2-surface-cream-300"
+                >
+                  {/* Qバッジ */}
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-win2-primary-orage to-win2-accent-amber text-base font-bold text-white shadow-md">
+                    Q
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-win2-primary-orage md:text-base">
+                      {item.question}
+                    </p>
+                  </div>
+                  {/* 開閉アイコン */}
+                  <div
+                    className={cn(
+                      "shrink-0 text-win2-primary-orage transition-transform duration-300",
+                      isOpen ? "rotate-180" : ""
+                    )}
+                  >
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </button>
+
+                {/* 回答部分（アコーディオン） */}
+                <div
+                  className={cn(
+                    "overflow-hidden transition-all duration-300",
+                    isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                  )}
+                >
+                  <div className="border-t border-slate-200 bg-gradient-to-br from-[#fafafa] to-white px-6 pb-6 pt-4">
+                    <div className="flex items-start gap-3">
+                      {/* Aバッジ */}
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#3b82f6] to-[#2563eb] text-sm font-bold text-white shadow-md">
+                        A
+                      </div>
+                      <p className="flex-1 text-sm leading-relaxed text-slate-700 md:text-base">
+                        {item.answer}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
@@ -502,7 +810,7 @@ function BottomCtaSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="bg-gradient-to-r from-[#f05972] to-[#f48a3c] py-16">
+    <section className="bg-gradient-to-r from-win2-accent-rose to-win2-accent-amber py-16">
       <div
         ref={ref}
         className={cn(
@@ -518,7 +826,7 @@ function BottomCtaSection() {
         <div className="flex flex-wrap justify-center gap-4">
           <Link
             href="/register"
-            className="rounded-full bg-white px-10 py-3 text-sm font-semibold text-[#f05972] transition hover:bg-white/90"
+            className="rounded-full bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-white/90"
           >
             無料メンバー登録はこちら
           </Link>
