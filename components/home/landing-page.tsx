@@ -131,7 +131,7 @@ const faqItems = [
 
 export function LandingPage() {
   return (
-    <main className="bg-[#fef4ea] text-slate-900">
+    <main className="bg-win2-surface-cream-100 text-slate-900">
       <HeroSection />
       <ProblemSection />
       <IntroductionBoxSection />
@@ -150,7 +150,7 @@ function HeroSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="relative -mb-32 overflow-visible bg-gradient-to-b from-[#fff7f2] via-white to-[#ffeade] pb-32 md:-mb-40 md:pb-40">
+    <section className="relative -mb-32 overflow-visible bg-gradient-to-b from-win2-surface-cream-320 via-white to-win2-surface-cream-150 pb-32 md:-mb-40 md:pb-40">
       <div className="absolute inset-0">
         <Image
           src="/assets/images/office-super-blur.webp"
@@ -170,10 +170,10 @@ function HeroSection() {
       >
         <div className="max-w-xl space-y-8">
           <div className="space-y-3">
-            <p className="text-sm font-semibold tracking-[0.35em] text-[#f5a623]">WIN×Ⅱ</p>
-            <h1 className="text-4xl font-bold leading-tight text-[#1c1c1c] md:text-5xl">
+            <p className="text-sm font-semibold tracking-[0.35em] text-win2-accent-gold">WIN×Ⅱ</p>
+            <h1 className="text-4xl font-bold leading-tight text-win2-neutral-950 md:text-5xl">
               暮らしを
-              <span className="text-[#f26f36]">もっとお得に</span>
+              <span className="text-win2-primary-orage">もっとお得に</span>
               <br />
               もっとスマートに。
             </h1>
@@ -187,8 +187,8 @@ function HeroSection() {
                 key={stat.title}
                 className="flex min-w-[160px] flex-1 flex-col items-center rounded-[28px] bg-white/90 px-5 py-4 text-center shadow-[0_10px_22px_rgba(240,130,90,0.18)] backdrop-blur"
               >
-                <p className="text-xs font-semibold text-[#f26f36]">{stat.title}</p>
-                <p className="mt-2 text-2xl font-bold text-[#1c1c1c]">
+                <p className="text-xs font-semibold text-win2-primary-orage">{stat.title}</p>
+                <p className="mt-2 text-2xl font-bold text-win2-neutral-950">
                   {stat.value}
                   <span className="ml-1 text-base font-semibold text-slate-600">{stat.unit}</span>
                 </p>
@@ -198,13 +198,13 @@ function HeroSection() {
           <div className="flex flex-wrap items-center gap-4">
             <Link
               href="/register"
-              className="rounded-full bg-[#f05972] px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-[#f05972]/25 transition hover:bg-[#d9475e]"
+              className="rounded-full bg-win2-accent-rose px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark"
             >
               メンバー登録（無料）はこちら
             </Link>
             <Link
               href="/login"
-              className="rounded-full border border-[#f05972] px-10 py-3 text-sm font-semibold text-[#f05972] transition hover:bg-[#fff0f3]"
+              className="rounded-full border border-win2-accent-rose px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-win2-surface-rose-100"
             >
               ログイン
             </Link>
@@ -229,7 +229,7 @@ function ProblemSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="relative z-20 bg-[#f5f1ed] pb-16 pt-40 md:pt-48">
+    <section className="relative z-20 bg-win2-surface-stone-100 pb-16 pt-40 md:pt-48">
       <div
         ref={ref}
         className={cn(
@@ -241,11 +241,11 @@ function ProblemSection() {
         {/* 見出し */}
         <div className="mb-12 text-center">
           <h2 className="flex flex-wrap items-center justify-center gap-2 text-2xl font-bold md:text-3xl lg:text-4xl">
-            <span className="inline-block rounded-full border-2 border-[#f26f36] bg-white px-4 py-1 text-[#f26f36]">
+            <span className="inline-block rounded-full border-2 border-win2-primary-orage bg-white px-4 py-1 text-win2-primary-orage">
               日常で
             </span>
             <span>こんな</span>
-            <span className="text-[#f26f36]">お悩み</span>
+            <span className="text-win2-primary-orage">お悩み</span>
             <span>、ありませんか？</span>
           </h2>
         </div>
@@ -268,23 +268,23 @@ function ProblemSection() {
           <div className="space-y-3 text-left text-sm md:text-base">
             <p className="leading-relaxed">
               • 保険料高い気がするけど、
-              <span className="font-semibold text-[#f26f36]">どこをどう見直せばいいか分からない</span>
+              <span className="font-semibold text-win2-primary-orage">どこをどう見直せばいいか分からない</span>
             </p>
             <p className="leading-relaxed">
               • 不動産の価値を知りたいけど、
-              <span className="font-semibold text-[#f26f36]">査定って難しそう</span>
+              <span className="font-semibold text-win2-primary-orage">査定って難しそう</span>
               で不安
             </p>
             <p className="leading-relaxed">
-              • <span className="font-semibold text-[#f26f36]">転職したい</span>
+              • <span className="font-semibold text-win2-primary-orage">転職したい</span>
               けど、どのサービスが自分に合っているのか分からない
             </p>
             <p className="leading-relaxed">
               • サブスクやキャンペーンが多すぎて、
-              <span className="font-semibold text-[#f26f36]">どれがお得か比べられない</span>
+              <span className="font-semibold text-win2-primary-orage">どれがお得か比べられない</span>
             </p>
             <p className="leading-relaxed">
-              • <span className="font-semibold text-[#f26f36]">生活費をもっと節約したい</span>
+              • <span className="font-semibold text-win2-primary-orage">生活費をもっと節約したい</span>
               けど、何から始めればいいか迷ってる
             </p>
           </div>
@@ -303,10 +303,10 @@ function ProblemSection() {
         </div>
 
         {/* 下部オレンジ帯 */}
-        <div className="relative -mx-6 mt-12 overflow-hidden bg-gradient-to-r from-[#f05972] to-[#f48a3c] py-6 text-center md:-mx-0 md:rounded-2xl">
+        <div className="relative -mx-6 mt-12 overflow-hidden bg-gradient-to-r from-win2-accent-rose to-win2-accent-amber py-6 text-center md:-mx-0 md:rounded-2xl">
           <p className="text-lg font-bold text-white md:text-xl">そんな時こそ</p>
           <p className="mt-1 text-2xl font-bold md:text-3xl">
-            <span className="text-[#fff44f]">WIN×Ⅱ</span>
+            <span className="text-win2-accent-sun">WIN×Ⅱ</span>
             <span className="text-white">の出番です！</span>
           </p>
         </div>
@@ -329,19 +329,19 @@ function IntroductionBoxSection() {
         )}
       >
         {/* 吹き出しボックス */}
-        <div className="relative rounded-[40px] border-4 border-[#f26f36] bg-white p-8 shadow-[0_20px_50px_rgba(242,111,54,0.2)] md:p-10">
+        <div className="relative rounded-[40px] border-4 border-win2-primary-orage bg-white p-8 shadow-[0_20px_50px_rgba(242,111,54,0.2)] md:p-10">
           {/* 上部三角形（オレンジ帯からの矢印効果） */}
-          <div className="absolute -top-6 left-1/2 h-12 w-12 -translate-x-1/2 rotate-45 border-l-4 border-t-4 border-[#f26f36] bg-white" />
+          <div className="absolute -top-6 left-1/2 h-12 w-12 -translate-x-1/2 rotate-45 border-l-4 border-t-4 border-win2-primary-orage bg-white" />
 
           <div className="relative z-10 space-y-4 text-center">
             <p className="text-base leading-relaxed md:text-lg">保険・不動産・転職・エンタメなど</p>
             <p className="text-base leading-relaxed md:text-lg">
               暮らしに関わる
-              <span className="font-bold text-[#f26f36]">多彩な情報を1つのサイトでまとめて比較・検討</span>
+              <span className="font-bold text-win2-primary-orage">多彩な情報を1つのサイトでまとめて比較・検討</span>
             </p>
             <p className="text-base leading-relaxed md:text-lg">
               できるから、「知らなかった」で損する前に、
-              <span className="font-bold text-[#f26f36]">最適な選択肢が見つかります！</span>
+              <span className="font-bold text-win2-primary-orage">最適な選択肢が見つかります！</span>
             </p>
           </div>
         </div>
@@ -350,7 +350,7 @@ function IntroductionBoxSection() {
         <div className="mt-8 text-center">
           <Link
             href="/register"
-            className="inline-block rounded-full bg-gradient-to-r from-[#f05972] to-[#f26f36] px-12 py-4 text-base font-bold text-white shadow-lg shadow-[#f05972]/30 transition hover:opacity-90 md:text-lg"
+            className="inline-block rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-12 py-4 text-base font-bold text-white shadow-lg shadow-win2-accent-rose/30 transition hover:opacity-90 md:text-lg"
           >
             メルマガ会員登録はこちら
           </Link>
@@ -406,7 +406,7 @@ function ServiceSection() {
   }, [isVideoError]);
 
   return (
-    <section className="bg-[#fffaf4] py-24">
+    <section className="bg-win2-surface-cream-50 py-24">
       <div
         ref={ref}
         className={cn(
@@ -426,7 +426,7 @@ function ServiceSection() {
             priority
           />
           <h2 className="text-3xl font-bold md:text-4xl lg:text-5xl">
-            どんな<span className="text-[#f26f36]">サービス</span>？
+            どんな<span className="text-win2-primary-orage">サービス</span>？
           </h2>
         </div>
 
@@ -435,14 +435,14 @@ function ServiceSection() {
           {serviceCategories.map((category) => (
             <div
               key={category}
-              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#f26f36] shadow-[0_12px_30px_rgba(242,111,54,0.18)]"
+              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-win2-primary-orage shadow-[0_12px_30px_rgba(242,111,54,0.18)]"
             >
               {category}
             </div>
           ))}
         </div>
         <div className="relative mx-auto w-full max-w-[640px] pt-24 lg:max-w-[720px]">
-          <div className="overflow-hidden rounded-[32px] bg-[#fffaf4]">
+          <div className="overflow-hidden rounded-[32px] bg-win2-surface-cream-50">
             {isVideoError ? (
               <Image
                 src="/assets/images/onestop-figure.webp"
@@ -494,7 +494,7 @@ function MeritSection() {
         )}
       >
         <div className="space-y-3">
-          <h2 className="text-3xl font-bold text-[#f48a3c] md:text-4xl">WIN×Ⅱでのメリット</h2>
+          <h2 className="text-3xl font-bold text-win2-accent-amber md:text-4xl">WIN×Ⅱでのメリット</h2>
           <p className="text-sm text-slate-600 md:text-base">
             暮らしを変えるヒントが一つに集まる。WIN×Ⅱだからできる 3 つのポイントをご紹介します。
           </p>
@@ -506,11 +506,11 @@ function MeritSection() {
               className="group relative overflow-hidden rounded-[32px] bg-white p-8 shadow-[0_18px_42px_rgba(244,138,60,0.22)] transition-all duration-300 hover:scale-105 hover:shadow-[0_24px_54px_rgba(244,138,60,0.32)]"
             >
               {/* 背景グラデーション装飾 */}
-              <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-gradient-to-br from-[#f26f36]/10 to-[#f48a3c]/10 blur-3xl" />
+              <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-gradient-to-br from-win2-primary-orage/10 to-win2-accent-amber/10 blur-3xl" />
 
               {/* POINT バッジ */}
               <div className="relative mb-6 flex justify-center">
-                <div className="flex h-20 w-20 flex-col items-center justify-center rounded-full bg-gradient-to-br from-[#f26f36] to-[#f48a3c] text-xs font-bold text-white shadow-lg shadow-[#f26f36]/30">
+                <div className="flex h-20 w-20 flex-col items-center justify-center rounded-full bg-gradient-to-br from-win2-primary-orage to-win2-accent-amber text-xs font-bold text-white shadow-lg shadow-win2-primary-orage/30">
                   <span className="text-[10px] tracking-wider">POINT</span>
                   <span className="text-2xl">{item.number}</span>
                 </div>
@@ -530,10 +530,10 @@ function MeritSection() {
 
               {/* タイトル */}
               <div className="relative mb-4">
-                <h3 className="text-center text-lg font-bold text-[#f26f36] md:text-xl">
+                <h3 className="text-center text-lg font-bold text-win2-primary-orage md:text-xl">
                   {item.title}
                 </h3>
-                <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#f26f36] to-[#f48a3c]" />
+                <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-win2-primary-orage to-win2-accent-amber" />
               </div>
 
               {/* 説明文 */}
@@ -552,7 +552,7 @@ function HighlightSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="relative bg-[#f0f6fb] py-24">
+    <section className="relative bg-win2-surface-sky-50 py-24">
       {/* City background image */}
       <div className="absolute inset-0">
         <Image
@@ -563,7 +563,7 @@ function HighlightSection() {
         />
       </div>
       {/* Gradient overlay for better text readability */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#f0f6fb]/80 to-[#f0f6fb]/90" />
+      <div className="absolute inset-0 bg-gradient-to-b from-win2-surface-sky-50/80 to-win2-surface-sky-50/90" />
 
       <div
         ref={ref}
@@ -574,7 +574,7 @@ function HighlightSection() {
         )}
       >
         <div className="space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-[#f26f36]">
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-win2-primary-orage">
             掲載サービス・活用シーン
           </p>
           <h2 className="text-3xl font-bold md:text-4xl">暮らしを変える多彩なサービス</h2>
@@ -597,7 +597,7 @@ function HighlightSection() {
         </div>
         <Link
           href="/register"
-          className="inline-flex items-center justify-center rounded-full bg-[#f05972] px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-[#f05972]/25 transition hover:bg-[#d9475e]"
+          className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark"
         >
           無料メンバー登録で最新情報を受け取る
         </Link>
@@ -610,7 +610,7 @@ function AchievementSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="bg-[#fffaf4] py-24">
+    <section className="bg-win2-surface-cream-50 py-24">
       <div
         ref={ref}
         className={cn(
@@ -619,7 +619,7 @@ function AchievementSection() {
           isVisible ? "reveal-visible" : "reveal"
         )}
       >
-        <h2 className="text-3xl font-bold text-[#f48a3c] md:text-4xl">実績・掲載数</h2>
+        <h2 className="text-3xl font-bold text-win2-accent-amber md:text-4xl">実績・掲載数</h2>
         <div className="grid gap-8 md:grid-cols-2">
           {achievementImages.map((achievement) => (
             <div
@@ -664,15 +664,15 @@ function TestimonialsSection() {
           {testimonials.map((testimonial, index) => (
             <div
               key={`${testimonial.age}-${testimonial.gender}-${index}`}
-              className="group relative rounded-[24px] bg-gradient-to-br from-[#fff7f2] to-white p-6 text-left shadow-[0_12px_28px_rgba(0,0,0,0.06)] transition-all duration-300 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
+              className="group relative rounded-[24px] bg-gradient-to-br from-win2-surface-cream-320 to-white p-6 text-left shadow-[0_12px_28px_rgba(0,0,0,0.06)] transition-all duration-300 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
             >
               {/* 引用符デザイン */}
-              <div className="absolute top-4 left-4 text-6xl font-serif text-[#f26f36]/20">&ldquo;</div>
+              <div className="absolute top-4 left-4 text-6xl font-serif text-win2-primary-orage/20">&ldquo;</div>
 
               {/* ユーザー情報 */}
               <div className="relative mb-4 flex items-center gap-3">
                 {/* アバター画像 */}
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full shadow-md ring-2 ring-[#f26f36]/20">
+                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full shadow-md ring-2 ring-win2-primary-orage/20">
                   <Image
                     src={testimonial.avatar}
                     alt={`${testimonial.age} ${testimonial.gender}`}
@@ -682,7 +682,7 @@ function TestimonialsSection() {
                 </div>
                 <div>
                   {/* 年齢・性別バッジ */}
-                  <div className="inline-block rounded-full bg-gradient-to-r from-[#f05972] to-[#f48a3c] px-3 py-1 text-xs font-semibold text-white">
+                  <div className="inline-block rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-accent-amber px-3 py-1 text-xs font-semibold text-white">
                     {testimonial.age} {testimonial.gender}
                   </div>
                   {/* 星評価 */}
@@ -715,7 +715,7 @@ function FaqSection() {
   };
 
   return (
-    <section className="bg-[#fff7f0] py-24">
+    <section className="bg-win2-surface-cream-300 py-24">
       <div
         ref={ref}
         className={cn(
@@ -741,21 +741,21 @@ function FaqSection() {
                 {/* 質問部分（クリック可能） */}
                 <button
                   onClick={() => toggleFaq(index)}
-                  className="flex w-full items-start gap-3 p-6 text-left transition-colors hover:bg-[#fff7f0]"
+                  className="flex w-full items-start gap-3 p-6 text-left transition-colors hover:bg-win2-surface-cream-300"
                 >
                   {/* Qバッジ */}
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#f26f36] to-[#f48a3c] text-base font-bold text-white shadow-md">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-win2-primary-orage to-win2-accent-amber text-base font-bold text-white shadow-md">
                     Q
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-semibold text-[#f26f36] md:text-base">
+                    <p className="text-sm font-semibold text-win2-primary-orage md:text-base">
                       {item.question}
                     </p>
                   </div>
                   {/* 開閉アイコン */}
                   <div
                     className={cn(
-                      "shrink-0 text-[#f26f36] transition-transform duration-300",
+                      "shrink-0 text-win2-primary-orage transition-transform duration-300",
                       isOpen ? "rotate-180" : ""
                     )}
                   >
@@ -802,7 +802,7 @@ function BottomCtaSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="bg-gradient-to-r from-[#f05972] to-[#f48a3c] py-16">
+    <section className="bg-gradient-to-r from-win2-accent-rose to-win2-accent-amber py-16">
       <div
         ref={ref}
         className={cn(
@@ -818,7 +818,7 @@ function BottomCtaSection() {
         <div className="flex flex-wrap justify-center gap-4">
           <Link
             href="/register"
-            className="rounded-full bg-white px-10 py-3 text-sm font-semibold text-[#f05972] transition hover:bg-white/90"
+            className="rounded-full bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-white/90"
           >
             無料メンバー登録はこちら
           </Link>

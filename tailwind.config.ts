@@ -50,6 +50,30 @@ export default {
           "4": "hsl(var(--chart-4))",
           "5": "hsl(var(--chart-5))",
         },
+        // WIN×II ブランドカラーパレット (カラーガイドライン準拠)
+        win2: {
+          // Primary & Accent Colors
+          'primary-orage': '#f26f36',      // ブランド基調色
+          'accent-rose': '#f05972',        // グラデーション左端
+          'accent-rose-dark': '#d9475e',   // ホバー時の濃色
+          'accent-amber': '#f48a3c',       // グラデーション右端
+          'accent-gold': '#f5a623',        // キャッチコピー強調
+          'accent-sun': '#fff44f',         // ハイライト
+          // Surface / Background Colors
+          'surface-cream-50': '#fffaf4',   // セクション背景（標準）
+          'surface-cream-100': '#fef4ea',  // イントロ背景
+          'surface-cream-150': '#ffeade',  // カード背景バリエーション
+          'surface-cream-200': '#ffe1cc',  // ピル状バッジ背景
+          'surface-cream-300': '#fff7f0',  // CTA背景
+          'surface-cream-320': '#fff7f2',  // メリットカード背景
+          'surface-rose-100': '#fff0f3',   // ピンク系薄背景
+          'surface-stone-100': '#f5f1ed',  // フッター手前境界
+          'surface-sky-50': '#f0f6fb',     // FAQ背景
+          // Neutral Colors
+          'neutral-950': '#1c1c1c',        // 見出し・本文ダーク
+          'neutral-900': '#374151',        // 標準本文
+          'neutral-600': '#6b7280',        // サブテキスト
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
