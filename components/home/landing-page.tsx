@@ -439,27 +439,32 @@ function MeritSection() {
           {meritItems.map((item) => (
             <div
               key={item.number}
-              className="group rounded-[32px] bg-gradient-to-br from-white to-[#fffaf4] p-6 shadow-[0_18px_42px_rgba(244,138,60,0.22)] transition-all duration-300 hover:scale-105 hover:shadow-[0_24px_54px_rgba(244,138,60,0.32)]"
+              className="group relative overflow-hidden rounded-[32px] bg-white p-8 shadow-[0_18px_42px_rgba(244,138,60,0.22)] transition-all duration-300 hover:scale-105 hover:shadow-[0_24px_54px_rgba(244,138,60,0.32)]"
             >
+              {/* 背景グラデーション装飾 */}
+              <div className="absolute -top-20 -right-20 h-40 w-40 rounded-full bg-gradient-to-br from-[#f26f36]/10 to-[#f48a3c]/10 blur-3xl" />
+
               {/* POINT バッジ */}
-              <div className="mb-4 flex justify-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#ffd700] to-[#ffb300] text-sm font-bold text-[#2563eb] shadow-lg">
-                  POINT
-                  <br />
-                  {item.number}
+              <div className="relative mb-6 flex justify-center">
+                <div className="flex h-20 w-20 flex-col items-center justify-center rounded-full bg-gradient-to-br from-[#f26f36] to-[#f48a3c] text-xs font-bold text-white shadow-lg shadow-[#f26f36]/30">
+                  <span className="text-[10px] tracking-wider">POINT</span>
+                  <span className="text-2xl">{item.number}</span>
                 </div>
               </div>
 
               {/* アイコン */}
-              <div className="mb-3 text-4xl">{item.icon}</div>
+              <div className="relative mb-4 flex justify-center text-5xl">{item.icon}</div>
 
-              {/* タイトルバー */}
-              <div className="relative mb-4 rounded-lg bg-gradient-to-r from-[#3b82f6] to-[#2563eb] py-3 px-4">
-                <h3 className="text-base font-bold text-white md:text-lg">{item.title}</h3>
+              {/* タイトル */}
+              <div className="relative mb-4">
+                <h3 className="text-center text-lg font-bold text-[#f26f36] md:text-xl">
+                  {item.title}
+                </h3>
+                <div className="mx-auto mt-2 h-1 w-16 rounded-full bg-gradient-to-r from-[#f26f36] to-[#f48a3c]" />
               </div>
 
               {/* 説明文 */}
-              <p className="text-sm leading-relaxed text-slate-700 md:text-base">
+              <p className="relative text-center text-sm leading-relaxed text-slate-700 md:text-base">
                 {item.description}
               </p>
             </div>
