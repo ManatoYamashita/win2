@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
@@ -27,39 +28,44 @@ const serviceCategories = ["各種保険", "不動産", "エンタメ", "転職"
 
 const serviceFeatures = [
   {
-    title: "保険の無料相談",
-    description: "ライフステージに合わせた最適な保険プランをご提案します。",
     image: "/assets/images/保険の無料相談.webp",
+    alt: "保険の無料相談",
   },
   {
-    title: "不動産査定サービス",
-    description: "売却・住み替えまで専門スタッフがしっかりサポートします。",
     image: "/assets/images/不動産査定サービス.webp",
+    alt: "不動産査定サービス",
   },
   {
-    title: "エンタメサブスク特集",
-    description: "動画配信・音楽など、お得なサブスク情報を厳選してお届け。",
     image: "/assets/images/エンタメサブスク特集.webp",
+    alt: "エンタメサブスク特集",
   },
   {
-    title: "転職支援サポート",
-    description: "キャリアアップを目指す方に最適な求人とノウハウをご紹介。",
     image: "/assets/images/転職支援サポート.webp",
+    alt: "転職支援サポート",
   },
 ];
 
-const meritImages = [
+const meritItems = [
   {
-    image: "/assets/images/point1.webp",
-    alt: "POINT01 保険・不動産など多彩なジャンルに対応",
+    number: "01",
+    title: "幅広いジャンルを網羅",
+    description:
+      "保険・不動産・転職・エンタメ・生活サービスなど、暮らしに関わる情報を総合的にカバー。",
+    icon: "📊",
   },
   {
-    image: "/assets/images/point2.webp",
-    alt: "POINT02 成果報酬型のキャッシュバック",
+    number: "02",
+    title: "比較・検討が一目でわかる",
+    description:
+      "各種サービス情報をまとめて掲載。自分に合った選択肢がスムーズに見つかります。",
+    icon: "🔍",
   },
   {
-    image: "/assets/images/point3.webp",
-    alt: "POINT03 専門家によるサポート",
+    number: "03",
+    title: "無料で使える安心設計",
+    description:
+      "多くのサービスが無料で利用可能。初めての方でも安心して活用できます。",
+    icon: "✨",
   },
 ];
 
@@ -76,20 +82,28 @@ const achievementImages = [
 
 const testimonials = [
   {
-    image: "/assets/images/comment-20-woman.webp",
-    alt: "20代女性の声",
+    age: "20代",
+    gender: "女性",
+    comment: "保険の見直しで年間5万円も節約できました！比較がとても簡単で助かりました。",
+    rating: 5,
   },
   {
-    image: "/assets/images/comment-30-man.webp",
-    alt: "30代男性の声",
+    age: "30代",
+    gender: "男性",
+    comment: "転職サービスの情報が充実していて、自分に合った求人が見つかりました。サポートも丁寧でした。",
+    rating: 5,
   },
   {
-    image: "/assets/images/comment-40-woman.webp",
-    alt: "40代女性の声",
+    age: "40代",
+    gender: "女性",
+    comment: "不動産査定がこんなに簡単にできるとは思いませんでした。対応も迅速で信頼できました。",
+    rating: 5,
   },
   {
-    image: "/assets/images/comment-50-man.webp",
-    alt: "50代男性の声",
+    age: "50代",
+    gender: "男性",
+    comment: "エンタメサブスクの比較ができて、無駄な契約を整理できました。家計に優しいサービスです。",
+    rating: 5,
   },
 ];
 
@@ -357,12 +371,14 @@ function ServiceSection() {
       >
         {/* 見出し：WIN×Ⅱは どんなサービス？ */}
         <div className="mb-12 flex flex-col items-center justify-center gap-6 md:flex-row md:gap-4">
-          <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#f05972] to-[#f48a3c] shadow-lg md:h-32 md:w-32 lg:h-36 lg:w-36">
-            <span className="text-center text-xl font-bold leading-tight text-white md:text-2xl">
-              WIN×Ⅱ
-              <br />は
-            </span>
-          </div>
+          <Image
+            src="/assets/images/win2-is-bibble.webp"
+            alt="WIN×Ⅱは"
+            width={180}
+            height={180}
+            className="h-28 w-28 shrink-0 object-contain md:h-32 md:w-32 lg:h-36 lg:w-36"
+            priority
+          />
           <h2 className="text-3xl font-bold md:text-4xl lg:text-5xl">
             どんな<span className="text-[#f26f36]">サービス</span>？
           </h2>
@@ -379,13 +395,22 @@ function ServiceSection() {
             </div>
           ))}
         </div>
-        <Image
-          src="/assets/images/ワンストップwin2.webp"
-          alt="ワンストップで暮らしをサポート"
-          width={720}
-          height={420}
-          className="w-full max-w-[540px] object-contain"
-        />
+        <div className="relative mx-auto w-full max-w-[560px] pt-20">
+          <Image
+            src="/assets/images/onestop-circle-text.webp"
+            alt="WIN×Ⅱはワンストップで暮らしを支える"
+            width={360}
+            height={360}
+            className="absolute left-1/2 top-0 w-48 -translate-x-1/2 -translate-y-1/2 object-contain md:w-56 lg:w-64"
+          />
+          <Image
+            src="/assets/images/onestop-figure.webp"
+            alt="暮らしを支える4つのカテゴリ"
+            width={720}
+            height={540}
+            className="w-full object-contain"
+          />
+        </div>
       </div>
     </section>
   );
@@ -411,18 +436,32 @@ function MeritSection() {
           </p>
         </div>
         <div className="grid gap-8 md:grid-cols-3">
-          {meritImages.map((item) => (
+          {meritItems.map((item) => (
             <div
-              key={item.alt}
-              className="rounded-[32px] bg-[#fffaf4] p-6 shadow-[0_18px_42px_rgba(244,138,60,0.22)]"
+              key={item.number}
+              className="group rounded-[32px] bg-gradient-to-br from-white to-[#fffaf4] p-6 shadow-[0_18px_42px_rgba(244,138,60,0.22)] transition-all duration-300 hover:scale-105 hover:shadow-[0_24px_54px_rgba(244,138,60,0.32)]"
             >
-              <Image
-                src={item.image}
-                alt={item.alt}
-                width={420}
-                height={300}
-                className="mx-auto w-full max-w-[320px] object-contain"
-              />
+              {/* POINT バッジ */}
+              <div className="mb-4 flex justify-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-[#ffd700] to-[#ffb300] text-sm font-bold text-[#2563eb] shadow-lg">
+                  POINT
+                  <br />
+                  {item.number}
+                </div>
+              </div>
+
+              {/* アイコン */}
+              <div className="mb-3 text-4xl">{item.icon}</div>
+
+              {/* タイトルバー */}
+              <div className="relative mb-4 rounded-lg bg-gradient-to-r from-[#3b82f6] to-[#2563eb] py-3 px-4">
+                <h3 className="text-base font-bold text-white md:text-lg">{item.title}</h3>
+              </div>
+
+              {/* 説明文 */}
+              <p className="text-sm leading-relaxed text-slate-700 md:text-base">
+                {item.description}
+              </p>
             </div>
           ))}
         </div>
@@ -467,19 +506,14 @@ function HighlightSection() {
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {serviceFeatures.map((feature) => (
-            <div
-              key={feature.title}
-              className="flex h-full flex-col rounded-[28px] bg-white/90 p-6 text-left shadow-[0_16px_34px_rgba(0,0,0,0.1)] backdrop-blur"
-            >
+            <div key={feature.alt} className="overflow-hidden rounded-[28px] shadow-[0_16px_34px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:scale-105">
               <Image
                 src={feature.image}
-                alt={feature.title}
+                alt={feature.alt}
                 width={320}
                 height={240}
-                className="mb-4 w-full object-contain"
+                className="h-full w-full object-cover"
               />
-              <h3 className="text-lg font-semibold text-[#1c1c1c]">{feature.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{feature.description}</p>
             </div>
           ))}
         </div>
@@ -551,16 +585,36 @@ function TestimonialsSection() {
         <div className="grid gap-6 md:grid-cols-2">
           {testimonials.map((testimonial, index) => (
             <div
-              key={`${testimonial.alt}-${index}`}
-              className="rounded-[24px] bg-[#f8f8f8] p-6 shadow-[0_12px_28px_rgba(0,0,0,0.06)]"
+              key={`${testimonial.age}-${testimonial.gender}-${index}`}
+              className="group relative rounded-[24px] bg-gradient-to-br from-[#fff7f2] to-white p-6 text-left shadow-[0_12px_28px_rgba(0,0,0,0.06)] transition-all duration-300 hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)]"
             >
-              <Image
-                src={testimonial.image}
-                alt={testimonial.alt}
-                width={780}
-                height={240}
-                className="w-full object-contain"
-              />
+              {/* 引用符デザイン */}
+              <div className="absolute top-4 left-4 text-6xl font-serif text-[#f26f36]/20">&ldquo;</div>
+
+              {/* ユーザー情報 */}
+              <div className="relative mb-4 flex items-center gap-3">
+                {/* アバター */}
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#f26f36] to-[#f48a3c] text-2xl shadow-md">
+                  {testimonial.gender === "女性" ? "👩" : "👨"}
+                </div>
+                <div>
+                  {/* 年齢・性別バッジ */}
+                  <div className="inline-block rounded-full bg-gradient-to-r from-[#f05972] to-[#f48a3c] px-3 py-1 text-xs font-semibold text-white">
+                    {testimonial.age} {testimonial.gender}
+                  </div>
+                  {/* 星評価 */}
+                  <div className="mt-1 text-sm">
+                    {Array.from({ length: testimonial.rating }).map((_, i) => (
+                      <span key={i} className="text-[#ffd700]">⭐</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* コメント */}
+              <p className="relative z-10 text-sm leading-relaxed text-slate-700 md:text-base">
+                {testimonial.comment}
+              </p>
             </div>
           ))}
         </div>
@@ -571,6 +625,11 @@ function TestimonialsSection() {
 
 function FaqSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const toggleFaq = (index: number) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
 
   return (
     <section className="bg-[#fff7f0] py-24">
@@ -588,26 +647,68 @@ function FaqSection() {
             ご不明な点があれば、お気軽にお問い合わせください。
           </p>
         </div>
-        <div className="space-y-6 text-left">
-          {faqItems.map((item, index) => (
-            <div
-              key={item.question}
-              className="rounded-[24px] bg-white p-6 shadow-[0_12px_26px_rgba(0,0,0,0.08)]"
-            >
-              <div className="flex items-start gap-3">
-                <Image src="/assets/images/question.webp" alt="Q" width={40} height={40} />
-                <div className="space-y-3">
-                  <p className="text-sm font-semibold text-[#f26f36]">
-                    Q{index + 1}. {item.question}
-                  </p>
-                  <div className="flex items-start gap-3 text-sm leading-relaxed text-slate-600 md:text-base">
-                    <Image src="/assets/images/answer.webp" alt="A" width={32} height={32} />
-                    <span>{item.answer}</span>
+        <div className="space-y-4 text-left">
+          {faqItems.map((item, index) => {
+            const isOpen = openIndex === index;
+            return (
+              <div
+                key={item.question}
+                className="overflow-hidden rounded-[24px] bg-white shadow-[0_12px_26px_rgba(0,0,0,0.08)] transition-all duration-300 hover:shadow-[0_18px_36px_rgba(0,0,0,0.14)]"
+              >
+                {/* 質問部分（クリック可能） */}
+                <button
+                  onClick={() => toggleFaq(index)}
+                  className="flex w-full items-start gap-3 p-6 text-left transition-colors hover:bg-[#fff7f0]"
+                >
+                  {/* Qバッジ */}
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#f26f36] to-[#f48a3c] text-base font-bold text-white shadow-md">
+                    Q
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-[#f26f36] md:text-base">
+                      {item.question}
+                    </p>
+                  </div>
+                  {/* 開閉アイコン */}
+                  <div
+                    className={cn(
+                      "shrink-0 text-[#f26f36] transition-transform duration-300",
+                      isOpen ? "rotate-180" : ""
+                    )}
+                  >
+                    <svg
+                      className="h-5 w-5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
+                </button>
+
+                {/* 回答部分（アコーディオン） */}
+                <div
+                  className={cn(
+                    "overflow-hidden transition-all duration-300",
+                    isOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                  )}
+                >
+                  <div className="border-t border-slate-200 bg-gradient-to-br from-[#fafafa] to-white px-6 pb-6 pt-4">
+                    <div className="flex items-start gap-3">
+                      {/* Aバッジ */}
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#3b82f6] to-[#2563eb] text-sm font-bold text-white shadow-md">
+                        A
+                      </div>
+                      <p className="flex-1 text-sm leading-relaxed text-slate-700 md:text-base">
+                        {item.answer}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
