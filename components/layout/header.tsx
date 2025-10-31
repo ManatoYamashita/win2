@@ -4,8 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useMemo, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { cn } from "@/lib/utils";
 
 /**
  * 共通Headerコンポーネント
@@ -19,11 +20,20 @@ import { Button } from "@/components/ui/button";
 export function Header() {
   const { data: session, status } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const navigation = useMemo(() => {
-    const items = [
-      { href: "/", label: "トップページ", isActive: pathname === "/" },
+    const items: Array<{ href: string; label: string; isActive: boolean }> = [
+      {
+        href: "/",
+        label: "トップページ",
+        isActive: pathname === "/",
+      },
       {
         href: "/blog",
         label: "ブログ",
@@ -31,180 +41,209 @@ export function Header() {
       },
     ];
 
-    items.push(
-      session
-        ? {
-            href: "/mypage",
-            label: "プロフィール",
-            isActive: pathname.startsWith("/mypage"),
-          }
-        : {
-            href: "/login",
-            label: "ログイン",
-            isActive: pathname === "/login",
-          }
-    );
+    if (session) {
+      items.push({
+        href: "/mypage",
+        label: "マイページ",
+        isActive: pathname.startsWith("/mypage"),
+      });
+    }
 
     return items;
   }, [pathname, session]);
 
   const getLinkClasses = (isActive: boolean) =>
-    [
-      "font-medium transition-colors inline-flex items-center",
-      isActive
-        ? "text-orange-600 border-b-2 border-orange-500 pb-1"
-        : "text-gray-700 hover:text-orange-600",
-    ].join(" ");
+    cn(
+      "relative inline-flex items-center text-[14px] font-medium text-slate-600 transition-colors",
+      isActive ? "text-win2-primary-orage" : "hover:text-win2-primary-orage"
+    );
 
   const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+    setIsMobileMenuOpen((prev) => !prev);
   };
 
   const handleSignOut = async () => {
     await signOut({ callbackUrl: "/" });
   };
 
+  const isAuthenticated = !!session;
+
+  // Mobile menu portal content
+  const mobileMenuPortal = isMounted ? createPortal(
+    <>
+      <div
+        className={cn(
+          "fixed inset-0 z-[9998] bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300 md:hidden",
+          isMobileMenuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        )}
+        aria-hidden={!isMobileMenuOpen}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+
+      <aside
+        className={cn(
+          "fixed inset-y-0 right-0 z-[9999] w-[80%] translate-x-full bg-white shadow-[-12px_0_36px_rgba(24,25,28,0.16)] transition-transform duration-300 md:hidden",
+          isMobileMenuOpen && "translate-x-0"
+        )}
+        aria-hidden={!isMobileMenuOpen}
+      >
+        <div className="flex items-center justify-between border-b border-win2-surface-cream-200 px-5 py-4">
+          <span className="text-sm font-semibold text-win2-neutral-900">メニュー</span>
+          <button
+            type="button"
+            onClick={toggleMobileMenu}
+            className="rounded-md p-2"
+            aria-label="メニューを閉じる"
+          >
+            <svg className="h-6 w-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <nav className="flex h-[calc(100%-4rem)] flex-col justify-between overflow-y-auto px-5 py-6 text-sm text-slate-600">
+          <div className="flex flex-col space-y-4">
+            {navigation.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={cn(
+                  "block py-2 text-base font-medium text-slate-600 transition-colors",
+                  item.isActive ? "text-win2-primary-orage" : "hover:text-win2-primary-orage"
+                )}
+              >
+                {item.label}
+              </Link>
+            ))}
+            {status === "loading" && (
+              <span className="text-xs text-slate-400">読み込み中...</span>
+            )}
+          </div>
+          <div className="space-y-3 border-t border-win2-surface-cream-200 pt-4">
+            {isAuthenticated ? (
+              <>
+                <Link
+                  href="/blog"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-6 py-3 text-sm font-semibold text-white shadow-md shadow-win2-accent-rose/25 transition hover:opacity-90"
+                >
+                  ブログ
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleSignOut();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="w-full rounded-full border border-win2-surface-cream-200 px-6 py-3 text-sm font-medium text-slate-600 transition hover:text-win2-primary-orage"
+                >
+                  ログアウト
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full rounded-full border border-win2-surface-cream-200 px-6 py-3 text-sm font-medium text-slate-600 transition hover:text-win2-primary-orage"
+                >
+                  ログイン
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-6 py-3 text-sm font-semibold text-white shadow-md shadow-win2-accent-rose/25 transition hover:opacity-90"
+                >
+                  新規登録
+                </Link>
+              </>
+            )}
+          </div>
+        </nav>
+      </aside>
+    </>,
+    document.body
+  ) : null;
+
   return (
-    <header className="bg-white border-b shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* ロゴ */}
-          <Link href="/" className="flex items-center" aria-label="WIN×Ⅱ トップページ">
+    <>
+      <header className="sticky top-0 z-[100] bg-white/95 backdrop-blur border-b border-win2-surface-cream-200">
+        <div className="mx-auto flex max-w-[1100px] items-center justify-between px-4 py-4 lg:px-6">
+          <Link href="/" className="flex items-center gap-3" aria-label="WIN×Ⅱ トップページ">
             <Image
               src="/assets/win2/logo.webp"
               alt="WIN×Ⅱ"
               width={140}
               height={40}
-              className="h-8 w-auto object-contain transition-transform hover:scale-105"
+              className="h-8 w-auto object-contain"
               priority
             />
+            {/* <span className="hidden text-sm font-semibold tracking-[0.35em] text-[#f26f36] md:inline">
+              アフィリエイトブログ
+            </span> */}
           </Link>
 
-          {/* デスクトップナビゲーション */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => (
+          <nav className="hidden items-center gap-7 md:flex">
+            {navigation.map((item) =>
               <Link key={item.href} href={item.href} className={getLinkClasses(item.isActive)}>
                 {item.label}
               </Link>
-            ))}
+            )}
           </nav>
 
-          {/* ログインボタン / ログアウトボタン */}
-          <div className="hidden md:flex items-center space-x-4">
-            {status === "loading" ? (
-              <div className="h-10 w-24 bg-gray-200 animate-pulse rounded" />
-            ) : session ? (
+          <div className="hidden items-center gap-4 md:flex">
+            {isAuthenticated ? (
               <>
-                <span className="text-sm text-gray-600">
-                  {session.user?.email}
-                </span>
-                <Button
+                <Link
+                  href="/mypage"
+                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-6 py-2 text-sm font-semibold text-white shadow-md shadow-win2-accent-rose/25 transition hover:opacity-90"
+                >
+                  プロフィールページ
+                </Link>
+                <button
+                  type="button"
                   onClick={handleSignOut}
-                  variant="outline"
-                  className="border-orange-600 text-orange-600 hover:bg-orange-50"
+                  className="text-sm font-medium text-slate-600 transition hover:text-win2-primary-orage"
                 >
                   ログアウト
-                </Button>
+                </button>
               </>
             ) : (
-              <Button
-                asChild
-                className="bg-orange-600 hover:bg-orange-700 text-white"
-              >
-                <Link href="/login">ログイン</Link>
-              </Button>
+              <>
+                <Link
+                  href="/login"
+                  className="text-sm font-medium text-slate-600 transition hover:text-win2-primary-orage"
+                >
+                  ログイン
+                </Link>
+                <Link
+                  href="/register"
+                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-6 py-2 text-sm font-semibold text-white shadow-md shadow-win2-accent-rose/25 transition hover:opacity-90"
+                >
+                  新規登録
+                </Link>
+              </>
             )}
           </div>
 
-          {/* モバイルハンバーガーメニュー */}
           <button
             onClick={toggleMobileMenu}
-            className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-            aria-label="メニューを開く"
+            className="rounded-md p-2 md:hidden"
+            aria-label={isMobileMenuOpen ? "メニューを閉じる" : "メニューを開く"}
           >
             {isMobileMenuOpen ? (
-              <svg
-                className="w-6 h-6 text-gray-700"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="h-6 w-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             ) : (
-              <svg
-                className="w-6 h-6 text-gray-700"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+              <svg className="h-6 w-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             )}
           </button>
         </div>
-
-        {/* モバイルメニュー */}
-        {isMobileMenuOpen && (
-          <div className="md:hidden py-4 border-t">
-            <nav className="flex flex-col space-y-4">
-              {navigation.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className={`${getLinkClasses(item.isActive)} px-2`}
-                >
-                  {item.label}
-                </Link>
-              ))}
-
-              {/* モバイルログインボタン */}
-              <div className="pt-4 border-t">
-                {session ? (
-                  <>
-                    <span className="text-sm text-gray-600 px-2 block mb-2">
-                      {session.user?.email}
-                    </span>
-                    <Button
-                      onClick={() => {
-                        handleSignOut();
-                        setIsMobileMenuOpen(false);
-                      }}
-                      variant="outline"
-                      className="w-full border-orange-600 text-orange-600 hover:bg-orange-50"
-                    >
-                      ログアウト
-                    </Button>
-                  </>
-                ) : (
-                  <Button
-                    asChild
-                    className="w-full bg-orange-600 hover:bg-orange-700 text-white"
-                  >
-                    <Link
-                      href="/login"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      ログイン
-                    </Link>
-                  </Button>
-                )}
-              </div>
-            </nav>
-          </div>
-        )}
-      </div>
-    </header>
+      </header>
+      {mobileMenuPortal}
+    </>
   );
 }

@@ -9,34 +9,35 @@ type PageTransitionProps = {
 
 export function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
-  const [showOverlay, setShowOverlay] = useState(true);
-  const [isInitialRender, setIsInitialRender] = useState(true);
+  const [displayState, setDisplayState] = useState<'loading' | 'visible'>('loading');
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setShowOverlay(false), 500);
+    // 初回ロード時のフェードイン
+    const timer = window.setTimeout(() => setDisplayState('visible'), 500);
     return () => window.clearTimeout(timer);
   }, []);
 
   useEffect(() => {
-    if (isInitialRender) {
-      setIsInitialRender(false);
-      return;
-    }
-    setShowOverlay(true);
-    const timer = window.setTimeout(() => setShowOverlay(false), 450);
+    // pathname 変更時のトランジション
+    setDisplayState('loading');
+    const timer = window.setTimeout(() => setDisplayState('visible'), 450);
     return () => window.clearTimeout(timer);
-  }, [pathname, isInitialRender]);
+  }, [pathname]);
+
+  const isLoading = displayState === 'loading';
 
   return (
     <div className="relative min-h-screen">
+      {/* 白いオーバーレイ - ページ遷移時に表示 */}
       <div
         className={`pointer-events-none fixed inset-0 z-[70] bg-white transition-opacity duration-500 ${
-          showOverlay ? "opacity-100" : "opacity-0"
+          isLoading ? "opacity-100" : "opacity-0"
         }`}
       />
+      {/* ページコンテンツ - ローディング中は非表示 */}
       <div
         className={`relative flex min-h-screen flex-col transition-opacity duration-500 ${
-          showOverlay ? "opacity-0" : "opacity-100"
+          isLoading ? "opacity-0" : "opacity-100"
         }`}
       >
         {children}
