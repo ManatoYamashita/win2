@@ -63,7 +63,7 @@ export function Header() {
   const isAuthenticated = !!session;
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-win2-surface-cream-200">
+    <header className="sticky top-0 z-[100] bg-white/95 backdrop-blur border-b border-win2-surface-cream-200">
       <div className="mx-auto flex max-w-[1100px] items-center justify-between px-4 py-4 lg:px-6">
         <Link href="/" className="flex items-center gap-3" aria-label="WIN×Ⅱ トップページ">
           <Image
