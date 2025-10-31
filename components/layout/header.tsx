@@ -74,9 +74,9 @@ export function Header() {
             className="h-8 w-auto object-contain"
             priority
           />
-          <span className="hidden text-sm font-semibold tracking-[0.35em] text-[#f26f36] md:inline">
+          {/* <span className="hidden text-sm font-semibold tracking-[0.35em] text-[#f26f36] md:inline">
             アフィリエイトブログ
-          </span>
+          </span> */}
         </Link>
 
         <nav className="hidden items-center gap-7 md:flex">

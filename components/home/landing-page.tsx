@@ -150,7 +150,7 @@ function HeroSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="relative overflow-visible bg-gradient-to-b from-[#fff7f2] via-white to-[#ffeade]">
+    <section className="relative -mb-32 overflow-visible bg-gradient-to-b from-[#fff7f2] via-white to-[#ffeade] pb-32 md:-mb-40 md:pb-40">
       <div className="absolute inset-0">
         <Image
           src="/assets/images/office-super-blur.webp"
@@ -163,7 +163,7 @@ function HeroSection() {
       <div
         ref={ref}
         className={cn(
-          "relative z-10 mx-auto flex max-w-[1100px] flex-col-reverse gap-12 px-6 pb-20 pt-24 md:flex-row md:items-center lg:px-8",
+          "relative z-10 mx-auto flex max-w-[1100px] flex-col-reverse gap-12 px-6 pt-24 md:flex-row md:items-center lg:px-8",
           "transition-transform-opacity",
           isVisible ? "reveal-visible" : "reveal"
         )}
@@ -229,7 +229,7 @@ function ProblemSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
-    <section className="relative z-20 bg-[#f5f1ed] py-16">
+    <section className="relative z-20 bg-[#f5f1ed] pb-16 pt-40 md:pt-48">
       <div
         ref={ref}
         className={cn(
@@ -364,8 +364,11 @@ function ServiceSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
+  const [isVideoError, setIsVideoError] = useState(false);
 
   useEffect(() => {
+    if (isVideoError) return;
+
     const videoNode = videoRef.current;
     if (!videoNode) return;
 
@@ -375,26 +378,32 @@ function ServiceSection() {
         .then(() => setHasPlayed(true))
         .catch(() => {
           // 自動再生がブロックされた場合はフォールバックとして最後のフレームを表示
-          videoNode.currentTime = videoNode.duration;
+          const fallbackTime = Number.isFinite(videoNode.duration)
+            ? videoNode.duration
+            : 0;
+          videoNode.currentTime = fallbackTime;
           setHasPlayed(true);
         });
     }
-  }, [isVisible, hasPlayed]);
+  }, [isVisible, hasPlayed, isVideoError]);
 
   useEffect(() => {
+    if (isVideoError) return;
+
     const videoNode = videoRef.current;
     if (!videoNode) return;
 
     const handleEnded = () => {
       videoNode.pause();
-      videoNode.currentTime = videoNode.duration;
+      const endTime = Number.isFinite(videoNode.duration) ? videoNode.duration : 0;
+      videoNode.currentTime = endTime;
     };
 
     videoNode.addEventListener("ended", handleEnded);
     return () => {
       videoNode.removeEventListener("ended", handleEnded);
     };
-  }, []);
+  }, [isVideoError]);
 
   return (
     <section className="bg-[#fffaf4] py-24">
@@ -432,20 +441,38 @@ function ServiceSection() {
             </div>
           ))}
         </div>
-        <div className="relative mx-auto w-full max-w-[560px] pt-20">
-          <div className="overflow-hidden rounded-[32px] border border-[#ffe1cc] bg-[#fffaf4]">
-            <video
-              ref={videoRef}
-              className="block w-full object-cover"
-              playsInline
-              preload="metadata"
-              muted
-              loop={false}
-              controls={false}
-              aria-label="WIN×Ⅱのサービス紹介"
-            >
-              <source src="/assets/images/what-is-win2.webm" type="video/webm" />
-            </video>
+        <div className="relative mx-auto w-full max-w-[640px] pt-24 lg:max-w-[720px]">
+          <div className="overflow-hidden rounded-[32px] bg-[#fffaf4]">
+            {isVideoError ? (
+              <Image
+                src="/assets/images/onestop-figure.webp"
+                alt="暮らしを支える4つのカテゴリ"
+                width={720}
+                height={540}
+                className="w-full object-contain"
+              />
+            ) : (
+              <video
+                ref={videoRef}
+                className="block w-full object-cover"
+                playsInline
+                preload="metadata"
+                muted
+                loop={false}
+                controls={false}
+                aria-label="WIN×Ⅱのサービス紹介"
+                poster="/assets/images/onestop-figure.webp"
+                onError={() => setIsVideoError(true)}
+              >
+                <source src="/assets/images/what-is-win2.webm" type="video/webm" />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/assets/images/onestop-figure.webp"
+                  alt="暮らしを支える4つのカテゴリ"
+                  className="block w-full object-contain"
+                />
+              </video>
+            )}
           </div>
         </div>
       </div>
