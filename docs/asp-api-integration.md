@@ -10,8 +10,8 @@ This document outlines the investigation results for ASP (Affiliate Service Prov
 
 | ASP | Webhook/Postback Support | Public Documentation | Status |
 |-----|--------------------------|---------------------|--------|
-| A8.net | Partial (Session Tracking) | Available | ⚠️ Requires Investigation |
-| afb (アフィb) | ✅ Real-time Postback System | Limited (Login Required) | ✅ Available |
+| A8.net | ❌ **Not Available (Media Member)** | Available | ❌ **Blocked - See Details Below** |
+| afb (アフィb) | ✅ Real-time Postback System | Limited (Login Required) | ✅ **Primary Implementation Target** |
 | もしもアフィリエイト | ❌ Unknown | None | ⚠️ Contact Support Required |
 | バリューコマース | ❌ Unknown | None | ⚠️ Contact Support Required |
 
@@ -19,7 +19,79 @@ This document outlines the investigation results for ASP (Affiliate Service Prov
 
 ## A8.net
 
-### Available Methods
+### ⛔ CRITICAL LIMITATION: Media Member Management Console
+
+**Last Verified:** 2025-01-03
+
+**Contract Type:** Media Member (Affiliate/Publisher)
+**Management Console:** Media Member Dashboard
+
+#### 🚫 **Individual Conversion Tracking: NOT POSSIBLE**
+
+**Root Cause:**
+The A8.net **Media Member management console** does NOT provide access to individual conversion details with custom tracking parameters (id1, eventId). Media members can only access **aggregated reports**.
+
+**Available CSV Downloads (Media Member):**
+
+| CSV Type | Content | Custom Parameters (id1, eventId) |
+|----------|---------|----------------------------------|
+| Program List | Program details, monthly revenue, click counts | ❌ Not included |
+| Performance Summary | Aggregated revenue by program | ❌ Not included |
+| Conversion Referrer Report | URLs where conversions originated | ⚠️ Partial URL parameters only |
+
+**Example of Downloaded CSV (Program List):**
+```
+広告主ID, 広告主名, プログラムID, プログラム名, 今月の報酬額, 昨日売上数, 昨日クリック数...
+```
+→ **No individual conversion records, No member IDs (id1), No event IDs**
+
+#### Why This is a Problem for WIN×Ⅱ
+
+WIN×Ⅱ requires tracking **which member** generated **which conversion** to calculate individual cashback amounts. However:
+
+1. **Media Member Console Limitation:**
+   - Only shows "total revenue from Program X"
+   - Cannot identify individual transactions
+   - Cannot retrieve custom tracking parameters
+
+2. **A8.net's Design Philosophy:**
+   - Affiliates need to know "how much did I earn from which program"
+   - Individual purchase details belong to advertisers (privacy)
+   - Media members don't need granular conversion data
+
+#### Attempted CSV Download Locations
+
+**Tested Menu:** "Report Download" button on top page
+
+**Result:**
+Downloaded CSV contained only program-level aggregated data, not individual conversion details.
+
+#### Alternative Approaches (All Require Advertiser Contract)
+
+| Approach | Description | Feasibility for Media Member |
+|----------|-------------|------------------------------|
+| **Advertiser Dashboard** | Access to order confirmation reports with individual details | ❌ Requires advertiser contract |
+| **Session Tracking API** | Send conversion data to A8.net with custom parameters | ❌ Advertiser-only feature |
+| **Webhook/Postback** | A8.net sends conversion notifications to external URL | ⚠️ Unknown if available, likely advertiser-only |
+
+#### Impact on WIN×Ⅱ Project
+
+**Status:** ❌ **A8.net individual conversion tracking is BLOCKED**
+
+**Implications:**
+- Cannot track which WIN×Ⅱ member generated which A8.net conversion
+- Cannot calculate member-specific cashback from A8.net deals
+- Manual CSV process cannot work (no member ID in available CSVs)
+
+**Recommended Actions:**
+1. ✅ **Implement afb first** (confirmed postback support)
+2. ⏸️ **Contact A8.net support** (ask about media member options for custom tracking)
+3. ⏸️ **Consider advertiser contract** (if business model allows)
+4. ⏸️ **Use A8.net for aggregate reporting only** (total revenue tracking, not member-specific cashback)
+
+---
+
+### Available Methods (For Reference - Advertiser-Only)
 
 #### 1. Session Tracking (セッショントラッキング)
 
@@ -332,16 +404,32 @@ https://yourdomain.com/api/webhooks/asp-conversion
 
 **Estimated Timeline:** 2-3 days
 
-### Phase 2: A8.net Investigation & Implementation
+### Phase 2: A8.net Investigation & Resolution
 
-⚠️ **Reason:** Largest ASP in Japan, high traffic potential
+❌ **Status:** **BLOCKED** - Media member console limitation confirmed
 
-**Tasks:**
-1. Contact A8.net support for postback URL documentation
-2. If available, implement A8.net webhook endpoint
-3. If not available, maintain current manual CSV process
+**Current Situation:**
+- Contract type: Media Member (Affiliate/Publisher)
+- Individual conversion tracking with custom parameters (id1, eventId) is NOT AVAILABLE
+- CSV downloads only provide aggregated program-level data
 
-**Estimated Timeline:** 3-5 days (dependent on API availability)
+**Potential Actions:**
+1. **Contact A8.net Support** (Priority: Medium)
+   - Ask about media member options for custom tracking
+   - Inquire about alternative tracking methods
+   - Request information on upgrading/changing contract type
+
+2. **Use A8.net for Aggregate Reporting Only** (Fallback)
+   - Track total revenue from A8.net deals
+   - NO member-specific cashback calculation
+   - Display A8.net deals without individual tracking
+
+3. **Defer A8.net Member Tracking** (Current Recommendation)
+   - Focus on afb implementation first
+   - Revisit A8.net after afb success
+   - Consider business model adjustments
+
+**Estimated Timeline:** ON HOLD - Pending support response or business decision
 
 ### Phase 3: もしも & バリューコマース
 
@@ -422,6 +510,7 @@ If webhook support is not available from any ASP:
 
 ---
 
-**Document Status:** Draft - Pending ASP dashboard access and support responses
+**Document Status:** Updated - A8.net limitation confirmed, afb implementation prioritized
 
 **Last Reviewed:** 2025-01-03
+**Last Updated:** 2025-01-03 (A8.net media member limitation documented)
