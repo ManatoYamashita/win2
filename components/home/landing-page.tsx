@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { cn } from "@/lib/utils";
 
@@ -26,22 +27,30 @@ const heroStats = [
 
 const serviceCategories = ["各種保険", "不動産", "エンタメ", "転職"];
 
-const serviceFeatures = [
+const serviceShowcaseItems = [
   {
-    image: "/assets/images/保険の無料相談.webp",
-    alt: "保険の無料相談",
+    tag: "ライフプラン",
+    title: "保険の無料相談",
+    description: "家計を守るための最適な保険選びを、専門家と無料で比較できます。",
+    image: "/assets/images/lifeplan.webp",
   },
   {
-    image: "/assets/images/不動産査定サービス.webp",
-    alt: "不動産査定サービス",
+    tag: "住まいの価値",
+    title: "不動産査定サービス",
+    description: "オンラインで相場をチェック。複数査定をまとめて依頼して時間を節約。",
+    image: "/assets/images/realestate.webp",
   },
   {
-    image: "/assets/images/エンタメサブスク特集.webp",
-    alt: "エンタメサブスク特集",
+    tag: "暮らしと娯楽",
+    title: "エンタメサブスク特集",
+    description: "動画・音楽・学びまで、生活を彩るサブスクを分かりやすく比較。",
+    image: "/assets/images/entertainment.webp",
   },
   {
-    image: "/assets/images/転職支援サポート.webp",
-    alt: "転職支援サポート",
+    tag: "キャリア支援",
+    title: "転職サポート",
+    description: "非公開求人やキャリア相談など、次の一歩を後押しする支援情報を厳選。",
+    image: "/assets/images/changejob.webp",
   },
 ];
 
@@ -619,6 +628,7 @@ function MeritSection() {
 
 function HighlightSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
     <section className="relative bg-win2-surface-sky-50 py-24">
@@ -653,22 +663,69 @@ function HighlightSection() {
             家計のお悩みからライフイベントまで、WIN×Ⅱなら幅広いカテゴリをワンストップでチェックできます。
           </p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {serviceFeatures.map((feature) => (
-            <div key={feature.alt} className="overflow-hidden rounded-[28px] shadow-[0_16px_34px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:scale-105">
-              <Image
-                src={feature.image}
-                alt={feature.alt}
-                width={320}
-                height={240}
-                className="h-full w-full object-cover"
-              />
-            </div>
-          ))}
+        <div className="flex flex-col gap-5 lg:flex-row">
+          {serviceShowcaseItems.map((item, index) => {
+            const isActive = hoveredIndex === index;
+            const isInactive = hoveredIndex !== null && hoveredIndex !== index;
+
+            return (
+              <Link
+                key={item.title}
+                href="/blog"
+                aria-label={`${item.title}の特集を見る`}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                onFocus={() => setHoveredIndex(index)}
+                onBlur={() => setHoveredIndex(null)}
+                className={cn(
+                  "group relative isolate flex min-h-[320px] flex-1 flex-col justify-between overflow-hidden rounded-[32px] bg-slate-900 text-left text-white shadow-[0_24px_44px_rgba(13,29,54,0.18)] transition-all duration-500 ease-out",
+                  "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-amber/50",
+                  "lg:min-h-[420px]",
+                  isActive ? "lg:flex-[1.55]" : "lg:flex-1",
+                  isInactive ? "lg:flex-[0.85] lg:opacity-75" : "lg:opacity-100"
+                )}
+                style={{
+                  transition: "flex 0.5s ease, opacity 0.35s ease, transform 0.45s ease",
+                }}
+              >
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  sizes="(min-width: 1024px) 25vw, 100vw"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  priority={index === 0}
+                />
+                <span className="absolute inset-0 bg-gradient-to-b from-black/10 via-slate-900/40 to-slate-950/80" />
+                <span className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-win2-accent-rose via-win2-accent-amber to-win2-primary-orage opacity-80" />
+
+                <div className="relative flex flex-col gap-6 p-6 sm:p-8">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-3">
+                      <span className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white backdrop-blur">
+                        {item.tag}
+                      </span>
+                      <h3 className="text-2xl font-bold leading-snug sm:text-3xl">{item.title}</h3>
+                      <p className="text-sm leading-relaxed text-slate-100/85 sm:text-base">
+                        {item.description}
+                      </p>
+                    </div>
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-white transition-colors duration-300 group-hover:bg-white/25">
+                      <ArrowUpRight className="h-5 w-5" aria-hidden />
+                    </span>
+                  </div>
+                  <span className="inline-flex items-center gap-2 text-sm font-semibold text-win2-accent-amber transition-colors duration-300 group-hover:text-win2-primary-orage">
+                    詳しく見る
+                    <ArrowUpRight className="h-4 w-4" aria-hidden />
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
         </div>
         <Link
           href="/register"
-          className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark"
+          className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-rose/40"
         >
           無料メルマガ会員登録で最新情報を受け取る
         </Link>
