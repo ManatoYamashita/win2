@@ -149,47 +149,88 @@ export function LandingPage() {
 function HeroSection() {
   const { ref } = useScrollReveal<HTMLDivElement>();
   const [isMounted, setIsMounted] = useState(false);
+  const headlineRef = useRef<HTMLHeadingElement | null>(null);
+  const imageRef = useRef<HTMLDivElement | null>(null);
+  const statsRef = useRef<HTMLDivElement | null>(null);
+  const ctaRef = useRef<HTMLDivElement | null>(null);
+  const [playKey, setPlayKey] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsMounted(true), 150);
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 80);
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (!isMounted) return;
+    setPlayKey((prev) => prev + 1);
+  }, [isMounted]);
+
   return (
     <section className="relative -mb-32 overflow-visible bg-gradient-to-b from-win2-surface-cream-320 via-white to-win2-surface-cream-150 pb-32 md:-mb-40 md:pb-44">
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 overflow-hidden">
         <Image
           src="/assets/images/office-super-blur.webp"
           alt="オフィス背景"
           fill
           sizes="100vw"
-          className="object-cover opacity-70"
+          className={cn(
+            "origin-top opacity-0 blur-[14px]",
+            isMounted && playKey ? "animate-hero-background" : "animate-none"
+          )}
           quality={75}
           priority
+        />
+        <div
+          className={cn(
+            "absolute inset-0 bg-gradient-to-b from-white/0 via-white/40 to-white/85 opacity-0",
+            isMounted && playKey ? "animate-hero-overlay" : "animate-none"
+          )}
         />
       </div>
       <div
         ref={ref}
-        className={cn(
-          "relative z-10 mx-auto flex max-w-[1100px] flex-col gap-12 px-6 pt-24 md:flex-row md:items-center lg:px-8",
-          "transition-transform-opacity",
-          isMounted ? "reveal-visible" : "reveal"
-        )}
+        className="relative z-10 mx-auto flex max-w-[1100px] flex-col gap-12 px-6 pt-24 md:flex-row md:items-center lg:px-8"
       >
         <div className="relative z-40 max-w-xl space-y-8">
           <div className="space-y-3">
-            <p className="text-sm font-semibold tracking-[0.35em] text-win2-accent-gold">WIN×Ⅱ</p>
-            <h1 className="text-4xl font-bold leading-tight text-win2-neutral-950 md:text-5xl">
+            <p
+              className={cn(
+                "text-sm font-semibold tracking-[0.35em] text-win2-accent-gold opacity-0",
+                isMounted && playKey ? "animate-hero-badge" : "animate-none"
+              )}
+            >
+              WIN×Ⅱ
+            </p>
+            <h1
+              ref={headlineRef}
+              className={cn(
+                "text-4xl font-bold leading-tight text-win2-neutral-950 opacity-0 md:text-5xl",
+                isMounted && playKey ? "animate-hero-headline" : "animate-none"
+              )}
+            >
               暮らしを
               <span className="text-win2-primary-orage">もっとお得に</span>
               <br />
               もっとスマートに。
             </h1>
-            <p className="text-[15px] leading-relaxed text-slate-700">
+            <p
+              className={cn(
+                "text-[15px] leading-relaxed text-slate-700 opacity-0",
+                isMounted && playKey ? "animate-hero-subtext" : "animate-none"
+              )}
+            >
               WIN×Ⅱは、暮らしに役立つサービスをワンストップで選べるアフィリエイトブログプラットフォームです。保険・不動産・転職・エンタメなど豊富なジャンルから、あなたにぴったりのサービスを見つけましょう。
             </p>
           </div>
-          <div className="flex flex-wrap gap-4">
+          <div
+            ref={statsRef}
+            className={cn(
+              "flex flex-wrap gap-4 opacity-0",
+              isMounted && playKey ? "animate-hero-stats" : "animate-none"
+            )}
+          >
             {heroStats.map((stat) => (
               <div
                 key={stat.title}
@@ -203,7 +244,13 @@ function HeroSection() {
               </div>
             ))}
           </div>
-          <div className="flex flex-wrap items-center gap-4">
+          <div
+            ref={ctaRef}
+            className={cn(
+              "flex flex-wrap items-center gap-4 opacity-0",
+              isMounted && playKey ? "animate-hero-cta" : "animate-none"
+            )}
+          >
             <Link
               href="/register"
               className="rounded-full bg-win2-primary-orage px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-primary-orage/25 transition hover:bg-win2-accent-amber"
@@ -218,7 +265,13 @@ function HeroSection() {
             </Link>
           </div>
         </div>
-        <div className="relative z-20 mx-auto w-full max-w-[420px] md:max-w-[460px]">
+        <div
+          ref={imageRef}
+          className={cn(
+            "relative z-20 mx-auto w-full max-w-[420px] opacity-0 md:max-w-[460px]",
+            isMounted && playKey ? "animate-hero-image" : "animate-none"
+          )}
+        >
           <Image
             src="/assets/images/woman.webp"
             alt="メインビジュアル"

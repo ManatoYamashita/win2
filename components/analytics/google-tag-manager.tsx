@@ -13,10 +13,15 @@ interface GoogleTagManagerProps {
  * <GoogleTagManager gtmId={process.env.NEXT_PUBLIC_GTM_ID!} />
  */
 export function GoogleTagManager({ gtmId }: GoogleTagManagerProps) {
+  // デバッグ用ログ（一時的）
+  console.log("[GTM Debug] GTM ID received:", gtmId || "(empty)");
+
   if (!gtmId) {
     console.warn("GTM ID is not provided. Google Tag Manager will not be loaded.");
     return null;
   }
+
+  console.log("[GTM Debug] Loading GTM with ID:", gtmId);
 
   return (
     <>
