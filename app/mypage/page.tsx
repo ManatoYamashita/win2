@@ -158,12 +158,12 @@ export default function MypagePage() {
 
       <CardContent className="space-y-6">
         {/* 会員ID */}
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <Label>会員ID</Label>
           <p className="text-sm font-mono bg-muted p-3 rounded-md">
             {member.memberId}
           </p>
-        </div>
+        </div> */}
 
         {/* 氏名 */}
         <div className="space-y-2">

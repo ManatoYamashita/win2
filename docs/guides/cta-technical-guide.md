@@ -122,7 +122,7 @@ export function BlogContent({ content }: BlogContentProps) {
             class="cta-button ..."
             data-deal-id="${dealId}"
           >
-            この案件に申し込む
+            このサービスに進む
           </button>
         </div>
       `;

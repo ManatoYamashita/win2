@@ -68,7 +68,7 @@ export function BlogContent({ content }: BlogContentProps) {
             class="cta-button bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
             data-deal-id="${dealId}"
           >
-            この案件に申し込む
+            このサービスに進む
             <svg class="inline-block ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
             </svg>
@@ -153,7 +153,7 @@ export function BlogContent({ content }: BlogContentProps) {
       // エラー時はボタンを元に戻す
       button.disabled = false;
       button.innerHTML = `
-        この案件に申し込む
+        このサービスに進む
         <svg class="inline-block ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
         </svg>
