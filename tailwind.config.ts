@@ -53,9 +53,9 @@ export default {
         // WIN×II ブランドカラーパレット (カラーガイドライン準拠)
         win2: {
           // Primary & Accent Colors
-          'primary-orage': '#f26f36',      // ブランド基調色
-          'accent-rose': '#f05972',        // グラデーション左端
-          'accent-rose-dark': '#d9475e',   // ホバー時の濃色
+          'primary-orage': '#c1341f',      // ブランド基調色（コントラスト改善）
+          'accent-rose': '#a9223c',        // グラデーション左端（濃色化）
+          'accent-rose-dark': '#8c1c32',   // ホバー時の濃色
           'accent-amber': '#f48a3c',       // グラデーション右端
           'accent-gold': '#f5a623',        // キャッチコピー強調
           'accent-sun': '#fff44f',         // ハイライト

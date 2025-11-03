@@ -183,6 +183,7 @@ export function Header() {
               height={40}
               className="h-8 w-auto object-contain"
               priority
+              loading="eager"
             />
             {/* <span className="hidden text-sm font-semibold tracking-[0.35em] text-[#f26f36] md:inline">
               アフィリエイトブログ

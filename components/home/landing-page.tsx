@@ -168,20 +168,23 @@ function HeroSection() {
   }, [isMounted]);
 
   return (
-    <section className="relative -mb-32 overflow-visible bg-gradient-to-b from-win2-surface-cream-320 via-white to-win2-surface-cream-150 pb-32 md:-mb-40 md:pb-44">
+    <section className="relative -mb-32 min-h-[540px] overflow-visible bg-gradient-to-b from-win2-surface-cream-320 via-white to-win2-surface-cream-150 pb-32 md:-mb-40 md:min-h-[640px] md:pb-44">
       <div className="absolute inset-0 overflow-hidden">
-        <Image
-          src="/assets/images/office-super-blur.webp"
-          alt="オフィス背景"
-          fill
-          sizes="100vw"
-          className={cn(
-            "origin-top opacity-0 blur-[14px]",
-            isMounted && playKey ? "animate-hero-background" : "animate-none"
-          )}
-          quality={75}
-          priority
-        />
+        <div className="relative h-full w-full md:aspect-[3/2] md:h-auto">
+          <Image
+            src="/assets/images/office-super-blur.webp"
+            alt="オフィス背景"
+            fill
+            sizes="100vw"
+            className={cn(
+              "origin-top opacity-0 blur-[14px]",
+              isMounted && playKey ? "animate-hero-background" : "animate-none"
+            )}
+            quality={75}
+            priority
+            loading="eager"
+          />
+        </div>
         <div
           className={cn(
             "absolute inset-0 bg-gradient-to-b from-white/0 via-white/40 to-white/85 opacity-0",
