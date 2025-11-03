@@ -6,11 +6,13 @@ import { PasswordResetEmail } from "@/emails/password-reset-email";
 /**
  * Resend SDK初期化
  * API Keyは環境変数から取得
+ * RESEND_VALID=true の場合のみ有効化
  */
 const resendApiKey = process.env.RESEND_API_KEY;
-export const isResendConfigured = Boolean(resendApiKey);
+const resendValid = process.env.RESEND_VALID === "true"; // デフォルト: false
+export const isResendValid = resendValid && Boolean(resendApiKey);
 
-const resend = resendApiKey ? new Resend(resendApiKey) : null;
+const resend = isResendValid ? new Resend(resendApiKey) : null;
 
 /**
  * 送信元メールアドレス
@@ -43,11 +45,11 @@ export async function sendVerificationEmail(
   token: string
 ): Promise<EmailSendResult> {
   try {
-    if (!resend) {
-      console.warn("Resend API key is not configured. Verification email will not be sent.");
+    if (!isResendValid || !resend) {
+      console.warn("Resend is disabled or not configured. Verification email will not be sent.");
       return {
         success: false,
-        error: "メール送信設定が完了していません",
+        error: "メール送信機能は現在無効です",
       };
     }
 
@@ -102,11 +104,11 @@ export async function sendPasswordResetEmail(
   token: string
 ): Promise<EmailSendResult> {
   try {
-    if (!resend) {
-      console.warn("Resend API key is not configured. Password reset email will not be sent.");
+    if (!isResendValid || !resend) {
+      console.warn("Resend is disabled or not configured. Password reset email will not be sent.");
       return {
         success: false,
-        error: "メール送信設定が完了していません",
+        error: "メール送信機能は現在無効です",
       };
     }
 
@@ -159,11 +161,11 @@ export async function sendPasswordResetNotification(
   email: string
 ): Promise<EmailSendResult> {
   try {
-    if (!resend) {
-      console.warn("Resend API key is not configured. Password reset notification will not be sent.");
+    if (!isResendValid || !resend) {
+      console.warn("Resend is disabled or not configured. Password reset notification will not be sent.");
       return {
         success: false,
-        error: "メール送信設定が完了していません",
+        error: "メール送信機能は現在無効です",
       };
     }
 

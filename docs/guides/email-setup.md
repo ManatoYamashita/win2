@@ -42,6 +42,11 @@ WIN×Ⅱプロジェクトのメール送信機能（Phase 2-1）の設定手順
 ```bash
 # Phase 2: Email Verification & Password Reset
 
+# Resend Feature Flag（メール機能の有効/無効を制御）
+# ⚠️ Wix DNS制限により、デフォルトはfalse（メール機能無効）
+# trueに設定する場合は、DNS移管後のみ推奨
+RESEND_VALID=false
+
 # Resend API Key（Step 2で取得したキー）
 RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxxx
 
@@ -171,6 +176,40 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000        # ← アプリケーションU
 
 2. 開発サーバーを再起動（`Ctrl+C` → `npm run dev`）
 3. API Response で `"emailSent": true` になることを確認
+
+## ⚠️ 重要: DNS制限によるメール機能の制約
+
+### 現在の構成
+
+WIN×Ⅱプロジェクトは **Wix.comでドメイン登録**、**Vercelでホスティング** という構成を採用しています。
+
+### DNS制限の詳細
+
+**Wix DNSの制限事項:**
+- MXレコードは **Wix指定のメールサービスのみ** 設定可能
+- NSレコードの書き換えは **禁止**（Wixの管理下に固定）
+- Resendなどのサードパーティメールサービスに必要なMXレコードを **設定できない**
+
+### フィーチャーフラグによる対応
+
+この制限に対応するため、`RESEND_VALID` 環境変数でメール機能を制御しています：
+
+**`RESEND_VALID=false`（デフォルト、現在の設定）:**
+- メール認証をスキップ（会員登録時に即座に認証済みとして登録）
+- パスワードリセット機能を無効化（503エラー返却）
+- メール認証再送信機能を無効化（503エラー返却）
+
+**`RESEND_VALID=true`（DNS移管後のみ推奨）:**
+- 通常のメール認証フロー（会員登録時に認証メール送信）
+- パスワードリセット機能が有効
+- メール認証再送信機能が有効
+
+### 詳細ドキュメント
+
+詳細な技術仕様と代替案については、以下を参照してください：
+- `docs/architecture/dns-infrastructure.md` - DNS制限の詳細とアーキテクチャ
+- ドメイン移管の選択肢（Cloudflare, Route 53, Google Domainsなど）
+- 代替メールサービスの検討
 
 ## 将来の本番環境移行計画
 

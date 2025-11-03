@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { forgotPasswordSchema } from "@/lib/validations/auth";
 import { getMemberByEmail } from "@/lib/sheets";
 import { generatePasswordResetToken } from "@/lib/tokens";
-import { sendPasswordResetEmail } from "@/lib/email";
+import { sendPasswordResetEmail, isResendValid } from "@/lib/email";
 
 /**
  * パスワードリセット要求API
@@ -13,6 +13,17 @@ import { sendPasswordResetEmail } from "@/lib/email";
  */
 export async function POST(request: NextRequest) {
   try {
+    // RESEND_VALID=false の場合はパスワードリセット機能を無効化
+    if (!isResendValid) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "パスワードリセット機能は現在利用できません。管理者にお問い合わせください。",
+        },
+        { status: 503 } // Service Unavailable
+      );
+    }
+
     // リクエストボディの取得
     const body = await request.json();
 

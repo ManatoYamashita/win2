@@ -28,6 +28,9 @@ docs/
 │   ├── cta-shortcode-guide.md    ← CTAショートコード使用ガイド（クライアント向け）
 │   └── cta-technical-guide.md    ← CTAショートコード技術仕様（開発者向け）
 │
+├── architecture/             ← アーキテクチャ決定記録・インフラ構成
+│   └── dns-infrastructure.md ← DNS/メールインフラ構成、Wix DNS制限、RESEND_VALIDフィーチャーフラグ
+│
 └── dev/                      ← 開発ワークフロー・規約
     ├── architecture.md      ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
     ├── environment.md       ← 開発環境セットアップ（Node.js / nvm / Turbopack / 環境変数）
@@ -59,6 +62,12 @@ docs/
 |---------|------|------------|
 | **cta-shortcode-guide.md** | CTAショートコード使用ガイド | 案件登録手順（Google Sheets）、ブログ記事でのショートコード使用方法、トラッキング仕組み、FAQ、トラブルシューティング |
 | **cta-technical-guide.md** | CTAショートコード技術仕様 | システムアーキテクチャ、BlogContentコンポーネント実装、/api/track-click仕様、GAS自動化、デバッグ手法、テスト戦略、パフォーマンス・セキュリティ |
+
+#### `architecture/` - アーキテクチャ決定記録・インフラ構成
+
+| ファイル | 内容 | 主要トピック |
+|---------|------|------------|
+| **dns-infrastructure.md** | DNS/メールインフラ構成 | Wix+Vercel構成、DNS制限（MXレコード/NSレコード）、RESEND_VALIDフィーチャーフラグ、代替メールサービス検討、ドメイン移管の選択肢、トラブルシューティング |
 
 #### `dev/` - 開発規約
 
@@ -169,6 +178,33 @@ docs/
 ## 更新履歴
 
 このセクションは、ドキュメントの主要な更新を記録します。
+
+### 2025-01-03
+
+#### DNS制限によるメール機能の制御（RESEND_VALIDフィーチャーフラグ実装）
+- **architecture/dns-infrastructure.md**: 新規作成（DNS/メールインフラ構成ドキュメント v1.0.0）
+  - Wix.com + Vercel構成の詳細説明
+  - **Wix DNS制限**: MXレコード/NSレコードの書き換え禁止によりResend完全統合が不可
+  - **RESEND_VALIDフィーチャーフラグ**: 環境変数でメール機能を制御
+    - `RESEND_VALID=false`（デフォルト）: メール認証スキップ、会員登録時に即座に認証済み
+    - `RESEND_VALID=true`: 通常のメール認証フロー（DNS移管後のみ推奨）
+  - 代替メールサービスの検討（SendGrid, AWS SES, Mailgun, Postmark, Brevo）
+  - ドメイン移管の選択肢（Cloudflare, Route 53, Google Domains）
+  - トラブルシューティング、運用フロー、セキュリティ考慮事項
+  - **ステータス**: DNS制限の完全な文書化完了、フィーチャーフラグ実装完了
+- **CLAUDE.md**: Phase 2実装ステータス更新
+  - メール認証システムとパスワードリセットフローに「Feature Flag Controlled」注記追加
+  - 環境変数セクションに`RESEND_VALID`の説明追加
+- **guides/email-setup.md**: DNS制限セクション追加
+  - Wix DNS制限の詳細説明
+  - `RESEND_VALID`環境変数の使用方法
+  - `docs/architecture/dns-infrastructure.md`へのリンク
+- **コード変更**:
+  - `lib/email.ts`: `isResendValid`フィーチャーフラグ実装
+  - `app/api/register/route.ts`: RESEND_VALIDによる条件分岐（メール認証スキップ/有効）
+  - `app/api/forgot-password/route.ts`: RESEND_VALID=falseで503エラー返却
+  - `app/api/resend-verification/route.ts`: RESEND_VALID=falseで503エラー返却
+  - `.env.local` / `.env.example`: `RESEND_VALID=false`環境変数追加
 
 ### 2025-10-30
 

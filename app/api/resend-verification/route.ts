@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { generateVerificationToken } from "@/lib/tokens";
-import { sendVerificationEmail } from "@/lib/email";
+import { sendVerificationEmail, isResendValid } from "@/lib/email";
 import { getMemberByEmail } from "@/lib/sheets";
 
 /**
@@ -14,6 +14,17 @@ import { getMemberByEmail } from "@/lib/sheets";
  */
 export async function POST() {
   try {
+    // RESEND_VALID=false の場合はメール認証再送信機能を無効化
+    if (!isResendValid) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "メール認証機能は現在利用できません。",
+        },
+        { status: 503 } // Service Unavailable
+      );
+    }
+
     // セッション認証チェック
     const session = await getServerSession(authOptions);
 
