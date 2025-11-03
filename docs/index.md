@@ -181,7 +181,7 @@ docs/
 
 ### 2025-01-03
 
-#### DNS制限によるメール機能の制御（RESEND_VALIDフィーチャーフラグ実装）
+#### DNS制限によるメール機能の制御（RESEND_VALIDフィーチャーフラグ実装・検証完了）
 - **architecture/dns-infrastructure.md**: 新規作成（DNS/メールインフラ構成ドキュメント v1.0.0）
   - Wix.com + Vercel構成の詳細説明
   - **Wix DNS制限**: MXレコード/NSレコードの書き換え禁止によりResend完全統合が不可
@@ -191,7 +191,8 @@ docs/
   - 代替メールサービスの検討（SendGrid, AWS SES, Mailgun, Postmark, Brevo）
   - ドメイン移管の選択肢（Cloudflare, Route 53, Google Domains）
   - トラブルシューティング、運用フロー、セキュリティ考慮事項
-  - **ステータス**: DNS制限の完全な文書化完了、フィーチャーフラグ実装完了
+  - **✅ 検証完了**: 会員登録・ログイン・ログアウト正常動作確認（`RESEND_VALID=false`構成）
+  - **ステータス**: DNS制限の完全な文書化完了、フィーチャーフラグ実装完了、動作検証完了
 - **CLAUDE.md**: Phase 2実装ステータス更新
   - メール認証システムとパスワードリセットフローに「Feature Flag Controlled」注記追加
   - 環境変数セクションに`RESEND_VALID`の説明追加

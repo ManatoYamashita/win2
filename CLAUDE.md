@@ -312,21 +312,26 @@ The existing GAS script:
 10. ✅ /api/track-click implementation with proper id1 tracking
 11. ✅ Member dashboard with conversion history (/mypage, /mypage/history)
 
-### Phase 2: 認証・会員機能 ✅ Completed (Phase 2-1 only)
+### Phase 2: 認証・会員機能 ✅ Completed (Phase 2-1 only) - **Verified 2025-01-03**
 1. ✅ Email verification system (Resend integration) - **Feature Flag Controlled**
    - Verification token generation with JWT
    - Email templates and sending
    - Token validation and email update in Google Sheets
    - **⚠️ DNS Restriction**: Wix DNS limits prevent full Resend integration (MX records restricted)
    - **Feature Flag**: `RESEND_VALID=false` (default) skips email verification, `true` enables full flow
+   - **✅ Tested**: Member registration with email verification skip works correctly
    - See `docs/architecture/dns-infrastructure.md` for details
 2. ✅ Password reset flow (forgot-password, reset-password pages) - **Feature Flag Controlled**
    - Password reset token generation
    - Email notification
    - Password update functionality
    - **⚠️ Currently Disabled**: Returns 503 error when `RESEND_VALID=false`
-3. ⏭️ Phase 2-2 Admin Dashboard - **Skipped** (not critical)
-4. ⏭️ Phase 2-3 Advanced features - **Skipped** (not critical)
+3. ✅ **Core Authentication Verified (2025-01-03)**
+   - ✅ Member registration: Works without email verification (`emailVerified=true` immediately)
+   - ✅ Login: Works normally with registered credentials
+   - ✅ Logout: Session management functions correctly
+4. ⏭️ Phase 2-2 Admin Dashboard - **Skipped** (not critical)
+5. ⏭️ Phase 2-3 Advanced features - **Skipped** (not critical)
 
 ### Phase 3: ブログ機能 ✅ Completed (100%)
 1. ✅ Blog components
