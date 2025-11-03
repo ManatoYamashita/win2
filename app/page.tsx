@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
     description:
-      "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。成果に応じたキャッシュバック付きの会員制プラットフォーム。",
+      "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。アフィリエイトブログプラットフォームです。",
     images: [
       {
         url: `${appUrl}/ogp.jpg`,
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
     description:
-      "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。成果に応じたキャッシュバック付き。",
+      "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。アフィリエイトブログプラットフォームです。",
     images: [`${appUrl}/ogp.jpg`],
   },
   alternates: {

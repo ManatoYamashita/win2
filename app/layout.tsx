@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     url: appUrl,
     siteName: "WIN×Ⅱ",
     title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
-    description: "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。成果に応じたキャッシュバック付きの会員制プラットフォーム。",
+    description: "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。成果に応じた会員制プラットフォーム。",
     images: [
       {
         url: `${appUrl}/ogp.jpg`,
@@ -34,7 +34,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
-    description: "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。成果に応じたキャッシュバック付き。",
+    description: "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。",
     images: [`${appUrl}/ogp.jpg`],
   },
   robots: {

@@ -115,7 +115,7 @@ const faqItems = [
   {
     question: "掲載するのに費用はかかりますか？",
     answer:
-      "掲載は完全無料です。成果が発生した場合のみ、報酬の一部を還元する仕組みです。",
+      "掲載は完全無料です。豊富なジャンルから、あなたにぴったりのサービスを見つけましょう。",
   },
   {
     question: "どんなサービスが掲載されていますか？",
@@ -184,7 +184,7 @@ function HeroSection() {
               もっとスマートに。
             </h1>
             <p className="text-[15px] leading-relaxed text-slate-700">
-              WIN×Ⅱは、暮らしに役立つサービスをワンストップで選べるキャッシュバック付きプラットフォームです。保険・不動産・転職・エンタメなど豊富なジャンルから、あなたにぴったりのサービスを見つけましょう。
+              WIN×Ⅱは、暮らしに役立つサービスをワンストップで選べるアフィリエイトブログプラットフォームです。保険・不動産・転職・エンタメなど豊富なジャンルから、あなたにぴったりのサービスを見つけましょう。
             </p>
           </div>
           <div className="flex flex-wrap gap-4">
@@ -206,7 +206,7 @@ function HeroSection() {
               href="/register"
               className="rounded-full bg-win2-primary-orage px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-primary-orage/25 transition hover:bg-win2-accent-amber"
             >
-              メンバー登録（無料）はこちら
+              無料メルマガ会員登録はこちら
             </Link>
             <Link
               href="/login"
@@ -607,7 +607,7 @@ function HighlightSection() {
           href="/register"
           className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark"
         >
-          無料メンバー登録で最新情報を受け取る
+          無料メルマガ会員登録で最新情報を受け取る
         </Link>
       </div>
     </section>
@@ -821,14 +821,14 @@ function BottomCtaSection() {
       >
         <h2 className="text-3xl font-bold md:text-4xl">いますぐ WIN×Ⅱ をはじめましょう</h2>
         <p className="text-sm leading-relaxed text-white/90 md:text-base">
-          暮らしをもっとお得に、もっとスマートに。WIN×Ⅱの無料登録でキャッシュバック特典と最新情報を手に入れてください。
+          暮らしをもっとお得に、もっとスマートに。WIN×Ⅱの無料メルマガ会員登録でキャッシュバック特典と最新情報を手に入れてください。
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
             href="/register"
             className="rounded-full bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-white/90"
           >
-            無料メンバー登録はこちら
+            無料メルマガ会員登録はこちら
           </Link>
           <Link
             href="/blog"
