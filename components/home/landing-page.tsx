@@ -162,7 +162,9 @@ function HeroSection() {
           src="/assets/images/office-super-blur.webp"
           alt="オフィス背景"
           fill
+          sizes="100vw"
           className="object-cover opacity-70"
+          quality={75}
           priority
         />
       </div>
@@ -266,6 +268,7 @@ function ProblemSection() {
                 src="/assets/images/problem.webp"
                 alt="悩む人"
                 fill
+                sizes="(max-width: 768px) 160px, (max-width: 1024px) 176px, 208px"
                 className="object-cover grayscale"
               />
             </div>
@@ -303,6 +306,7 @@ function ProblemSection() {
                 src="/assets/images/woman.webp"
                 alt="案内スタッフ"
                 fill
+                sizes="(max-width: 768px) 160px, (max-width: 1024px) 176px, 208px"
                 className="object-contain"
               />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-win2-surface-stone-100" />
@@ -531,6 +535,7 @@ function MeritSection() {
                     src={item.image}
                     alt={`${item.title}のアイコン`}
                     fill
+                    sizes="96px"
                     className="object-contain"
                   />
                 </div>
@@ -567,7 +572,9 @@ function HighlightSection() {
           src="/assets/images/city.webp"
           alt="都市背景"
           fill
+          sizes="100vw"
           className="object-cover opacity-30"
+          quality={70}
         />
       </div>
       {/* Gradient overlay for better text readability */}
@@ -685,6 +692,7 @@ function TestimonialsSection() {
                     src={testimonial.avatar}
                     alt={`${testimonial.age} ${testimonial.gender}`}
                     fill
+                    sizes="56px"
                     className="object-cover"
                   />
                 </div>

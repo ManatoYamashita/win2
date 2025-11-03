@@ -5,8 +5,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { PageTransition } from "@/components/layout/page-transition";
+import { GoogleTagManager, GoogleTagManagerNoScript } from "@/components/analytics/google-tag-manager";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const gtmId = process.env.NEXT_PUBLIC_GTM_ID || "";
 
 export const metadata: Metadata = {
   title: {
@@ -61,7 +63,13 @@ export default function RootLayout({
   // Suppress hydration mismatches caused by dev tools injecting CSS variables on the root element.
   return (
     <html lang="ja" suppressHydrationWarning>
+      {/* Google Tag Manager - Script */}
+      <GoogleTagManager gtmId={gtmId} />
+
       <body>
+        {/* Google Tag Manager - NoScript */}
+        <GoogleTagManagerNoScript gtmId={gtmId} />
+
         <SessionProvider>
           <Header />
           <PageTransition>
