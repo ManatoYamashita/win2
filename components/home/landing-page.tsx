@@ -284,18 +284,14 @@ function HeroSection() {
             isMounted && playKey ? "animate-hero-image" : "animate-none"
           )}
         >
-          <div className="relative">
-            <Image
-              src="/assets/images/woman.webp"
-              alt="メインビジュアル"
-              width={880}
-              height={880}
-              className="w-full object-contain"
-              priority
-            />
-            {/* 下部を背景に溶け込ませるグラデーション */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-win2-surface-stone-100 via-win2-surface-stone-100/40 via-60% to-transparent" />
-          </div>
+          <Image
+            src="/assets/images/woman.webp"
+            alt="メインビジュアル"
+            width={880}
+            height={880}
+            className="w-full object-contain"
+            priority
+          />
         </div>
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent via-win2-surface-stone-100/80 to-win2-surface-stone-100 md:h-32 md:via-win2-surface-stone-100/90" />
@@ -700,7 +696,7 @@ function HighlightSection() {
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   priority={index === 0}
                 />
-                <span className="absolute inset-0 bg-gradient-to-b from-slate-900/10 via-slate-900/40 to-slate-950/80" />
+                <span className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/60" />
                 <span className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-win2-accent-rose via-win2-accent-amber to-win2-primary-orage opacity-80" />
 
                 <div className="relative flex flex-col gap-6 p-6 sm:p-8">
