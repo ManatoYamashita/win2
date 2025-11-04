@@ -36,7 +36,7 @@ export async function generateMetadata({
   const canonicalUrl = `${appUrl}/blog/${id}`;
   const primaryImage = blog.thumbnail?.url || `${appUrl}/ogp.jpg`;
   const keywordBase = ["アフィリエイト", "キャッシュバック", "WIN×Ⅱ", "お得情報"];
-  const categoryKeywords = blog.category?.map((cat) => `${cat.name} アフィリエイト`) ?? [];
+  const categoryKeywords = blog.category ? [`${blog.category.name} アフィリエイト`] : [];
 
   return {
     title: blog.title,
@@ -167,17 +167,14 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       )}
 
       {/* カテゴリバッジ */}
-      {blog.category && blog.category.length > 0 && (
+      {blog.category && (
         <div className="flex gap-2 mb-4">
-          {blog.category.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/category/${cat.id}`}
-              className="inline-block px-3 py-1 text-sm font-semibold text-orange-600 bg-orange-100 rounded hover:bg-orange-200 transition-colors"
-            >
-              {cat.name}
-            </Link>
-          ))}
+          <Link
+            href={`/category/${blog.category.id}`}
+            className="inline-block px-3 py-1 text-sm font-semibold text-orange-600 bg-orange-100 rounded hover:bg-orange-200 transition-colors"
+          >
+            {blog.category.name}
+          </Link>
         </div>
       )}
 
@@ -219,19 +216,16 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       */}
 
       {/* カテゴリリンク（フッター） */}
-      {blog.category && blog.category.length > 0 && (
+      {blog.category && (
         <div className="mt-12 pt-8 border-t border-gray-200">
           <p className="text-sm text-gray-600 mb-2">関連カテゴリ:</p>
           <div className="flex flex-wrap gap-2">
-            {blog.category.map((cat) => (
-              <Link
-                key={cat.id}
-                href={`/category/${cat.id}`}
-                className="inline-block px-3 py-1 text-sm text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
-              >
-                {cat.name}
-              </Link>
-            ))}
+            <Link
+              href={`/category/${blog.category.id}`}
+              className="inline-block px-3 py-1 text-sm text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+            >
+              {blog.category.name}
+            </Link>
           </div>
         </div>
       )}

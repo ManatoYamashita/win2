@@ -33,16 +33,13 @@ export function BlogCard({ blog }: BlogCardProps) {
           {/* 右側: コンテンツ */}
           <div className="flex-1 p-6">
             {/* カテゴリバッジ */}
-            {blog.category && blog.category.length > 0 && (
+            {blog.category && (
               <div className="flex gap-2 mb-3">
-                {blog.category.slice(0, 2).map((cat) => (
-                  <span
-                    key={cat.id}
-                    className="inline-block px-2 py-1 text-xs font-semibold text-orange-600 bg-orange-200 rounded"
-                  >
-                    {cat.name}
-                  </span>
-                ))}
+                <span
+                  className="inline-block px-2 py-1 text-xs font-semibold text-orange-600 bg-orange-200 rounded"
+                >
+                  {blog.category.name}
+                </span>
               </div>
             )}
 
