@@ -294,7 +294,7 @@ function HeroSection() {
               priority
             />
             {/* 下側グラデーション（徐々に下から見えるように） */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-win2-surface-cream-150" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white to-transparent" />
           </div>
         </div>
       </div>
@@ -544,6 +544,7 @@ function ServiceSection() {
                 aria-label="WIN×Ⅱのサービス紹介"
                 poster="/assets/images/onestop-figure.webp"
                 onError={() => setIsVideoError(true)}
+                suppressHydrationWarning
               >
                 <source src="/assets/images/what-is-win2.webm" type="video/webm" />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
