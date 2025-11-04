@@ -685,10 +685,10 @@ function HighlightSection() {
                 href="/blog"
                 aria-label={`${item.title}の特集を見る`}
                 className={cn(
-                  "group relative isolate flex w-[85vw] min-h-[380px] min-w-[280px] max-w-[360px] flex-col justify-between overflow-hidden rounded-[36px] bg-slate-900 text-left text-white shadow-[0_28px_56px_rgba(13,29,54,0.24)] transition-all duration-500 ease-out",
+                  "group relative isolate flex w-[85vw] min-h-[420px] min-w-[280px] max-w-[360px] flex-col justify-between overflow-hidden rounded-[36px] bg-slate-900 text-left text-white shadow-[0_12px_24px_rgba(13,29,54,0.12)] transition-all duration-500 ease-out",
                   "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-amber/50",
-                  "sm:w-[420px] sm:min-w-[380px] md:w-[460px] lg:w-[500px] lg:min-h-[520px]",
-                  "snap-start hover:-translate-y-2 hover:shadow-[0_32px_64px_rgba(13,29,54,0.32)] focus-visible:-translate-y-2"
+                  "sm:w-[420px] sm:min-w-[380px] md:w-[460px] lg:w-[500px] lg:min-h-[560px]",
+                  "snap-start hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(13,29,54,0.16)] focus-visible:-translate-y-1"
                 )}
               >
                 <Image
