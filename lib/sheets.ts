@@ -572,3 +572,37 @@ export async function writeConversionData(data: ConversionWebhookData): Promise<
     throw error;
   }
 }
+
+/**
+ * 重複チェック（eventIDベース）
+ *
+ * AFB Webhookなどから同じ成果が複数回送信された場合、
+ * eventIDをキーに重複をチェックします。
+ *
+ * @param eventId イベントID（UUID v4）
+ * @returns 重複している場合はtrue、重複していない場合はfalse
+ *
+ * @example
+ * const isDuplicate = await isDuplicateConversion("event-uuid-456");
+ * if (isDuplicate) {
+ *   console.log("Duplicate conversion detected, skipping...");
+ *   return;
+ * }
+ */
+export async function isDuplicateConversion(eventId: string): Promise<boolean> {
+  try {
+    const rows = await readSheet(SHEET_NAMES.RESULT_CSV_RAW, "A2:H");
+
+    // C列（eventId）で検索
+    const isDuplicate = rows.some(row => row[2] === eventId);
+
+    if (isDuplicate) {
+      console.log(`[isDuplicateConversion] Duplicate eventId detected: ${eventId}`);
+    }
+
+    return isDuplicate;
+  } catch (error) {
+    console.error("[isDuplicateConversion] Error checking duplicate conversion:", error);
+    throw error;
+  }
+}

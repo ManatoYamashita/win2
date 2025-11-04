@@ -277,7 +277,7 @@ export async function findMatchingCandidates(
     console.log(`[conversion-matcher] Generated ${candidates.length} candidates`);
 
     // 5. 最高スコアの候補を取得
-    const bestMatch = candidates.length > 0 ? candidates[0] : null;
+    const bestMatch: ConversionMatchCandidate | null = candidates.length > 0 ? (candidates[0] ?? null) : null;
 
     if (bestMatch) {
       console.log(

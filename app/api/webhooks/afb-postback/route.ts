@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
     const headersList = await headers();
     const forwardedFor = headersList.get("x-forwarded-for");
     const realIp = headersList.get("x-real-ip");
-    const clientIp = forwardedFor?.split(",")[0].trim() || realIp || "unknown";
+    const clientIp = (forwardedFor?.split(",")[0]?.trim()) || realIp || "unknown";
 
     console.log(`[afb-postback] Received postback from IP: ${clientIp}`);
 

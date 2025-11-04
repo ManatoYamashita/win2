@@ -628,7 +628,6 @@ function MeritSection() {
 
 function HighlightSection() {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   return (
     <section className="relative bg-win2-surface-sky-50 py-24">
@@ -663,36 +662,30 @@ function HighlightSection() {
             家計のお悩みからライフイベントまで、WIN×Ⅱなら幅広いカテゴリをワンストップでチェックできます。
           </p>
         </div>
-        <div className="flex flex-col gap-5 lg:flex-row">
-          {serviceShowcaseItems.map((item, index) => {
-            const isActive = hoveredIndex === index;
-            const isInactive = hoveredIndex !== null && hoveredIndex !== index;
-
-            return (
+        <div className="relative -mx-6 lg:-mx-8">
+          <div className="pointer-events-none absolute inset-y-6 left-0 w-12 bg-gradient-to-r from-win2-surface-sky-50 via-win2-surface-sky-50/90 to-transparent" />
+          <div className="pointer-events-none absolute inset-y-6 right-0 w-12 bg-gradient-to-l from-win2-surface-sky-50 via-win2-surface-sky-50/90 to-transparent" />
+          <div
+            className="relative flex snap-x snap-mandatory gap-5 overflow-x-auto px-6 pb-5 pt-1 lg:px-8"
+            aria-roledescription="horizontal carousel"
+          >
+            {serviceShowcaseItems.map((item, index) => (
               <Link
                 key={item.title}
                 href="/blog"
                 aria-label={`${item.title}の特集を見る`}
-                onMouseEnter={() => setHoveredIndex(index)}
-                onMouseLeave={() => setHoveredIndex(null)}
-                onFocus={() => setHoveredIndex(index)}
-                onBlur={() => setHoveredIndex(null)}
                 className={cn(
-                  "group relative isolate flex min-h-[320px] flex-1 flex-col justify-between overflow-hidden rounded-[32px] bg-slate-900 text-left text-white shadow-[0_24px_44px_rgba(13,29,54,0.18)] transition-all duration-500 ease-out",
+                  "group relative isolate flex w-[82vw] min-h-[320px] min-w-[240px] max-w-[320px] flex-col justify-between overflow-hidden rounded-[32px] bg-slate-900 text-left text-white shadow-[0_24px_44px_rgba(13,29,54,0.18)] transition-transform duration-500 ease-out",
                   "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-amber/50",
-                  "lg:min-h-[420px]",
-                  isActive ? "lg:flex-[1.55]" : "lg:flex-1",
-                  isInactive ? "lg:flex-[0.85] lg:opacity-75" : "lg:opacity-100"
+                  "sm:w-[360px] sm:min-w-[320px] lg:w-[380px] lg:min-h-[420px]",
+                  "snap-start hover:-translate-y-1.5 focus-visible:-translate-y-1.5"
                 )}
-                style={{
-                  transition: "flex 0.5s ease, opacity 0.35s ease, transform 0.45s ease",
-                }}
               >
                 <Image
                   src={item.image}
                   alt={item.title}
                   fill
-                  sizes="(min-width: 1024px) 25vw, 100vw"
+                  sizes="(min-width: 1024px) 30vw, 85vw"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   priority={index === 0}
                 />
@@ -720,8 +713,8 @@ function HighlightSection() {
                   </span>
                 </div>
               </Link>
-            );
-          })}
+            ))}
+          </div>
         </div>
         <Link
           href="/register"
