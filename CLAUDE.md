@@ -312,17 +312,26 @@ The existing GAS script:
 10. ✅ /api/track-click implementation with proper id1 tracking
 11. ✅ Member dashboard with conversion history (/mypage, /mypage/history)
 
-### Phase 2: 認証・会員機能 ✅ Completed (Phase 2-1 only)
-1. ✅ Email verification system (Resend integration)
+### Phase 2: 認証・会員機能 ✅ Completed (Phase 2-1 only) - **Verified 2025-01-03**
+1. ✅ Email verification system (Resend integration) - **Feature Flag Controlled**
    - Verification token generation with JWT
    - Email templates and sending
    - Token validation and email update in Google Sheets
-2. ✅ Password reset flow (forgot-password, reset-password pages)
+   - **⚠️ DNS Restriction**: Wix DNS limits prevent full Resend integration (MX records restricted)
+   - **Feature Flag**: `RESEND_VALID=false` (default) skips email verification, `true` enables full flow
+   - **✅ Tested**: Member registration with email verification skip works correctly
+   - See `docs/architecture/dns-infrastructure.md` for details
+2. ✅ Password reset flow (forgot-password, reset-password pages) - **Feature Flag Controlled**
    - Password reset token generation
    - Email notification
    - Password update functionality
-3. ⏭️ Phase 2-2 Admin Dashboard - **Skipped** (not critical)
-4. ⏭️ Phase 2-3 Advanced features - **Skipped** (not critical)
+   - **⚠️ Currently Disabled**: Returns 503 error when `RESEND_VALID=false`
+3. ✅ **Core Authentication Verified (2025-01-03)**
+   - ✅ Member registration: Works without email verification (`emailVerified=true` immediately)
+   - ✅ Login: Works normally with registered credentials
+   - ✅ Logout: Session management functions correctly
+4. ⏭️ Phase 2-2 Admin Dashboard - **Skipped** (not critical)
+5. ⏭️ Phase 2-3 Advanced features - **Skipped** (not critical)
 
 ### Phase 3: ブログ機能 ✅ Completed (100%)
 1. ✅ Blog components
@@ -375,7 +384,8 @@ GOOGLE_SHEETS_SPREADSHEET_ID=your-spreadsheet-id
 NEXTAUTH_URL=http://localhost:3000  # or production URL
 NEXTAUTH_SECRET=your-secret-key     # Generate with: openssl rand -base64 32
 
-# Resend (email sending)
+# Resend (email sending) - Feature Flag Controlled
+RESEND_VALID=false  # true=Email verification enabled, false=Skip email verification (default)
 RESEND_API_KEY=your-resend-api-key
 RESEND_FROM_EMAIL=onboarding@resend.dev  # Development: onboarding@resend.dev, Production: noreply@yourdomain.com
 
@@ -387,6 +397,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000  # Used for email verification links
 
 - **GOOGLE_SHEETS_PRIVATE_KEY**: Must include literal `\n` characters (not actual newlines)
 - **NEXTAUTH_SECRET**: Generate unique secret for each environment (dev/staging/prod)
+- **RESEND_VALID**: Controls email functionality (default: `false` due to Wix DNS restrictions). Set to `true` only after DNS migration.
 - **RESEND_FROM_EMAIL**: Development uses `onboarding@resend.dev`, production requires verified domain
 - **NEXT_PUBLIC_* variables**: Exposed to browser, use for non-sensitive config only
 

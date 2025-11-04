@@ -115,7 +115,7 @@ const faqItems = [
   {
     question: "掲載するのに費用はかかりますか？",
     answer:
-      "掲載は完全無料です。成果が発生した場合のみ、報酬の一部を還元する仕組みです。",
+      "掲載は完全無料です。豊富なジャンルから、あなたにぴったりのサービスを見つけましょう。",
   },
   {
     question: "どんなサービスが掲載されていますか？",
@@ -149,45 +149,91 @@ export function LandingPage() {
 function HeroSection() {
   const { ref } = useScrollReveal<HTMLDivElement>();
   const [isMounted, setIsMounted] = useState(false);
+  const headlineRef = useRef<HTMLHeadingElement | null>(null);
+  const imageRef = useRef<HTMLDivElement | null>(null);
+  const statsRef = useRef<HTMLDivElement | null>(null);
+  const ctaRef = useRef<HTMLDivElement | null>(null);
+  const [playKey, setPlayKey] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsMounted(true), 150);
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 80);
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (!isMounted) return;
+    setPlayKey((prev) => prev + 1);
+  }, [isMounted]);
+
   return (
-    <section className="relative -mb-32 overflow-visible bg-gradient-to-b from-win2-surface-cream-320 via-white to-win2-surface-cream-150 pb-32 md:-mb-40 md:pb-44">
-      <div className="absolute inset-0">
-        <Image
-          src="/assets/images/office-super-blur.webp"
-          alt="オフィス背景"
-          fill
-          className="object-cover opacity-70"
-          priority
+    <section className="relative -mb-32 min-h-[540px] overflow-visible bg-gradient-to-b from-win2-surface-cream-320 via-white to-win2-surface-cream-150 pb-32 md:-mb-40 md:min-h-[640px] md:pb-44">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="relative h-full w-full md:aspect-[3/2] md:h-auto">
+          <Image
+            src="/assets/images/office-super-blur.webp"
+            alt="オフィス背景"
+            fill
+            sizes="100vw"
+            className={cn(
+              "origin-top opacity-0 blur-[14px]",
+              isMounted && playKey ? "animate-hero-background" : "animate-none"
+            )}
+            quality={75}
+            priority
+            loading="eager"
+          />
+        </div>
+        <div
+          className={cn(
+            "absolute inset-0 bg-gradient-to-b from-white/0 via-white/40 to-white/85 opacity-0",
+            isMounted && playKey ? "animate-hero-overlay" : "animate-none"
+          )}
         />
       </div>
       <div
         ref={ref}
-        className={cn(
-          "relative z-10 mx-auto flex max-w-[1100px] flex-col gap-12 px-6 pt-24 md:flex-row md:items-center lg:px-8",
-          "transition-transform-opacity",
-          isMounted ? "reveal-visible" : "reveal"
-        )}
+        className="relative z-10 mx-auto flex max-w-[1100px] flex-col gap-12 px-6 pt-24 md:flex-row md:items-center lg:px-8"
       >
         <div className="relative z-40 max-w-xl space-y-8">
           <div className="space-y-3">
-            <p className="text-sm font-semibold tracking-[0.35em] text-win2-accent-gold">WIN×Ⅱ</p>
-            <h1 className="text-4xl font-bold leading-tight text-win2-neutral-950 md:text-5xl">
+            <p
+              className={cn(
+                "text-sm font-semibold tracking-[0.35em] text-win2-accent-gold opacity-0",
+                isMounted && playKey ? "animate-hero-badge" : "animate-none"
+              )}
+            >
+              WIN×Ⅱ
+            </p>
+            <h1
+              ref={headlineRef}
+              className={cn(
+                "text-4xl font-bold leading-tight text-win2-neutral-950 opacity-0 md:text-5xl",
+                isMounted && playKey ? "animate-hero-headline" : "animate-none"
+              )}
+            >
               暮らしを
               <span className="text-win2-primary-orage">もっとお得に</span>
               <br />
               もっとスマートに。
             </h1>
-            <p className="text-[15px] leading-relaxed text-slate-700">
-              WIN×Ⅱは、暮らしに役立つサービスをワンストップで選べるキャッシュバック付きプラットフォームです。保険・不動産・転職・エンタメなど豊富なジャンルから、あなたにぴったりのサービスを見つけましょう。
+            <p
+              className={cn(
+                "text-[15px] leading-relaxed text-slate-700 opacity-0",
+                isMounted && playKey ? "animate-hero-subtext" : "animate-none"
+              )}
+            >
+              WIN×Ⅱは、暮らしに役立つサービスをワンストップで選べるアフィリエイトブログプラットフォームです。保険・不動産・転職・エンタメなど豊富なジャンルから、あなたにぴったりのサービスを見つけましょう。
             </p>
           </div>
-          <div className="flex flex-wrap gap-4">
+          <div
+            ref={statsRef}
+            className={cn(
+              "flex flex-wrap gap-4 opacity-0",
+              isMounted && playKey ? "animate-hero-stats" : "animate-none"
+            )}
+          >
             {heroStats.map((stat) => (
               <div
                 key={stat.title}
@@ -201,12 +247,18 @@ function HeroSection() {
               </div>
             ))}
           </div>
-          <div className="flex flex-wrap items-center gap-4">
+          <div
+            ref={ctaRef}
+            className={cn(
+              "flex flex-wrap items-center gap-4 opacity-0",
+              isMounted && playKey ? "animate-hero-cta" : "animate-none"
+            )}
+          >
             <Link
               href="/register"
               className="rounded-full bg-win2-primary-orage px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-primary-orage/25 transition hover:bg-win2-accent-amber"
             >
-              メンバー登録（無料）はこちら
+              無料メルマガ会員登録はこちら
             </Link>
             <Link
               href="/login"
@@ -216,7 +268,13 @@ function HeroSection() {
             </Link>
           </div>
         </div>
-        <div className="relative z-20 mx-auto w-full max-w-[420px] md:max-w-[460px]">
+        <div
+          ref={imageRef}
+          className={cn(
+            "relative z-20 mx-auto w-full max-w-[420px] opacity-0 md:max-w-[460px]",
+            isMounted && playKey ? "animate-hero-image" : "animate-none"
+          )}
+        >
           <Image
             src="/assets/images/woman.webp"
             alt="メインビジュアル"
@@ -266,6 +324,7 @@ function ProblemSection() {
                 src="/assets/images/problem.webp"
                 alt="悩む人"
                 fill
+                sizes="(max-width: 768px) 160px, (max-width: 1024px) 176px, 208px"
                 className="object-cover grayscale"
               />
             </div>
@@ -303,6 +362,7 @@ function ProblemSection() {
                 src="/assets/images/woman.webp"
                 alt="案内スタッフ"
                 fill
+                sizes="(max-width: 768px) 160px, (max-width: 1024px) 176px, 208px"
                 className="object-contain"
               />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-win2-surface-stone-100" />
@@ -531,6 +591,7 @@ function MeritSection() {
                     src={item.image}
                     alt={`${item.title}のアイコン`}
                     fill
+                    sizes="96px"
                     className="object-contain"
                   />
                 </div>
@@ -567,7 +628,9 @@ function HighlightSection() {
           src="/assets/images/city.webp"
           alt="都市背景"
           fill
+          sizes="100vw"
           className="object-cover opacity-30"
+          quality={70}
         />
       </div>
       {/* Gradient overlay for better text readability */}
@@ -607,7 +670,7 @@ function HighlightSection() {
           href="/register"
           className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark"
         >
-          無料メンバー登録で最新情報を受け取る
+          無料メルマガ会員登録で最新情報を受け取る
         </Link>
       </div>
     </section>
@@ -685,6 +748,7 @@ function TestimonialsSection() {
                     src={testimonial.avatar}
                     alt={`${testimonial.age} ${testimonial.gender}`}
                     fill
+                    sizes="56px"
                     className="object-cover"
                   />
                 </div>
@@ -821,14 +885,14 @@ function BottomCtaSection() {
       >
         <h2 className="text-3xl font-bold md:text-4xl">いますぐ WIN×Ⅱ をはじめましょう</h2>
         <p className="text-sm leading-relaxed text-white/90 md:text-base">
-          暮らしをもっとお得に、もっとスマートに。WIN×Ⅱの無料登録でキャッシュバック特典と最新情報を手に入れてください。
+          暮らしをもっとお得に、もっとスマートに。WIN×Ⅱの無料メルマガ会員登録でキャッシュバック特典と最新情報を手に入れてください。
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
             href="/register"
             className="rounded-full bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-white/90"
           >
-            無料メンバー登録はこちら
+            無料メルマガ会員登録はこちら
           </Link>
           <Link
             href="/blog"

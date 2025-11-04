@@ -119,7 +119,7 @@ function VerifyEmailPageContent() {
                 <Link href="/login">ログインする</Link>
               </Button>
               <Button asChild variant="outline" className="w-full">
-                <Link href="/register">新規登録する</Link>
+                <Link href="/register">無料メルマガ会員登録をする</Link>
               </Button>
             </>
           )}
