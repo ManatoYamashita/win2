@@ -36,7 +36,7 @@ export async function generateMetadata({
   const canonicalUrl = `${appUrl}/blog/${id}`;
   const primaryImage = blog.thumbnail?.url || `${appUrl}/ogp.jpg`;
   const keywordBase = ["アフィリエイト", "キャッシュバック", "WIN×Ⅱ", "お得情報"];
-  const categoryKeywords = blog.category ? [`${blog.category.name} アフィリエイト`] : [];
+  const categoryKeywords = blog.category ? [`${blog.category.name} アフィリエイト`] : ["その他 アフィリエイト"];
 
   return {
     title: blog.title,
@@ -140,6 +140,13 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     ],
   };
 
+  // サムネイル画像のURL（なければplaceholder）
+  const thumbnailUrl = blog.thumbnail?.url || `${appUrl}/ogp.jpg`;
+
+  // カテゴリ情報（なければデフォルト）
+  const categoryId = blog.category?.id || "other";
+  const categoryName = blog.category?.name || "その他";
+
   return (
     <article className="container max-w-4xl mx-auto px-4 py-8">
       {[articleSchema, breadcrumbSchema].map((schema, index) => (
@@ -152,31 +159,27 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
           }}
         />
       ))}
-      {/* サムネイル画像 */}
-      {blog.thumbnail && (
-        <div className="relative w-full h-[400px] mb-8 rounded-lg overflow-hidden">
-          <Image
-            src={blog.thumbnail.url}
-            alt={blog.title}
-            fill
-            className="object-cover"
-            priority
-            sizes="(max-width: 1024px) 100vw, 1024px"
-          />
-        </div>
-      )}
+      {/* サムネイル画像（常に表示、placeholderあり） */}
+      <div className="relative w-full aspect-video mb-8 rounded-lg overflow-hidden bg-gray-100">
+        <Image
+          src={thumbnailUrl}
+          alt={blog.title}
+          fill
+          className="object-cover"
+          priority
+          sizes="(max-width: 1024px) 100vw, 1024px"
+        />
+      </div>
 
-      {/* カテゴリバッジ */}
-      {blog.category && (
-        <div className="flex gap-2 mb-4">
-          <Link
-            href={`/category/${blog.category.id}`}
-            className="inline-block px-3 py-1 text-sm font-semibold text-orange-600 bg-orange-100 rounded hover:bg-orange-200 transition-colors"
-          >
-            {blog.category.name}
-          </Link>
-        </div>
-      )}
+      {/* カテゴリバッジ（常に表示） */}
+      <div className="flex gap-2 mb-4">
+        <Link
+          href={`/category/${categoryId}`}
+          className="inline-block px-3 py-1 text-sm font-semibold text-orange-600 bg-orange-100 rounded hover:bg-orange-200 transition-colors"
+        >
+          {categoryName}
+        </Link>
+      </div>
 
       {/* タイトル */}
       <h1 className="text-4xl font-bold mb-4 text-gray-900">{blog.title}</h1>
@@ -215,20 +218,18 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       )}
       */}
 
-      {/* カテゴリリンク（フッター） */}
-      {blog.category && (
-        <div className="mt-12 pt-8 border-t border-gray-200">
-          <p className="text-sm text-gray-600 mb-2">関連カテゴリ:</p>
-          <div className="flex flex-wrap gap-2">
-            <Link
-              href={`/category/${blog.category.id}`}
-              className="inline-block px-3 py-1 text-sm text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
-            >
-              {blog.category.name}
-            </Link>
-          </div>
+      {/* カテゴリリンク（フッター・常に表示） */}
+      <div className="mt-12 pt-8 border-t border-gray-200">
+        <p className="text-sm text-gray-600 mb-2">関連カテゴリ:</p>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href={`/category/${categoryId}`}
+            className="inline-block px-3 py-1 text-sm text-gray-700 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+          >
+            {categoryName}
+          </Link>
         </div>
-      )}
+      </div>
 
       {/* ブログ一覧へ戻るリンク */}
       <div className="mt-12 text-center">
