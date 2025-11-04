@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { cn } from "@/lib/utils";
 
@@ -26,22 +27,30 @@ const heroStats = [
 
 const serviceCategories = ["各種保険", "不動産", "エンタメ", "転職"];
 
-const serviceFeatures = [
+const serviceShowcaseItems = [
   {
-    image: "/assets/images/保険の無料相談.webp",
-    alt: "保険の無料相談",
+    tag: "ライフプラン",
+    title: "保険の無料相談",
+    description: "家計を守るための最適な保険選びを、専門家と無料で比較できます。",
+    image: "/assets/images/lifeplan.webp",
   },
   {
-    image: "/assets/images/不動産査定サービス.webp",
-    alt: "不動産査定サービス",
+    tag: "住まいの価値",
+    title: "不動産査定サービス",
+    description: "オンラインで相場をチェック。複数査定をまとめて依頼して時間を節約。",
+    image: "/assets/images/realestate.webp",
   },
   {
-    image: "/assets/images/エンタメサブスク特集.webp",
-    alt: "エンタメサブスク特集",
+    tag: "暮らしと娯楽",
+    title: "エンタメサブスク特集",
+    description: "動画・音楽・学びまで、生活を彩るサブスクを分かりやすく比較。",
+    image: "/assets/images/entertainment.webp",
   },
   {
-    image: "/assets/images/転職支援サポート.webp",
-    alt: "転職支援サポート",
+    tag: "キャリア支援",
+    title: "転職サポート",
+    description: "非公開求人やキャリア相談など、次の一歩を後押しする支援情報を厳選。",
+    image: "/assets/images/changejob.webp",
   },
 ];
 
@@ -115,7 +124,7 @@ const faqItems = [
   {
     question: "掲載するのに費用はかかりますか？",
     answer:
-      "掲載は完全無料です。成果が発生した場合のみ、報酬の一部を還元する仕組みです。",
+      "掲載は完全無料です。豊富なジャンルから、あなたにぴったりのサービスを見つけましょう。",
   },
   {
     question: "どんなサービスが掲載されていますか？",
@@ -149,45 +158,91 @@ export function LandingPage() {
 function HeroSection() {
   const { ref } = useScrollReveal<HTMLDivElement>();
   const [isMounted, setIsMounted] = useState(false);
+  const headlineRef = useRef<HTMLHeadingElement | null>(null);
+  const imageRef = useRef<HTMLDivElement | null>(null);
+  const statsRef = useRef<HTMLDivElement | null>(null);
+  const ctaRef = useRef<HTMLDivElement | null>(null);
+  const [playKey, setPlayKey] = useState(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsMounted(true), 150);
+    const timer = setTimeout(() => {
+      setIsMounted(true);
+    }, 80);
     return () => clearTimeout(timer);
   }, []);
 
+  useEffect(() => {
+    if (!isMounted) return;
+    setPlayKey((prev) => prev + 1);
+  }, [isMounted]);
+
   return (
-    <section className="relative -mb-32 overflow-visible bg-gradient-to-b from-win2-surface-cream-320 via-white to-win2-surface-cream-150 pb-32 md:-mb-40 md:pb-44">
-      <div className="absolute inset-0">
-        <Image
-          src="/assets/images/office-super-blur.webp"
-          alt="オフィス背景"
-          fill
-          className="object-cover opacity-70"
-          priority
+    <section className="relative -mb-32 min-h-[540px] overflow-visible bg-gradient-to-b from-win2-surface-cream-320 via-white to-win2-surface-cream-150 pb-32 md:-mb-40 md:min-h-[640px] md:pb-44">
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="relative h-full w-full md:aspect-[3/2] md:h-auto">
+          <Image
+            src="/assets/images/office-super-blur.webp"
+            alt="オフィス背景"
+            fill
+            sizes="100vw"
+            className={cn(
+              "origin-top opacity-0 blur-[14px]",
+              isMounted && playKey ? "animate-hero-background" : "animate-none"
+            )}
+            quality={75}
+            priority
+            loading="eager"
+          />
+        </div>
+        <div
+          className={cn(
+            "absolute inset-0 bg-gradient-to-b from-white/0 via-white/40 to-white/85 opacity-0",
+            isMounted && playKey ? "animate-hero-overlay" : "animate-none"
+          )}
         />
       </div>
       <div
         ref={ref}
-        className={cn(
-          "relative z-10 mx-auto flex max-w-[1100px] flex-col gap-12 px-6 pt-24 md:flex-row md:items-center lg:px-8",
-          "transition-transform-opacity",
-          isMounted ? "reveal-visible" : "reveal"
-        )}
+        className="relative z-10 mx-auto flex max-w-[1100px] flex-col gap-12 px-6 pt-24 md:flex-row md:items-center lg:px-8"
       >
         <div className="relative z-40 max-w-xl space-y-8">
           <div className="space-y-3">
-            <p className="text-sm font-semibold tracking-[0.35em] text-win2-accent-gold">WIN×Ⅱ</p>
-            <h1 className="text-4xl font-bold leading-tight text-win2-neutral-950 md:text-5xl">
+            <p
+              className={cn(
+                "text-sm font-semibold tracking-[0.35em] text-win2-accent-gold opacity-0",
+                isMounted && playKey ? "animate-hero-badge" : "animate-none"
+              )}
+            >
+              WIN×Ⅱ
+            </p>
+            <h1
+              ref={headlineRef}
+              className={cn(
+                "text-4xl font-bold leading-tight text-win2-neutral-950 opacity-0 md:text-5xl",
+                isMounted && playKey ? "animate-hero-headline" : "animate-none"
+              )}
+            >
               暮らしを
               <span className="text-win2-primary-orage">もっとお得に</span>
               <br />
               もっとスマートに。
             </h1>
-            <p className="text-[15px] leading-relaxed text-slate-700">
-              WIN×Ⅱは、暮らしに役立つサービスをワンストップで選べるキャッシュバック付きプラットフォームです。保険・不動産・転職・エンタメなど豊富なジャンルから、あなたにぴったりのサービスを見つけましょう。
+            <p
+              className={cn(
+                "text-[15px] leading-relaxed text-slate-700 opacity-0",
+                isMounted && playKey ? "animate-hero-subtext" : "animate-none"
+              )}
+            >
+              WIN×Ⅱは、暮らしに役立つサービスをワンストップで選べるアフィリエイトブログプラットフォームです。保険・不動産・転職・エンタメなど豊富なジャンルから、あなたにぴったりのサービスを見つけましょう。
             </p>
           </div>
-          <div className="flex flex-wrap gap-4">
+          <div
+            ref={statsRef}
+            className={cn(
+              "flex flex-wrap gap-4 opacity-0",
+              isMounted && playKey ? "animate-hero-stats" : "animate-none"
+            )}
+          >
             {heroStats.map((stat) => (
               <div
                 key={stat.title}
@@ -201,30 +256,49 @@ function HeroSection() {
               </div>
             ))}
           </div>
-          <div className="flex flex-wrap items-center gap-4">
+          <div
+            ref={ctaRef}
+            className={cn(
+              "flex flex-wrap items-center gap-4 opacity-0",
+              isMounted && playKey ? "animate-hero-cta" : "animate-none"
+            )}
+          >
             <Link
               href="/register"
               className="rounded-full bg-win2-primary-orage px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-primary-orage/25 transition hover:bg-win2-accent-amber"
             >
-              メンバー登録（無料）はこちら
+              無料メルマガ会員登録はこちら
             </Link>
             <Link
               href="/login"
-              className="rounded-full border border-win2-accent-rose px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-win2-surface-rose-100"
+              className="rounded-full border border-win2-accent-rose bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-win2-surface-rose-100"
             >
               ログイン
             </Link>
           </div>
         </div>
-        <div className="relative z-20 mx-auto w-full max-w-[420px] md:max-w-[460px]">
-          <Image
-            src="/assets/images/woman.webp"
-            alt="メインビジュアル"
-            width={880}
-            height={880}
-            className="w-full object-contain"
-            priority
-          />
+        <div
+          ref={imageRef}
+          className={cn(
+            "relative z-20 mx-auto w-full max-w-[420px] opacity-0 md:max-w-[460px]",
+            isMounted && playKey ? "animate-hero-image" : "animate-none"
+          )}
+        >
+          <div className="relative">
+            <Image
+              src="/assets/images/woman.webp"
+              alt="メインビジュアル"
+              width={880}
+              height={880}
+              className="w-full object-contain"
+              priority
+            />
+            {/* 下部を自然にフェードアウト */}
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-win2-surface-stone-100 to-transparent"
+              style={{ maskImage: 'linear-gradient(to top, black, transparent)' }}
+            />
+          </div>
         </div>
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent via-win2-surface-stone-100/80 to-win2-surface-stone-100 md:h-32 md:via-win2-surface-stone-100/90" />
@@ -266,6 +340,7 @@ function ProblemSection() {
                 src="/assets/images/problem.webp"
                 alt="悩む人"
                 fill
+                sizes="(max-width: 768px) 160px, (max-width: 1024px) 176px, 208px"
                 className="object-cover grayscale"
               />
             </div>
@@ -303,6 +378,7 @@ function ProblemSection() {
                 src="/assets/images/woman.webp"
                 alt="案内スタッフ"
                 fill
+                sizes="(max-width: 768px) 160px, (max-width: 1024px) 176px, 208px"
                 className="object-contain"
               />
               <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-win2-surface-stone-100" />
@@ -426,7 +502,7 @@ function ServiceSection() {
         {/* 見出し：WIN×Ⅱは どんなサービス？ */}
         <div className="mb-12 flex flex-col items-center justify-center gap-6 md:flex-row md:gap-4">
           <Image
-            src="/assets/images/win2-is-bibble.webp"
+            src="/assets/images/win2-is-bubble.webp"
             alt="WIN×Ⅱは"
             width={180}
             height={180}
@@ -471,6 +547,7 @@ function ServiceSection() {
                 aria-label="WIN×Ⅱのサービス紹介"
                 poster="/assets/images/onestop-figure.webp"
                 onError={() => setIsVideoError(true)}
+                suppressHydrationWarning
               >
                 <source src="/assets/images/what-is-win2.webm" type="video/webm" />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -531,6 +608,7 @@ function MeritSection() {
                     src={item.image}
                     alt={`${item.title}のアイコン`}
                     fill
+                    sizes="96px"
                     className="object-contain"
                   />
                 </div>
@@ -567,7 +645,9 @@ function HighlightSection() {
           src="/assets/images/city.webp"
           alt="都市背景"
           fill
+          sizes="100vw"
           className="object-cover opacity-30"
+          quality={70}
         />
       </div>
       {/* Gradient overlay for better text readability */}
@@ -576,12 +656,13 @@ function HighlightSection() {
       <div
         ref={ref}
         className={cn(
-          "relative mx-auto max-w-[1100px] space-y-12 px-6 text-center lg:px-8",
+          "relative space-y-12",
           "transition-transform-opacity",
           isVisible ? "reveal-visible" : "reveal"
         )}
       >
-        <div className="space-y-3">
+        {/* ヘッダー部分（中央揃え） */}
+        <div className="mx-auto max-w-[1100px] space-y-3 px-6 text-center lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-win2-primary-orage">
             掲載サービス・活用シーン
           </p>
@@ -590,25 +671,65 @@ function HighlightSection() {
             家計のお悩みからライフイベントまで、WIN×Ⅱなら幅広いカテゴリをワンストップでチェックできます。
           </p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {serviceFeatures.map((feature) => (
-            <div key={feature.alt} className="overflow-hidden rounded-[28px] shadow-[0_16px_34px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:scale-105">
-              <Image
-                src={feature.image}
-                alt={feature.alt}
-                width={320}
-                height={240}
-                className="h-full w-full object-cover"
-              />
-            </div>
-          ))}
+
+        {/* スクロールセクション（横幅いっぱい） */}
+        <div className="relative">
+          {/* グラデーションフェード（左） */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-win2-surface-sky-50 via-win2-surface-sky-50/80 to-transparent md:w-32" />
+          {/* グラデーションフェード（右） */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-win2-surface-sky-50 via-win2-surface-sky-50/80 to-transparent md:w-32" />
+
+          <div
+            className="hide-scrollbar relative flex snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-6 pt-1 md:gap-8 md:px-8 lg:px-12"
+            aria-roledescription="horizontal carousel"
+          >
+            {serviceShowcaseItems.map((item, index) => (
+              <Link
+                key={item.title}
+                href="/blog"
+                aria-label={`${item.title}の特集を見る`}
+                className={cn(
+                  "group relative isolate flex w-[85vw] min-h-[420px] min-w-[280px] max-w-[360px] flex-col justify-between overflow-hidden rounded-2xl bg-slate-900 text-left text-white shadow-md transition-all duration-300 ease-out",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-accent-amber/50",
+                  "sm:w-[420px] sm:min-w-[380px] md:w-[460px] lg:w-[500px] lg:min-h-[560px]",
+                  "snap-start hover:shadow-lg focus-visible:shadow-lg"
+                )}
+              >
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  sizes="(min-width: 1024px) 30vw, 85vw"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  priority={index === 0}
+                />
+                <span className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60" />
+
+                <div className="relative flex flex-col gap-4 p-6 sm:p-8">
+                  <div className="space-y-3">
+                    <span className="inline-flex items-center rounded-md bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
+                      {item.tag}
+                    </span>
+                    <h3 className="text-2xl font-bold leading-tight sm:text-3xl">{item.title}</h3>
+                    <p className="text-sm leading-relaxed text-white/80 sm:text-base">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
-        <Link
-          href="/register"
-          className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark"
-        >
-          無料メンバー登録で最新情報を受け取る
-        </Link>
+
+        {/* CTA ボタン（中央揃え） */}
+        <div className="mx-auto max-w-[1100px] px-6 text-center lg:px-8">
+          <Link
+            href="/register"
+            className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-rose/40"
+          >
+            無料メルマガ会員登録で最新情報を受け取る
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -685,6 +806,7 @@ function TestimonialsSection() {
                     src={testimonial.avatar}
                     alt={`${testimonial.age} ${testimonial.gender}`}
                     fill
+                    sizes="56px"
                     className="object-cover"
                   />
                 </div>
@@ -821,14 +943,14 @@ function BottomCtaSection() {
       >
         <h2 className="text-3xl font-bold md:text-4xl">いますぐ WIN×Ⅱ をはじめましょう</h2>
         <p className="text-sm leading-relaxed text-white/90 md:text-base">
-          暮らしをもっとお得に、もっとスマートに。WIN×Ⅱの無料登録でキャッシュバック特典と最新情報を手に入れてください。
+          暮らしをもっとお得に、もっとスマートに。WIN×Ⅱの無料メルマガ会員登録でキャッシュバック特典と最新情報を手に入れてください。
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           <Link
             href="/register"
             className="rounded-full bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-white/90"
           >
-            無料メンバー登録はこちら
+            無料メルマガ会員登録はこちら
           </Link>
           <Link
             href="/blog"

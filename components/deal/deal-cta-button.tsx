@@ -19,7 +19,7 @@ interface DealCTAButtonProps {
 export function DealCTAButton({
   dealId,
   dealName,
-  ctaText = "この案件に申し込む",
+  ctaText = "このサービスに進む",
   className,
 }: DealCTAButtonProps) {
   const { toast } = useToast();

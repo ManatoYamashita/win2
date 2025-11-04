@@ -154,7 +154,7 @@ export function Header() {
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-6 py-3 text-sm font-semibold text-white shadow-md shadow-win2-accent-rose/25 transition hover:opacity-90"
                 >
-                  新規登録
+                  無料メルマガ会員登録
                 </Link>
               </>
             )}
@@ -177,6 +177,7 @@ export function Header() {
               height={40}
               className="h-8 w-auto object-contain"
               priority
+              loading="eager"
             />
             {/* <span className="hidden text-sm font-semibold tracking-[0.35em] text-[#f26f36] md:inline">
               アフィリエイトブログ
@@ -184,30 +185,22 @@ export function Header() {
           </Link>
 
           <nav className="hidden items-center gap-7 md:flex">
-            {navigation.map((item) =>
+            {navigation.map((item) => (
               <Link key={item.href} href={item.href} className={getLinkClasses(item.isActive)}>
                 {item.label}
               </Link>
-            )}
+            ))}
           </nav>
 
           <div className="hidden items-center gap-4 md:flex">
             {isAuthenticated ? (
-              <>
-                <Link
-                  href="/mypage"
-                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-6 py-2 text-sm font-semibold text-white shadow-md shadow-win2-accent-rose/25 transition hover:opacity-90"
-                >
-                  プロフィールページ
-                </Link>
-                <button
-                  type="button"
-                  onClick={handleSignOut}
-                  className="text-sm font-medium text-slate-600 transition hover:text-win2-primary-orage"
-                >
-                  ログアウト
-                </button>
-              </>
+              <button
+                type="button"
+                onClick={handleSignOut}
+                className="text-sm font-medium text-slate-600 transition hover:text-win2-primary-orage"
+              >
+                ログアウト
+              </button>
             ) : (
               <>
                 <Link
@@ -220,7 +213,7 @@ export function Header() {
                   href="/register"
                   className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-6 py-2 text-sm font-semibold text-white shadow-md shadow-win2-accent-rose/25 transition hover:opacity-90"
                 >
-                  新規登録
+                  無料メルマガ会員登録
                 </Link>
               </>
             )}

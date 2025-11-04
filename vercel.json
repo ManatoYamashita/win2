@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-afb-conversions",
+      "schedule": "0 * * * *"
+    }
+  ]
+}

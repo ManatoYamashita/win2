@@ -5,8 +5,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { PageTransition } from "@/components/layout/page-transition";
+import { GoogleTagManager, GoogleTagManagerNoScript } from "@/components/analytics/google-tag-manager";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const gtmId = process.env.NEXT_PUBLIC_GTM_ID || "";
 
 export const metadata: Metadata = {
   title: {
@@ -21,7 +23,7 @@ export const metadata: Metadata = {
     url: appUrl,
     siteName: "WIN×Ⅱ",
     title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
-    description: "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。成果に応じたキャッシュバック付きの会員制プラットフォーム。",
+    description: "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。成果に応じた会員制プラットフォーム。",
     images: [
       {
         url: `${appUrl}/ogp.jpg`,
@@ -34,7 +36,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
-    description: "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。成果に応じたキャッシュバック付き。",
+    description: "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。",
     images: [`${appUrl}/ogp.jpg`],
   },
   robots: {
@@ -61,7 +63,13 @@ export default function RootLayout({
   // Suppress hydration mismatches caused by dev tools injecting CSS variables on the root element.
   return (
     <html lang="ja" suppressHydrationWarning>
+      {/* Google Tag Manager - Script */}
+      <GoogleTagManager gtmId={gtmId} />
+
       <body>
+        {/* Google Tag Manager - NoScript */}
+        <GoogleTagManagerNoScript gtmId={gtmId} />
+
         <SessionProvider>
           <Header />
           <PageTransition>
