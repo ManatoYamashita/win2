@@ -284,14 +284,21 @@ function HeroSection() {
             isMounted && playKey ? "animate-hero-image" : "animate-none"
           )}
         >
-          <Image
-            src="/assets/images/woman.webp"
-            alt="メインビジュアル"
-            width={880}
-            height={880}
-            className="w-full object-contain"
-            priority
-          />
+          <div className="relative">
+            <Image
+              src="/assets/images/woman.webp"
+              alt="メインビジュアル"
+              width={880}
+              height={880}
+              className="w-full object-contain"
+              priority
+            />
+            {/* 下部を自然にフェードアウト */}
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-win2-surface-stone-100 to-transparent"
+              style={{ maskImage: 'linear-gradient(to top, black, transparent)' }}
+            />
+          </div>
         </div>
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent via-win2-surface-stone-100/80 to-win2-surface-stone-100 md:h-32 md:via-win2-surface-stone-100/90" />
@@ -682,10 +689,10 @@ function HighlightSection() {
                 href="/blog"
                 aria-label={`${item.title}の特集を見る`}
                 className={cn(
-                  "group relative isolate flex w-[85vw] min-h-[420px] min-w-[280px] max-w-[360px] flex-col justify-between overflow-hidden rounded-[36px] bg-slate-900 text-left text-white shadow-[0_12px_24px_rgba(13,29,54,0.12)] transition-all duration-500 ease-out",
-                  "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-amber/50",
+                  "group relative isolate flex w-[85vw] min-h-[420px] min-w-[280px] max-w-[360px] flex-col justify-between overflow-hidden rounded-2xl bg-slate-900 text-left text-white shadow-md transition-all duration-300 ease-out",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-accent-amber/50",
                   "sm:w-[420px] sm:min-w-[380px] md:w-[460px] lg:w-[500px] lg:min-h-[560px]",
-                  "snap-start hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(13,29,54,0.16)] focus-visible:-translate-y-1"
+                  "snap-start hover:shadow-lg focus-visible:shadow-lg"
                 )}
               >
                 <Image
@@ -697,27 +704,17 @@ function HighlightSection() {
                   priority={index === 0}
                 />
                 <span className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/60" />
-                <span className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-win2-accent-rose via-win2-accent-amber to-win2-primary-orage opacity-80" />
 
-                <div className="relative flex flex-col gap-6 p-6 sm:p-8">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="space-y-3">
-                      <span className="inline-flex items-center rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-white backdrop-blur">
-                        {item.tag}
-                      </span>
-                      <h3 className="text-2xl font-bold leading-snug sm:text-3xl">{item.title}</h3>
-                      <p className="text-sm leading-relaxed text-slate-100/85 sm:text-base">
-                        {item.description}
-                      </p>
-                    </div>
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-white transition-colors duration-300 group-hover:bg-white/25">
-                      <ArrowUpRight className="h-5 w-5" aria-hidden />
+                <div className="relative flex flex-col gap-4 p-6 sm:p-8">
+                  <div className="space-y-3">
+                    <span className="inline-flex items-center rounded-md bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
+                      {item.tag}
                     </span>
+                    <h3 className="text-2xl font-bold leading-tight sm:text-3xl">{item.title}</h3>
+                    <p className="text-sm leading-relaxed text-white/80 sm:text-base">
+                      {item.description}
+                    </p>
                   </div>
-                  <span className="inline-flex items-center gap-2 text-sm font-semibold text-win2-accent-amber transition-colors duration-300 group-hover:text-win2-primary-orage">
-                    詳しく見る
-                    <ArrowUpRight className="h-4 w-4" aria-hidden />
-                  </span>
                 </div>
               </Link>
             ))}
