@@ -450,3 +450,159 @@ export async function getAllActiveDeals(): Promise<DealRow[]> {
     throw error;
   }
 }
+
+// ========================================
+// Webhook成果データ記録関連の関数
+// ========================================
+
+/**
+ * Webhookから受信した成果データ型定義
+ *
+ * ASP Webhookから受信した成果情報を「成果CSV_RAW」シートに記録するための型定義
+ * GASによる自動処理の対象となります
+ */
+export interface ConversionWebhookData {
+  /** 追跡ID（会員ID or guest:UUID） */
+  trackingId: string;
+  /** イベントID（クリック時に生成したUUID v4） */
+  eventId?: string;
+  /** 案件名 */
+  dealName: string;
+  /** ASP名 */
+  aspName: string;
+  /** 報酬額（ASPから支払われる金額） */
+  rewardAmount: number;
+  /** 承認状況（pending: 未承認, approved: 承認済み, cancelled: キャンセル） */
+  status: "pending" | "approved" | "cancelled";
+  /** 注文ID（ASP側の注文番号、オプション） */
+  orderId?: string;
+  /** タイムスタンプ（ISO8601形式、未指定の場合は現在時刻を使用） */
+  timestamp?: string;
+}
+
+/**
+ * eventIdからクリックログを検索
+ *
+ * Webhookで受信したeventIdを使って、クリックログから対応する会員情報を取得します。
+ * eventIdが一致するログが複数ある場合は最初のものを返します。
+ *
+ * @param eventId イベントID（UUID v4）
+ * @returns クリックログ情報（見つからない場合はnull）
+ */
+export async function getClickLogByEventId(eventId: string): Promise<ClickLogRow | null> {
+  try {
+    const rows = await readSheet(SHEET_NAMES.CLICK_LOG, "A2:E");
+
+    // E列（eventId）で検索
+    const logRow = rows.find(row => row[4] === eventId);
+
+    if (!logRow) {
+      console.log(`Click log not found for eventId: ${eventId}`);
+      return null;
+    }
+
+    return {
+      timestamp: logRow[0] || "",
+      memberId: logRow[1] || "",
+      dealName: logRow[2] || "",
+      dealId: logRow[3] || "",
+      eventId: logRow[4] || "",
+    };
+  } catch (error) {
+    console.error("Error getting click log by eventId:", error);
+    throw error;
+  }
+}
+
+/**
+ * Webhook受信データを「成果CSV_RAW」シートに記録
+ *
+ * ASP Webhookから受信した成果データを「成果CSV_RAW」シートに追記します。
+ * このデータは後でGAS（Google Apps Script）によって処理され、
+ * キャッシュバック金額の計算と「成果データ」シートへの転記が行われます。
+ *
+ * シート構成（成果CSV_RAW）:
+ * A: 日時 (ISO8601)
+ * B: 追跡ID (id1: memberId or guest:UUID)
+ * C: イベントID (eventId: UUID v4)
+ * D: 案件名
+ * E: ASP名
+ * F: 報酬額
+ * G: 承認状況 (pending/approved/cancelled)
+ * H: 注文ID（オプション）
+ *
+ * @param data Webhook受信データ
+ *
+ * @example
+ * await writeConversionData({
+ *   trackingId: "member-uuid-123",
+ *   eventId: "event-uuid-456",
+ *   dealName: "楽天カード",
+ *   aspName: "afb",
+ *   rewardAmount: 10000,
+ *   status: "pending",
+ *   orderId: "ORD-2025-001",
+ *   timestamp: "2025-01-03T12:00:00Z"
+ * });
+ */
+export async function writeConversionData(data: ConversionWebhookData): Promise<void> {
+  try {
+    const values = [
+      data.timestamp || new Date().toISOString(), // A列: 日時
+      data.trackingId,                             // B列: 追跡ID (id1)
+      data.eventId || "",                          // C列: イベントID
+      data.dealName,                               // D列: 案件名
+      data.aspName,                                // E列: ASP名
+      data.rewardAmount,                           // F列: 報酬額
+      data.status,                                 // G列: 承認状況
+      data.orderId || "",                          // H列: 注文ID（オプション）
+    ];
+
+    await appendToSheet(SHEET_NAMES.RESULT_CSV_RAW, values);
+
+    console.log(`[writeConversionData] Successfully recorded conversion:`, {
+      trackingId: data.trackingId,
+      eventId: data.eventId,
+      dealName: data.dealName,
+      status: data.status,
+      rewardAmount: data.rewardAmount,
+    });
+  } catch (error) {
+    console.error("[writeConversionData] Error writing conversion data:", error);
+    throw error;
+  }
+}
+
+/**
+ * 重複チェック（eventIDベース）
+ *
+ * AFB Webhookなどから同じ成果が複数回送信された場合、
+ * eventIDをキーに重複をチェックします。
+ *
+ * @param eventId イベントID（UUID v4）
+ * @returns 重複している場合はtrue、重複していない場合はfalse
+ *
+ * @example
+ * const isDuplicate = await isDuplicateConversion("event-uuid-456");
+ * if (isDuplicate) {
+ *   console.log("Duplicate conversion detected, skipping...");
+ *   return;
+ * }
+ */
+export async function isDuplicateConversion(eventId: string): Promise<boolean> {
+  try {
+    const rows = await readSheet(SHEET_NAMES.RESULT_CSV_RAW, "A2:H");
+
+    // C列（eventId）で検索
+    const isDuplicate = rows.some(row => row[2] === eventId);
+
+    if (isDuplicate) {
+      console.log(`[isDuplicateConversion] Duplicate eventId detected: ${eventId}`);
+    }
+
+    return isDuplicate;
+  } catch (error) {
+    console.error("[isDuplicateConversion] Error checking duplicate conversion:", error);
+    throw error;
+  }
+}

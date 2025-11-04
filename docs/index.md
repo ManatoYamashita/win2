@@ -14,14 +14,17 @@
 ```text
 docs/
 ├── index.md                  ← 本ファイル（ドキュメント索引・運用ルール）
+│
 ├── design/
 │   └── color-guidelines.md   ← ブランド/アクセントカラーの命名規則と運用ルール
+│
 ├── dev/
 │   ├── architecture.md       ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
 │   ├── branch.md             ← Git ブランチ戦略・CI/CD・コミット規約
 │   ├── environment.md        ← 開発環境セットアップ（Node.js / nvm / Turbopack / 環境変数）
 │   └── seo-implementation.md ← SEO実装ガイド（メタデータ、OGP、Twitter Card、構造化データ）
-├── guides/
+│
+├── guides/                   ← ユーザー/開発者向けガイド
 │   ├── cta-shortcode-guide.md    ← CTAショートコード使用ガイド（クライアント向け）
 │   ├── cta-technical-guide.md    ← CTAショートコード技術仕様（開発者向け）
 │   ├── email-setup.md            ← Email送信設定ガイド（Resend, 環境別手順）
@@ -31,15 +34,31 @@ docs/
 ├── architecture/             ← アーキテクチャ決定記録・インフラ構成
 │   └── dns-infrastructure.md ← DNS/メールインフラ構成、Wix DNS制限、RESEND_VALIDフィーチャーフラグ
 │
-├── specs/
-│   ├── google.md            ← Google Sheets (win2_master) 構成・GAS仕様
-│   └── spec.md              ← WIN×Ⅱ プロジェクト要件定義書（システム設計・機能要件）
-│
-└── dev/                      ← 開発ワークフロー・規約
-    ├── architecture.md      ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
-    ├── environment.md       ← 開発環境セットアップ（Node.js / nvm / Turbopack / 環境変数）
-    ├── branch.md            ← Git ブランチ戦略・CI/CD・コミット規約
-    └── seo-implementation.md ← SEO実装ガイド（メタデータ、OGP、Twitter Card、構造化データ）
+└── specs/                    ← プロジェクト仕様・外部連携情報
+    ├── spec.md              ← WIN×Ⅱ プロジェクト要件定義書（システム設計・機能要件）
+    ├── google.md            ← Google Sheets (win2_master) 構成・GAS仕様
+    ├── asp.md               ← ASP認証情報（A8.net, AFB, もしも, バリュコマ）
+    └── asp/                 ← ASP統合仕様・実装ガイド（16ファイル）
+        ├── README.md                    ← ASP統合プロジェクト概要（ナビゲーションハブ）
+        ├── asp-comparison-report.md     ← 全ASP比較レポート（7ASP詳細分析、800行）
+        ├── a8net-api.md                 ← A8.net API仕様（Media Member制限あり）
+        ├── afb-implementation-guide.md  ← AFBポストバック実装ガイド（Phase 1完了）
+        ├── valuecommerce/               ← ValueCommerce詳細ドキュメント（Phase 2）
+        │   ├── overview.md              │  - API概要、対応機能
+        │   ├── order-api-guide.md       │  - 注文レポートAPI実装ガイド
+        │   ├── authentication-setup.md  │  - OAuth 1.0a 認証設定
+        │   └── troubleshooting.md       │  - トラブルシューティング
+        ├── moshimo-overview.md          ← もしもアフィリエイト概要（Phase 3候補）
+        ├── accesstrade-overview.md      ← AccessTrade概要（Phase 3候補）
+        ├── linkshare-overview.md        ← LinkShare（楽天）概要（Phase 4候補）
+        ├── janet-overview.md            ← JANet概要（Phase 4候補）
+        ├── infotop-overview.md          ← infotop概要（Phase 5候補）
+        └── common/                      ← 共通技術ドキュメント
+            ├── tracking-parameters.md   │  - カスタムトラッキングパラメータ仕様
+            ├── conversion-matching.md   │  - 成果マッチングアルゴリズム
+            ├── error-handling.md        │  - エラーハンドリング戦略
+            ├── testing-strategy.md      │  - テスト戦略とテストケース
+            └── security-considerations.md│  - セキュリティベストプラクティス
 ```
 
 ### ドキュメント概要
@@ -59,6 +78,20 @@ docs/
 | **google.md** | Google Sheets構成 | 会員リスト、クリックログ、成果データ、GASコード |
 
 > ※ ASPなどの認証情報はセキュアストレージ（社内共有ドライブ等）で管理し、リポジトリには保存しないこと。
+
+#### `specs/asp/` - ASP統合仕様・実装ガイド
+
+**実装優先度: AFB（最優先） > A8.net（集計レポートのみ）**
+
+| ファイル | 内容 | 主要トピック | 優先度 |
+|---------|------|------------|--------|
+| **afb-implementation-guide.md** | AFBポストバック実装ガイド | Webhook実装、セキュリティ（IPホワイトリスト）、Google Sheets統合、テスト手順、トラブルシューティング | 🔥 **最優先** |
+| **a8net-api.md** | A8.net API仕様（広告主契約前提） | **⚠️ Media Member制限あり**: 個別成果トラッキング不可、API利用不可、代替実装方法（AFB優先、手動CSV、広告主契約変更） | ⏸️ 保留中 |
+
+**重要な制限事項:**
+- **A8.net**: 現在のMedia Member契約では個別成果データにアクセスできないため、会員別キャッシュバック機能は実装不可
+- **AFB**: リアルタイムポストバック対応のため、会員別トラッキングが可能（推奨）
+- **実装方針**: AFBを優先実装し、A8.netは集計レポートとして使用
 
 #### `guides/` - ユーザー/開発者向けガイド
 
@@ -186,6 +219,45 @@ docs/
 ## 更新履歴
 
 このセクションは、ドキュメントの主要な更新を記録します。
+
+### 2025-01-04
+
+#### ASP統合調査完了 - A8.net制限判明、AFB優先実装へ移行
+- **specs/asp/a8net-api.md**: Media Member制限警告追加（v2.0.0）
+  - **⚠️ 重要な発見**: WIN×ⅡのA8.net契約は「Media Member（メディア会員）」のため、個別成果トラッキングが不可能
+  - **制限内容**: A8.net確定API v3（広告主専用）にアクセス不可、個別の成果データ（order_no, order_click_date）取得不可、カスタムトラッキングパラメータ（id1, eventId）の個別マッチング不可
+  - **利用可能な機能**: 集計レポート（プログラム別総報酬額、クリック数）、手動CSVエクスポート
+  - **代替実装方法**: 3つのオプション（AFB優先実装、A8.netサポート問い合わせ、広告主契約変更）を明記
+  - **ドキュメント構造変更**: 冒頭に制限事項セクション追加、既存のAPI仕様セクションに「広告主契約前提」注記
+- **specs/asp/afb-implementation-guide.md**: 新規作成（AFBポストバック完全実装ガイド v1.0.0）
+  - **概要**: AFBリアルタイムポストバック機能を使用した会員別成果トラッキングとキャッシュバック自動化の完全ガイド
+  - **なぜAFB優先か**: A8.net制限、AFBの優位性（ポストバック対応、会員別トラッキング可能）、実装難易度の低さ、所要時間（2-3日）
+  - **AFBポストバック仕様**: エンドポイント形式、パラメータ仕様（paid, u, price, judge, adid, time）、ステータス変換ロジック
+  - **実装手順**:
+    - Phase 1: AFB管理画面設定（ポストバックURL登録、通知タイプ設定、IPアドレス確認）
+    - Phase 2: Webhookエンドポイント実装（`app/api/webhooks/afb-postback/route.ts`、Google Sheets関数追加）
+    - Phase 3: セキュリティ強化（環境変数設定、署名検証）
+    - Phase 4: テスト（ローカルテスト、E2Eテスト、デプロイ前チェックリスト）
+  - **データフロー**: クリック→/api/track-click→AFBアフィリエイトURL→ユーザー申し込み→AFBポストバック→Webhook→Google Sheets→GAS→会員マイページ
+  - **トラブルシューティング**: 4つの問題パターン（ポストバック届かない、重複データ、IPブロック、Google Sheets書き込みエラー）と対策
+  - **運用ドキュメント**: 日次モニタリング、週次メンテナンス、月次レポート
+  - **今後の拡張**: ステータス更新自動反映、案件名自動取得、エラー通知
+- **index.md**: ASP統合ドキュメント構造追加
+  - **ツリー構造更新**: `specs/asp/` ディレクトリ追加（a8net-api.md, afb-implementation-guide.md）
+  - **セクション追加**: `specs/asp/` - ASP統合仕様・実装ガイド
+  - **実装優先度明記**: AFB（最優先）> A8.net（集計レポートのみ）
+  - **制限事項サマリー**: A8.net（Media Member契約では個別成果トラッキング不可）、AFB（リアルタイムポストバック対応）、実装方針（AFB優先、A8.net集計のみ）
+- **調査結果**:
+  - A8.net Media Member契約の詳細確認（`docs/asp-api-integration.md`との照合）
+  - A8.net公式ドキュメント（https://document.a8.net/）で最新仕様確認
+  - 現在の実装状況確認（/api/track-click、Google Sheets構造、GASスクリプト）
+  - ギャップ分析（ドキュメント提案 vs 現実の制限）
+- **実装計画確定**:
+  - Phase 0: ドキュメント更新（完了）
+  - Phase 1: AFBポストバック実装（次のステップ）
+  - Phase 2: A8.netサポート問い合わせ（並行）
+  - Phase 3: テスト・本番稼働
+- **ステータス**: ASP統合調査完了、AFB実装ガイド完成、Phase 0ドキュメント更新完了、Phase 1実装準備完了
 
 ### 2025-01-03
 
