@@ -284,14 +284,18 @@ function HeroSection() {
             isMounted && playKey ? "animate-hero-image" : "animate-none"
           )}
         >
-          <Image
-            src="/assets/images/woman.webp"
-            alt="メインビジュアル"
-            width={880}
-            height={880}
-            className="w-full object-contain"
-            priority
-          />
+          <div className="relative">
+            <Image
+              src="/assets/images/woman.webp"
+              alt="メインビジュアル"
+              width={880}
+              height={880}
+              className="w-full object-contain"
+              priority
+            />
+            {/* 下側グラデーション（徐々に透明に） */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-win2-surface-cream-150/60 to-win2-surface-cream-150 md:h-32" />
+          </div>
         </div>
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent via-win2-surface-stone-100/80 to-win2-surface-stone-100 md:h-32 md:via-win2-surface-stone-100/90" />
@@ -495,7 +499,7 @@ function ServiceSection() {
         {/* 見出し：WIN×Ⅱは どんなサービス？ */}
         <div className="mb-12 flex flex-col items-center justify-center gap-6 md:flex-row md:gap-4">
           <Image
-            src="/assets/images/win2-is-bibble.webp"
+            src="/assets/images/win2-is-bubble.webp"
             alt="WIN×Ⅱは"
             width={180}
             height={180}
