@@ -293,8 +293,8 @@ function HeroSection() {
               className="w-full object-contain"
               priority
             />
-            {/* 下側グラデーション（徐々に透明に） */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-b from-transparent via-win2-surface-cream-150/60 to-win2-surface-cream-150 md:h-32" />
+            {/* 下側グラデーション（徐々に下から見えるように） */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-b from-transparent to-win2-surface-cream-150" />
           </div>
         </div>
       </div>
