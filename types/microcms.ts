@@ -45,7 +45,7 @@ export interface Blog {
   title: string;
   content: string;               // リッチエディタコンテンツ（HTML形式）
   thumbnail?: MicroCMSImage;     // サムネイル画像（オプション）
-  category?: Category[];         // 複数カテゴリ参照（配列）
+  category?: Category;           // 単一カテゴリ参照（microCMS設定に準拠）
 }
 
 export type BlogResponse = Blog & MicroCMSDate;

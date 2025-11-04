@@ -593,7 +593,7 @@
 
 - **要件定義:** `docs/specs/spec.md`
 - **Google Sheets構成:** `docs/specs/google.md`
-- **ASP認証情報:** `docs/specs/asp.md`
+- **ASP認証情報:** 社内パスワードマネージャで管理（リポジトリに保存しない）
 - **アーキテクチャ:** `docs/dev/architecture.md`
 - **ブランチ戦略:** `docs/dev/branch.md`
 - **プロジェクトガイド:** `CLAUDE.md`

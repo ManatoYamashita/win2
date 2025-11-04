@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { cn } from "@/lib/utils";
 
@@ -26,22 +27,30 @@ const heroStats = [
 
 const serviceCategories = ["各種保険", "不動産", "エンタメ", "転職"];
 
-const serviceFeatures = [
+const serviceShowcaseItems = [
   {
-    image: "/assets/images/保険の無料相談.webp",
-    alt: "保険の無料相談",
+    tag: "ライフプラン",
+    title: "保険の無料相談",
+    description: "家計を守るための最適な保険選びを、専門家と無料で比較できます。",
+    image: "/assets/images/lifeplan.webp",
   },
   {
-    image: "/assets/images/不動産査定サービス.webp",
-    alt: "不動産査定サービス",
+    tag: "住まいの価値",
+    title: "不動産査定サービス",
+    description: "オンラインで相場をチェック。複数査定をまとめて依頼して時間を節約。",
+    image: "/assets/images/realestate.webp",
   },
   {
-    image: "/assets/images/エンタメサブスク特集.webp",
-    alt: "エンタメサブスク特集",
+    tag: "暮らしと娯楽",
+    title: "エンタメサブスク特集",
+    description: "動画・音楽・学びまで、生活を彩るサブスクを分かりやすく比較。",
+    image: "/assets/images/entertainment.webp",
   },
   {
-    image: "/assets/images/転職支援サポート.webp",
-    alt: "転職支援サポート",
+    tag: "キャリア支援",
+    title: "転職サポート",
+    description: "非公開求人やキャリア相談など、次の一歩を後押しする支援情報を厳選。",
+    image: "/assets/images/changejob.webp",
   },
 ];
 
@@ -262,7 +271,7 @@ function HeroSection() {
             </Link>
             <Link
               href="/login"
-              className="rounded-full border border-win2-accent-rose px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-win2-surface-rose-100"
+              className="rounded-full border border-win2-accent-rose bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-win2-surface-rose-100"
             >
               ログイン
             </Link>
@@ -275,14 +284,21 @@ function HeroSection() {
             isMounted && playKey ? "animate-hero-image" : "animate-none"
           )}
         >
-          <Image
-            src="/assets/images/woman.webp"
-            alt="メインビジュアル"
-            width={880}
-            height={880}
-            className="w-full object-contain"
-            priority
-          />
+          <div className="relative">
+            <Image
+              src="/assets/images/woman.webp"
+              alt="メインビジュアル"
+              width={880}
+              height={880}
+              className="w-full object-contain"
+              priority
+            />
+            {/* 下部を自然にフェードアウト */}
+            <div
+              className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-win2-surface-stone-100 to-transparent"
+              style={{ maskImage: 'linear-gradient(to top, black, transparent)' }}
+            />
+          </div>
         </div>
       </div>
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-b from-transparent via-win2-surface-stone-100/80 to-win2-surface-stone-100 md:h-32 md:via-win2-surface-stone-100/90" />
@@ -486,7 +502,7 @@ function ServiceSection() {
         {/* 見出し：WIN×Ⅱは どんなサービス？ */}
         <div className="mb-12 flex flex-col items-center justify-center gap-6 md:flex-row md:gap-4">
           <Image
-            src="/assets/images/win2-is-bibble.webp"
+            src="/assets/images/win2-is-bubble.webp"
             alt="WIN×Ⅱは"
             width={180}
             height={180}
@@ -531,6 +547,7 @@ function ServiceSection() {
                 aria-label="WIN×Ⅱのサービス紹介"
                 poster="/assets/images/onestop-figure.webp"
                 onError={() => setIsVideoError(true)}
+                suppressHydrationWarning
               >
                 <source src="/assets/images/what-is-win2.webm" type="video/webm" />
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -639,12 +656,13 @@ function HighlightSection() {
       <div
         ref={ref}
         className={cn(
-          "relative mx-auto max-w-[1100px] space-y-12 px-6 text-center lg:px-8",
+          "relative space-y-12",
           "transition-transform-opacity",
           isVisible ? "reveal-visible" : "reveal"
         )}
       >
-        <div className="space-y-3">
+        {/* ヘッダー部分（中央揃え） */}
+        <div className="mx-auto max-w-[1100px] space-y-3 px-6 text-center lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-win2-primary-orage">
             掲載サービス・活用シーン
           </p>
@@ -653,25 +671,65 @@ function HighlightSection() {
             家計のお悩みからライフイベントまで、WIN×Ⅱなら幅広いカテゴリをワンストップでチェックできます。
           </p>
         </div>
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {serviceFeatures.map((feature) => (
-            <div key={feature.alt} className="overflow-hidden rounded-[28px] shadow-[0_16px_34px_rgba(0,0,0,0.1)] transition-transform duration-300 hover:scale-105">
-              <Image
-                src={feature.image}
-                alt={feature.alt}
-                width={320}
-                height={240}
-                className="h-full w-full object-cover"
-              />
-            </div>
-          ))}
+
+        {/* スクロールセクション（横幅いっぱい） */}
+        <div className="relative">
+          {/* グラデーションフェード（左） */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-20 bg-gradient-to-r from-win2-surface-sky-50 via-win2-surface-sky-50/80 to-transparent md:w-32" />
+          {/* グラデーションフェード（右） */}
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-win2-surface-sky-50 via-win2-surface-sky-50/80 to-transparent md:w-32" />
+
+          <div
+            className="hide-scrollbar relative flex snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-6 pt-1 md:gap-8 md:px-8 lg:px-12"
+            aria-roledescription="horizontal carousel"
+          >
+            {serviceShowcaseItems.map((item, index) => (
+              <Link
+                key={item.title}
+                href="/blog"
+                aria-label={`${item.title}の特集を見る`}
+                className={cn(
+                  "group relative isolate flex w-[85vw] min-h-[420px] min-w-[280px] max-w-[360px] flex-col justify-between overflow-hidden rounded-2xl bg-slate-900 text-left text-white shadow-md transition-all duration-300 ease-out",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-accent-amber/50",
+                  "sm:w-[420px] sm:min-w-[380px] md:w-[460px] lg:w-[500px] lg:min-h-[560px]",
+                  "snap-start hover:shadow-lg focus-visible:shadow-lg"
+                )}
+              >
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  fill
+                  sizes="(min-width: 1024px) 30vw, 85vw"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                  priority={index === 0}
+                />
+                <span className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60" />
+
+                <div className="relative flex flex-col gap-4 p-6 sm:p-8">
+                  <div className="space-y-3">
+                    <span className="inline-flex items-center rounded-md bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
+                      {item.tag}
+                    </span>
+                    <h3 className="text-2xl font-bold leading-tight sm:text-3xl">{item.title}</h3>
+                    <p className="text-sm leading-relaxed text-white/80 sm:text-base">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
-        <Link
-          href="/register"
-          className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark"
-        >
-          無料メルマガ会員登録で最新情報を受け取る
-        </Link>
+
+        {/* CTA ボタン（中央揃え） */}
+        <div className="mx-auto max-w-[1100px] px-6 text-center lg:px-8">
+          <Link
+            href="/register"
+            className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-rose/40"
+          >
+            無料メルマガ会員登録で最新情報を受け取る
+          </Link>
+        </div>
       </div>
     </section>
   );
