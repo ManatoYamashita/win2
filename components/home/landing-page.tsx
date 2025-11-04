@@ -294,7 +294,7 @@ function HeroSection() {
               priority
             />
             {/* 下側グラデーション（徐々に下から見えるように） */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-white to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-win2-surface-stone-100 via-win2-surface-stone-100/50 to-transparent" />
           </div>
         </div>
       </div>
@@ -700,7 +700,7 @@ function HighlightSection() {
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   priority={index === 0}
                 />
-                <span className="absolute inset-0 bg-gradient-to-b from-black/10 via-slate-900/40 to-slate-950/80" />
+                <span className="absolute inset-0 bg-gradient-to-b from-transparent from-30% via-slate-900/35 via-65% to-slate-950/75" />
                 <span className="absolute inset-y-0 left-0 w-1.5 bg-gradient-to-b from-win2-accent-rose via-win2-accent-amber to-win2-primary-orage opacity-80" />
 
                 <div className="relative flex flex-col gap-6 p-6 sm:p-8">
