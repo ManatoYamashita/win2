@@ -271,7 +271,7 @@ function HeroSection() {
             </Link>
             <Link
               href="/login"
-              className="rounded-full border border-win2-accent-rose px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-win2-surface-rose-100"
+              className="rounded-full border border-win2-accent-rose bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-win2-surface-rose-100"
             >
               ログイン
             </Link>
