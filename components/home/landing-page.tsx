@@ -652,12 +652,13 @@ function HighlightSection() {
       <div
         ref={ref}
         className={cn(
-          "relative mx-auto max-w-[1100px] space-y-12 px-6 text-center lg:px-8",
+          "relative space-y-12",
           "transition-transform-opacity",
           isVisible ? "reveal-visible" : "reveal"
         )}
       >
-        <div className="space-y-3">
+        {/* ヘッダー部分（中央揃え） */}
+        <div className="mx-auto max-w-[1100px] space-y-3 px-6 text-center lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-win2-primary-orage">
             掲載サービス・活用シーン
           </p>
@@ -666,11 +667,16 @@ function HighlightSection() {
             家計のお悩みからライフイベントまで、WIN×Ⅱなら幅広いカテゴリをワンストップでチェックできます。
           </p>
         </div>
-        <div className="relative -mx-6 lg:-mx-8">
-          <div className="pointer-events-none absolute inset-y-6 left-0 w-12 bg-gradient-to-r from-win2-surface-sky-50 via-win2-surface-sky-50/90 to-transparent" />
-          <div className="pointer-events-none absolute inset-y-6 right-0 w-12 bg-gradient-to-l from-win2-surface-sky-50 via-win2-surface-sky-50/90 to-transparent" />
+
+        {/* スクロールセクション（横幅いっぱい） */}
+        <div className="relative">
+          {/* グラデーションフェード（左） */}
+          <div className="pointer-events-none absolute inset-y-6 left-0 z-10 w-20 bg-gradient-to-r from-win2-surface-sky-50 via-win2-surface-sky-50/80 to-transparent md:w-32" />
+          {/* グラデーションフェード（右） */}
+          <div className="pointer-events-none absolute inset-y-6 right-0 z-10 w-20 bg-gradient-to-l from-win2-surface-sky-50 via-win2-surface-sky-50/80 to-transparent md:w-32" />
+
           <div
-            className="relative flex snap-x snap-mandatory gap-5 overflow-x-auto px-6 pb-5 pt-1 lg:px-8"
+            className="hide-scrollbar relative flex snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-6 pt-1 md:gap-8 md:px-8 lg:px-12"
             aria-roledescription="horizontal carousel"
           >
             {serviceShowcaseItems.map((item, index) => (
@@ -679,10 +685,10 @@ function HighlightSection() {
                 href="/blog"
                 aria-label={`${item.title}の特集を見る`}
                 className={cn(
-                  "group relative isolate flex w-[82vw] min-h-[320px] min-w-[240px] max-w-[320px] flex-col justify-between overflow-hidden rounded-[32px] bg-slate-900 text-left text-white shadow-[0_24px_44px_rgba(13,29,54,0.18)] transition-transform duration-500 ease-out",
+                  "group relative isolate flex w-[85vw] min-h-[380px] min-w-[280px] max-w-[360px] flex-col justify-between overflow-hidden rounded-[36px] bg-slate-900 text-left text-white shadow-[0_28px_56px_rgba(13,29,54,0.24)] transition-all duration-500 ease-out",
                   "focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-amber/50",
-                  "sm:w-[360px] sm:min-w-[320px] lg:w-[380px] lg:min-h-[420px]",
-                  "snap-start hover:-translate-y-1.5 focus-visible:-translate-y-1.5"
+                  "sm:w-[420px] sm:min-w-[380px] md:w-[460px] lg:w-[500px] lg:min-h-[520px]",
+                  "snap-start hover:-translate-y-2 hover:shadow-[0_32px_64px_rgba(13,29,54,0.32)] focus-visible:-translate-y-2"
                 )}
               >
                 <Image
@@ -720,12 +726,16 @@ function HighlightSection() {
             ))}
           </div>
         </div>
-        <Link
-          href="/register"
-          className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-rose/40"
-        >
-          無料メルマガ会員登録で最新情報を受け取る
-        </Link>
+
+        {/* CTA ボタン（中央揃え） */}
+        <div className="mx-auto max-w-[1100px] px-6 text-center lg:px-8">
+          <Link
+            href="/register"
+            className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-rose/40"
+          >
+            無料メルマガ会員登録で最新情報を受け取る
+          </Link>
+        </div>
       </div>
     </section>
   );
