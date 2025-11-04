@@ -9,6 +9,13 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 export const metadata: Metadata = {
   title: "ブログ一覧 | WIN×Ⅱ",
   description: "会員制アフィリエイトブログWIN×Ⅱのブログ記事一覧ページです。お得な案件情報や攻略法を発信しています。",
+  keywords: [
+    "アフィリエイトブログ",
+    "キャッシュバック情報",
+    "WIN×Ⅱ",
+    "副業",
+    "お得情報",
+  ],
   openGraph: {
     title: "ブログ一覧 | WIN×Ⅱ",
     description: "会員制アフィリエイトブログWIN×Ⅱのブログ記事一覧ページです。お得な案件情報や攻略法を発信しています。",
@@ -23,6 +30,17 @@ export const metadata: Metadata = {
     title: "ブログ一覧 | WIN×Ⅱ",
     description: "会員制アフィリエイトブログWIN×Ⅱのブログ記事一覧ページです。お得な案件情報や攻略法を発信しています。",
     images: [`${appUrl}/ogp.jpg`],
+  },
+  alternates: {
+    canonical: `${appUrl}/blog`,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
   },
 };
 
@@ -68,14 +86,36 @@ export default async function BlogListPage({ searchParams }: BlogListPageProps) 
     },
   };
 
+  const itemListSchema = blogs.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        name: "WIN×Ⅱ ブログ記事一覧",
+        description: "キャッシュバックやアフィリエイトに役立つブログ記事をまとめたリスト",
+        itemListElement: blogs.map((blog, index) => ({
+          "@type": "ListItem",
+          position: offset + index + 1,
+          url: `${appUrl}/blog/${blog.id}`,
+          name: blog.title,
+          image: blog.thumbnail?.url,
+        })),
+      }
+    : null;
+
+  const schemas = [collectionPageSchema, itemListSchema].filter(Boolean);
+
   return (
     <div>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(collectionPageSchema),
-        }}
-      />
+      {schemas.map((schema, index) => (
+        <script
+          // eslint-disable-next-line react/no-array-index-key
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(schema),
+          }}
+        />
+      ))}
       {/* カテゴリナビゲーションバー */}
       <CategoryNav categories={categories} />
 

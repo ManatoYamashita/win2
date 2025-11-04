@@ -14,36 +14,32 @@
 ```text
 docs/
 ├── index.md                  ← 本ファイル（ドキュメント索引・運用ルール）
-├── email-setup.md            ← Email送信設定ガイド（Resend, 開発環境/本番環境）
-├── resend-setup.md           ← Resend.com 詳細セットアップ手順書（DNS設定・ドメイン検証・APIキー）
-├── microcms-setup.md         ← microCMS設定ガイド（API作成、フィールド定義、環境変数設定）
-├── seo-implementation.md     ← SEO実装ガイド（全ページのメタデータ、OGP、Twitter Card、JSON-LD）
-│
-├── specs/                    ← プロジェクト仕様・外部連携情報
-│   ├── spec.md              ← WIN×Ⅱ プロジェクト要件定義書（システム設計・機能要件）
-│   ├── google.md            ← Google Sheets (win2_master) 構成・GAS仕様
-│   └── asp.md               ← ASP認証情報（A8.net, AFB, もしも, バリュコマ）
-│
-├── guides/                   ← ユーザー/開発者向けガイド
+├── design/
+│   └── color-guidelines.md   ← ブランド/アクセントカラーの命名規則と運用ルール
+├── dev/
+│   ├── architecture.md       ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
+│   ├── branch.md             ← Git ブランチ戦略・CI/CD・コミット規約
+│   ├── environment.md        ← 開発環境セットアップ（Node.js / nvm / Turbopack / 環境変数）
+│   └── seo-implementation.md ← SEO実装ガイド（メタデータ、OGP、Twitter Card、構造化データ）
+├── guides/
 │   ├── cta-shortcode-guide.md    ← CTAショートコード使用ガイド（クライアント向け）
-│   └── cta-technical-guide.md    ← CTAショートコード技術仕様（開発者向け）
-│
-└── dev/                      ← 開発ワークフロー・規約
-    ├── architecture.md      ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
-    ├── environment.md       ← 開発環境セットアップ（Node.js / nvm / Turbopack / 環境変数）
-    └── branch.md            ← Git ブランチ戦略・CI/CD・コミット規約
+│   ├── cta-technical-guide.md    ← CTAショートコード技術仕様（開発者向け）
+│   ├── email-setup.md            ← Email送信設定ガイド（Resend, 環境別手順）
+│   ├── microcms-setup.md         ← microCMS設定ガイド（API作成、フィールド定義、環境変数設定）
+│   └── resend-setup.md           ← Resend.com 詳細セットアップ手順書（DNS設定・ドメイン検証・APIキー）
+└── specs/
+    ├── google.md            ← Google Sheets (win2_master) 構成・GAS仕様
+    └── spec.md              ← WIN×Ⅱ プロジェクト要件定義書（システム設計・機能要件）
 ```
 
 ### ドキュメント概要
 
-#### ルートレベル - 環境設定・運用
+#### ルートレベル・デザインガイドライン
 
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
-| **email-setup.md** | Email送信設定ガイド | Resend設定、開発環境用セットアップ、ドメイン取得計画、トラブルシューティング |
-| **resend-setup.md** | Resend.com詳細セットアップ手順書 | アカウント作成、ドメイン追加、DNS設定（SPF/DKIM/DMARC）、ドメイン検証、APIキー取得、テスト送信、トラブルシューティング |
-| **microcms-setup.md** | microCMS設定ガイド | API作成（blogs/deals/categories）、フィールド定義、サンプルデータ、環境変数設定、トラブルシューティング |
-| **seo-implementation.md** | SEO実装ガイド | 全ページのメタデータ、OGP、Twitter Card、JSON-LD構造化データ、検証方法、今後の改善案 |
+| **index.md** | ドキュメント索引・運用ルール | docs配下の構成、更新フロー、PDCAルール |
+| **design/color-guidelines.md** | ブランドカラー運用ガイド | `win2-primary-orage` を中心としたカラートークン命名、背景/ステータスカラー、運用ルール |
 
 #### `specs/` - 仕様・外部連携
 
@@ -51,22 +47,27 @@ docs/
 |---------|------|------------|
 | **spec.md** | プロジェクト要件定義書 | 技術スタック、データフロー、API設計、画面設計、開発フェーズ |
 | **google.md** | Google Sheets構成 | 会員リスト、クリックログ、成果データ、GASコード |
-| **asp.md** | ASP認証情報 | A8.net, AFB, もしも, バリューコマース のログイン情報 |
+
+> ※ ASPなどの認証情報はセキュアストレージ（社内共有ドライブ等）で管理し、リポジトリには保存しないこと。
 
 #### `guides/` - ユーザー/開発者向けガイド
 
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
-| **cta-shortcode-guide.md** | CTAショートコード使用ガイド | 案件登録手順（Google Sheets）、ブログ記事でのショートコード使用方法、トラッキング仕組み、FAQ、トラブルシューティング |
-| **cta-technical-guide.md** | CTAショートコード技術仕様 | システムアーキテクチャ、BlogContentコンポーネント実装、/api/track-click仕様、GAS自動化、デバッグ手法、テスト戦略、パフォーマンス・セキュリティ |
+| **guides/cta-shortcode-guide.md** | CTAショートコード使用ガイド | 案件登録手順（Google Sheets）、ブログ記事でのショートコード使用方法、トラッキング仕組み、FAQ、トラブルシューティング |
+| **guides/cta-technical-guide.md** | CTAショートコード技術仕様 | システムアーキテクチャ、BlogContentコンポーネント実装、/api/track-click仕様、GAS自動化、デバッグ手法、テスト戦略、パフォーマンス・セキュリティ |
+| **guides/email-setup.md** | Email送信設定ガイド | Resend設定、開発環境用セットアップ、ドメイン取得計画、トラブルシューティング |
+| **guides/resend-setup.md** | Resend.com詳細セットアップ手順書 | アカウント作成、ドメイン追加、DNS設定（SPF/DKIM/DMARC）、ドメイン検証、APIキー取得、テスト送信、トラブルシューティング |
+| **guides/microcms-setup.md** | microCMS設定ガイド | API作成（blogs/deals/categories）、フィールド定義、サンプルデータ、環境変数設定、トラブルシューティング |
 
 #### `dev/` - 開発規約
 
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
-| **architecture.md** | アーキテクチャ詳細 | ディレクトリ構成、TypeScript/TailwindCSS設定、実装済み機能、データフロー |
-| **environment.md** | 開発環境セットアップ | Node.js 22（nvm）、Turbopackデフォルト設定、必須コマンド、環境変数、チェックリスト |
-| **branch.md** | ブランチ戦略 | 2ブランチ管理（dev/main）、PR規約、コミットメッセージ形式、CI/CD |
+| **dev/architecture.md** | アーキテクチャ詳細 | ディレクトリ構成、TypeScript/TailwindCSS設定、実装済み機能、データフロー |
+| **dev/environment.md** | 開発環境セットアップ | Node.js 22（nvm）、Turbopackデフォルト設定、必須コマンド、環境変数、チェックリスト |
+| **dev/branch.md** | ブランチ戦略 | 2ブランチ管理（dev/main）、PR規約、コミットメッセージ形式、CI/CD |
+| **dev/seo-implementation.md** | SEO実装ガイド | 全ページのメタデータ、OGP、Twitter Card、JSON-LD構造化データ、検証方法、今後の改善案 |
 
 ### 今後追加が想定されるドキュメントカテゴリ
 
@@ -102,7 +103,7 @@ docs/
 ### 3. 秘匿情報の管理
 
 6. **PII/秘匿情報の取り扱い**:
-   - `docs/specs/asp.md` には ASP 認証情報が含まれるため、**パブリックリポジトリには含めない**
+   - ASPや各種外部サービスの認証情報はリポジトリに保存せず、セキュアストレージ（Password Manager / Secrets Manager 等）で管理する
    - 秘匿情報は `.gitignore` に追加するか、環境変数・シークレット管理サービスで管理
    - 社外提供するドキュメントは `docs/` から秘匿情報を除外したものを提供
 
@@ -113,7 +114,7 @@ docs/
 ### 命名規則
 
 - ドキュメントは目的が分かる短い英語名（`kebab-case.md` 推奨）
-- 日本語ファイル名も許容（既存: `google.md`, `asp.md` など）
+- 日本語ファイル名も許容（既存: `google.md` など）
 - カテゴリディレクトリは英語（`specs/`, `dev/`, `api/` など）
 
 ### 分割基準

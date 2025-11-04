@@ -14,6 +14,8 @@ interface BlogDetailPageProps {
   }>;
 }
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 /**
  * generateMetadata: SEO/OGP対応
  */
@@ -31,23 +33,44 @@ export async function generateMetadata({
 
   // contentから自動生成した抜粋を使用
   const excerpt = extractExcerpt(blog.content, 120);
+  const canonicalUrl = `${appUrl}/blog/${id}`;
+  const primaryImage = blog.thumbnail?.url || `${appUrl}/ogp.jpg`;
+  const keywordBase = ["アフィリエイト", "キャッシュバック", "WIN×Ⅱ", "お得情報"];
+  const categoryKeywords = blog.category?.map((cat) => `${cat.name} アフィリエイト`) ?? [];
 
   return {
     title: blog.title,
     description: excerpt,
+    keywords: [...keywordBase, ...categoryKeywords],
     openGraph: {
       title: blog.title,
       description: excerpt,
-      images: blog.thumbnail ? [blog.thumbnail.url] : [],
+      images: [
+        {
+          url: primaryImage,
+          width: 1200,
+          height: 630,
+          alt: blog.title,
+        },
+      ],
       type: "article",
       publishedTime: blog.publishedAt || blog.createdAt,
       authors: ["WIN×Ⅱ"],
+      url: canonicalUrl,
+      siteName: "WIN×Ⅱ",
     },
     twitter: {
       card: "summary_large_image",
       title: blog.title,
       description: excerpt,
-      images: blog.thumbnail ? [blog.thumbnail.url] : [],
+      images: [primaryImage],
+    },
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    robots: {
+      index: true,
+      follow: true,
     },
   };
 }
@@ -63,7 +86,6 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
     notFound();
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
   const excerpt = extractExcerpt(blog.content, 120);
 
   const articleSchema = {
@@ -87,16 +109,49 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       },
     },
     description: excerpt,
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${appUrl}/blog/${blog.id}`,
+    },
+  };
+
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "ホーム",
+        item: appUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "ブログ",
+        item: `${appUrl}/blog`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: blog.title,
+        item: `${appUrl}/blog/${blog.id}`,
+      },
+    ],
   };
 
   return (
     <article className="container max-w-4xl mx-auto px-4 py-8">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(articleSchema),
-        }}
-      />
+      {[articleSchema, breadcrumbSchema].map((schema, index) => (
+        <script
+          // eslint-disable-next-line react/no-array-index-key
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(schema),
+          }}
+        />
+      ))}
       {/* サムネイル画像 */}
       {blog.thumbnail && (
         <div className="relative w-full h-[400px] mb-8 rounded-lg overflow-hidden">
