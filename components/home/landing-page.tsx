@@ -703,7 +703,7 @@ function HighlightSection() {
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                   priority={index === 0}
                 />
-                <span className="absolute inset-0 bg-gradient-to-b from-black/20 to-black/60" />
+                <span className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60" />
 
                 <div className="relative flex flex-col gap-4 p-6 sm:p-8">
                   <div className="space-y-3">
