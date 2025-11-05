@@ -1,0 +1,186 @@
+name: dev merge CI
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  build-and-lighthouse:
+    name: Build and Lighthouse
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        id: build
+        run: npm run build
+        continue-on-error: true
+
+      - name: Run Lighthouse CI
+        id: lighthouse
+        run: npx @lhci/cli autorun
+        continue-on-error: true
+
+      - name: Collect results summary
+        id: summary
+        env:
+          BUILD_OUTCOME: ${{ steps.build.outcome }}
+          LH_OUTCOME: ${{ steps.lighthouse.outcome }}
+        run: |
+          node <<'SCRIPT'
+          const fs = require('fs');
+          const path = require('path');
+
+          const summaryLines = [];
+          summaryLines.push('# devブランチCIレポート');
+          summaryLines.push('');
+
+          const buildOutcome = process.env.BUILD_OUTCOME || 'unknown';
+          const lighthouseOutcome = process.env.LH_OUTCOME || 'unknown';
+          const translateOutcome = (value) => {
+            if (value === 'success') return '成功';
+            if (value === 'failure') return '失敗';
+            if (value === 'cancelled') return 'キャンセル';
+            return '不明';
+          };
+
+          summaryLines.push(`- Build: ${translateOutcome(buildOutcome)}`);
+          summaryLines.push(`- Lighthouse: ${translateOutcome(lighthouseOutcome)}`);
+          summaryLines.push('');
+
+          const manifestPath = path.join('.lighthouseci', 'manifest.json');
+          if (fs.existsSync(manifestPath)) {
+            try {
+              const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+              if (Array.isArray(manifest) && manifest.length > 0) {
+                const lastRun = manifest[manifest.length - 1];
+                if (lastRun.summary && typeof lastRun.summary === 'object') {
+                  const summary = lastRun.summary;
+                  const categoryLabels = {
+                    performance: 'Performance',
+                    accessibility: 'Accessibility',
+                    bestPractices: 'Best Practices',
+                    seo: 'SEO',
+                    pwa: 'PWA'
+                  };
+                  const categoryKeys = Object.keys(categoryLabels).filter((key) => summary[key] !== undefined);
+                  if (categoryKeys.length > 0) {
+                    summaryLines.push('| カテゴリ | スコア |');
+                    summaryLines.push('| --- | --- |');
+                    categoryKeys.forEach((key) => {
+                      const value = summary[key];
+                      const score = typeof value === 'number' ? Math.round(value * 100) : value;
+                      summaryLines.push(`| ${categoryLabels[key]} | ${score} |`);
+                    });
+                    summaryLines.push('');
+                  }
+                }
+
+                if (lastRun.lhr) {
+                  const resolveLhrPath = (target) => {
+                    if (path.isAbsolute(target)) {
+                      return target;
+                    }
+                    if (target.startsWith('.lighthouseci/')) {
+                      return path.resolve(target);
+                    }
+                    return path.resolve('.lighthouseci', target);
+                  };
+                  const lhrPath = resolveLhrPath(lastRun.lhr);
+                  if (fs.existsSync(lhrPath)) {
+                    const lhr = JSON.parse(fs.readFileSync(lhrPath, 'utf8'));
+                    const audits = lhr.audits || {};
+                    const metrics = [
+                      ['first-contentful-paint', 'First Contentful Paint'],
+                      ['largest-contentful-paint', 'Largest Contentful Paint'],
+                      ['total-blocking-time', 'Total Blocking Time'],
+                      ['cumulative-layout-shift', 'Cumulative Layout Shift'],
+                      ['interactive', 'Time to Interactive']
+                    ];
+                    const presentMetrics = metrics.filter(([id]) => audits[id] && audits[id].displayValue);
+                    if (presentMetrics.length > 0) {
+                      summaryLines.push('| 指標 | 値 |');
+                      summaryLines.push('| --- | --- |');
+                      presentMetrics.forEach(([id, label]) => {
+                        summaryLines.push(`| ${label} | ${audits[id].displayValue} |`);
+                      });
+                      summaryLines.push('');
+                    }
+                  }
+                }
+              } else {
+                summaryLines.push('Lighthouseのレポートを取得できませんでした。');
+              }
+            } catch (error) {
+              summaryLines.push('Lighthouseレポートの解析に失敗しました。');
+            }
+          } else {
+            summaryLines.push('Lighthouseのレポートが生成されませんでした。');
+          }
+
+          fs.writeFileSync('lhci-summary.md', summaryLines.join('\n'), 'utf8');
+          SCRIPT
+
+          cat lhci-summary.md >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo "body<<'EOF'"
+            cat lhci-summary.md
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create or update PR to main
+        uses: actions/github-script@v7
+        env:
+          PR_BODY: ${{ steps.summary.outputs.body }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const body = process.env.PR_BODY || '# devブランチCIレポート\n\nレポート本文を生成できませんでした。';
+            const title = 'dev -> main 自動PR (CIレポート付き)';
+
+            const { data: existing } = await github.rest.pulls.list({
+              owner,
+              repo,
+              state: 'open',
+              head: `${owner}:dev`,
+              base: 'main',
+              per_page: 1
+            });
+
+            if (existing.length > 0) {
+              await github.rest.pulls.update({
+                owner,
+                repo,
+                pull_number: existing[0].number,
+                title,
+                body
+              });
+              core.setOutput('action', 'updated');
+              core.setOutput('pull_number', existing[0].number);
+            } else {
+              const { data: pr } = await github.rest.pulls.create({
+                owner,
+                repo,
+                head: 'dev',
+                base: 'main',
+                title,
+                body
+              });
+              core.setOutput('action', 'created');
+              core.setOutput('pull_number', pr.number);
+            }
