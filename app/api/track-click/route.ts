@@ -113,12 +113,6 @@ export async function POST(request: NextRequest) {
     trackingUrl.searchParams.set("id1", trackingId);
     trackingUrl.searchParams.set("eventId", eventId);
 
-    // AFBの場合のみ paid パラメータを追加（ポストバック用の会員ID追跡）
-    if (deal.aspName.toLowerCase() === "afb") {
-      trackingUrl.searchParams.set("paid", trackingId);
-      console.log("[track-click] AFB: Added paid parameter:", trackingId);
-    }
-
     console.log("[track-click] Tracking URL generated:", trackingUrl.toString());
 
     // 7. レスポンス返却（非会員の場合はCookie設定）

@@ -10,8 +10,8 @@ This document outlines the investigation results for ASP (Affiliate Service Prov
 
 | ASP | Webhook/Postback Support | Public Documentation | Status |
 |-----|--------------------------|---------------------|--------|
-| A8.net | ⚠️ **Parameter Tracking (Unverified)** | Available | 🔄 **Under Review - Management Console Verification Required** |
-| afb (アフィb) | ✅ Real-time Postback System | Limited (Login Required) | ✅ **Primary Implementation Target** |
+| A8.net | ⚠️ **Parameter Tracking (CSV Manual)** | Available | ✅ **Primary Implementation Target** |
+| afb (アフィb) | ✅ Real-time Postback System | Limited (Login Required) | ⏸️ **Deferred (Vercel Cron Limitation)** |
 | もしもアフィリエイト | ❌ Unknown | None | ⚠️ Contact Support Required |
 | バリューコマース | ❌ Unknown | None | ⚠️ Contact Support Required |
 
@@ -290,9 +290,34 @@ API for automating the process of confirming affiliate conversions (reduces manu
 
 ## afb (アフィb)
 
-### Real-time Postback System
+### ⏸️ DEFERRED: Real-time Postback System
 
-✅ **Status:** Available
+**Last Updated:** 2025-01-05
+**Status:** ⏸️ Implementation deferred due to Vercel Cron limitations
+
+#### Deferral Reason
+
+**Vercel Free Plan Limitation:**
+- Vercel Cron is required for API polling-based integration
+- Free plan has insufficient Cron execution quota
+- Caused deployment failures
+
+**Implementation Status:**
+- ✅ Type definitions (types/afb-postback.ts) - **DELETED**
+- ✅ Webhook endpoint (app/api/webhooks/afb-postback/route.ts) - **DELETED**
+- ✅ API client (lib/asp/afb-client.ts) - **DELETED**
+- ✅ Conversion matcher (lib/matching/conversion-matcher.ts) - **DELETED**
+
+**Re-implementation Requirements:**
+- Alternative scheduler solution (GitHub Actions, external cron service)
+- OR upgrade to Vercel Pro plan
+- OR switch to AFB Postback-only approach (no polling)
+
+---
+
+### Real-time Postback System (For Future Reference)
+
+✅ **Capability:** Available
 
 afb provides a real-time postback system that automatically notifies publishers (media operators) about affiliate conversions. This allows centralized management of conversion data across multiple ASPs.
 
@@ -526,44 +551,78 @@ https://yourdomain.com/api/webhooks/asp-conversion
 
 ## Implementation Priority
 
-### Phase 1: afb Integration (Highest Priority)
+**Last Updated:** 2025-01-05
 
-✅ **Reason:** Only ASP with confirmed real-time postback system
+### Phase 1: A8.net Parameter Tracking Report (Highest Priority)
 
-**Tasks:**
-1. Login to afb dashboard and download API documentation
-2. Obtain API keys and webhook configuration
-3. Implement webhook endpoint for afb
-4. Test with afb's test environment
+✅ **Reason:** Parameter tracking feature confirmed, manual CSV workflow viable
 
-**Estimated Timeline:** 2-3 days
+**Current Status:**
+- Technical implementation: ✅ COMPLETE (id1 + eventId parameter appending)
+- CSV export verification: ⚠️ PENDING (30-minute manual check required)
+- Google Sheets integration: ✅ COMPLETE
+- GAS processing: ✅ COMPLETE
 
-### Phase 2: A8.net Investigation & Resolution
+**Next Steps:**
+1. **[CRITICAL] CSV Export Verification (30 minutes)**
+   - Login to A8.net management console
+   - Access Parameter Tracking Report: `https://media-console.a8.net/report/parameter#`
+   - Download CSV and verify id1 column exists
+   - Document column structure in `docs/dev/a8-parameter-tracking-verification.md`
 
-❌ **Status:** **BLOCKED** - Media member console limitation confirmed
+2. **If CSV Verification Successful:**
+   - Create operations manual for daily CSV download workflow
+   - Update documentation with CSV download procedures
+   - Begin production use
 
-**Current Situation:**
-- Contract type: Media Member (Affiliate/Publisher)
-- Individual conversion tracking with custom parameters (id1, eventId) is NOT AVAILABLE
-- CSV downloads only provide aggregated program-level data
+3. **If CSV Verification Fails:**
+   - Revert to aggregate reporting only (no member-specific cashback)
+   - Prioritize alternative ASPs (もしも, バリューコマース)
 
-**Potential Actions:**
-1. **Contact A8.net Support** (Priority: Medium)
-   - Ask about media member options for custom tracking
-   - Inquire about alternative tracking methods
-   - Request information on upgrading/changing contract type
+**Policy Risk:**
+- ⚠️ "本機能はポイントサイト向けではありません" (Not for point sites)
+- Consider contacting A8.net support for pre-approval
+- Monitor for policy violations
 
-2. **Use A8.net for Aggregate Reporting Only** (Fallback)
-   - Track total revenue from A8.net deals
-   - NO member-specific cashback calculation
-   - Display A8.net deals without individual tracking
+**Estimated Timeline:**
+- Verification: 30 minutes
+- Operations manual: 1-2 hours
+- **Total: Same day completion possible**
 
-3. **Defer A8.net Member Tracking** (Current Recommendation)
-   - Focus on afb implementation first
-   - Revisit A8.net after afb success
-   - Consider business model adjustments
+### Phase 2: afb Integration (Deferred)
 
-**Estimated Timeline:** ON HOLD - Pending support response or business decision
+⏸️ **Status:** **DEFERRED** - Vercel Cron limitations
+
+**Deferral Reason:**
+- Vercel Free Plan has insufficient Cron execution quota
+- Deployment failures due to Cron restrictions
+- Code has been removed to enable deployment
+
+**Implementation Removed:**
+- Type definitions (types/afb-postback.ts)
+- Webhook endpoint (app/api/webhooks/afb-postback/route.ts)
+- API client (lib/asp/afb-client.ts)
+- Conversion matcher (lib/matching/conversion-matcher.ts)
+
+**Re-implementation Options:**
+1. **GitHub Actions Scheduler** (Free alternative)
+   - Use GitHub Actions cron to trigger API polling
+   - Call API endpoint with CRON_SECRET authentication
+   - Estimated implementation: 2-3 hours
+
+2. **Upgrade to Vercel Pro** (Paid solution)
+   - Pro plan: 1000 Cron invocations/month
+   - Cost: $20/month
+   - Re-implement deleted code
+
+3. **Postback-Only Approach** (No polling)
+   - Remove API polling entirely
+   - Rely solely on AFB's real-time postback system
+   - No Cron required
+
+**Current Recommendation:** Focus on A8.net first, revisit AFB after A8.net success
+
+**Estimated Timeline:** ON HOLD - Pending A8.net completion and scheduler solution
 
 ### Phase 3: もしも & バリューコマース
 
@@ -644,7 +703,7 @@ If webhook support is not available from any ASP:
 
 ---
 
-**Document Status:** Updated - A8.net limitation confirmed, afb implementation prioritized
+**Document Status:** Updated - A8.net prioritized, AFB deferred due to Vercel Cron limitations
 
-**Last Reviewed:** 2025-01-03
-**Last Updated:** 2025-01-03 (A8.net media member limitation documented)
+**Last Reviewed:** 2025-01-05
+**Last Updated:** 2025-01-05 (AFB implementation removed, A8.net set as primary target)
