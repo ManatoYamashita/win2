@@ -36,6 +36,11 @@ docs/
 ├── architecture/             ← アーキテクチャ決定記録・インフラ構成
 │   └── dns-infrastructure.md ← DNS/メールインフラ構成、Wix DNS制限、RESEND_VALIDフィーチャーフラグ
 │
+├── handoff/                  ← セッション引き継ぎ記録（実装中断・変更経緯）
+│   ├── asp-integration-session-handoff.md   ← ASP統合セッション引き継ぎ（AFB実装保留、A8優先）
+│   ├── 2025-01-05-afb-removal-handoff.md    ← AFB実装削除記録（Vercel Cron制限、1181行削除、A8最優先化）
+│   └── afb-postback-integration.md          ← AFBポストバック統合記録（Phase 1完了、本番運用保留）
+│
 └── specs/                    ← プロジェクト仕様・外部連携情報
     ├── spec.md              ← WIN×Ⅱ プロジェクト要件定義書（システム設計・機能要件）
     ├── google.md            ← Google Sheets (win2_master) 構成・GAS仕様
@@ -84,17 +89,24 @@ docs/
 
 #### `specs/asp/` - ASP統合仕様・実装ガイド
 
-**実装優先度: AFB（最優先） > A8.net（集計レポートのみ）**
+**実装優先度: A8.net（最優先・CSV検証待ち） > AFB（Vercel Cron制限により保留）**
 
-| ファイル | 内容 | 主要トピック | 優先度 |
-|---------|------|------------|--------|
-| **afb-implementation-guide.md** | AFBポストバック実装ガイド | Webhook実装、セキュリティ（IPホワイトリスト）、Google Sheets統合、テスト手順、トラブルシューティング | 🔥 **最優先** |
-| **a8net-api.md** | A8.net API仕様（広告主契約前提） | **⚠️ Media Member制限あり**: 個別成果トラッキング不可、API利用不可、代替実装方法（AFB優先、手動CSV、広告主契約変更） | ⏸️ 保留中 |
+**Last Updated:** 2025-01-05
 
-**重要な制限事項:**
-- **A8.net**: 現在のMedia Member契約では個別成果データにアクセスできないため、会員別キャッシュバック機能は実装不可
-- **AFB**: リアルタイムポストバック対応のため、会員別トラッキングが可能（推奨）
-- **実装方針**: AFBを優先実装し、A8.netは集計レポートとして使用
+| ファイル | 内容 | 主要トピック | 優先度 | ステータス |
+|---------|------|------------|--------|-----------|
+| **a8net-api.md** | A8.net API仕様 | **✅ Parameter Tracking Report機能確認済み**: id1-id5カスタムパラメータ対応、CSV export検証待ち（30分）、技術実装100%完了 | 🔥 **最優先** | ⏳ CSV検証待ち |
+| **afb-implementation-guide.md** | AFBポストバック実装ガイド | **⏸️ 実装削除済み（2025-01-05）**: Vercel Free Plan Cron制限により1181行削除、再実装にはGitHub Actions等の代替スケジューラが必要 | ⏸️ 保留中 | ❌ 削除済み |
+
+**重要な変更事項（2025-01-05）:**
+- **A8.net**: Parameter Tracking Report機能の発見により最優先に変更
+  - 技術実装: ✅ 完了（id1/eventId付与、Google Sheets連携、GAS処理）
+  - 残タスク: ⏳ CSV export検証（30分）
+  - リスク: ⚠️ 「ポイントサイト向けではない」警告あり
+- **AFB**: Vercel Cron制限によりデプロイ失敗、実装を完全削除
+  - 削除内容: Webhook, Cron, 型定義, APIクライアント, マッチングアルゴリズム
+  - 再実装: GitHub Actions等の代替スケジューラ構築が必要
+  - 詳細: `docs/handoff/2025-01-05-afb-removal-handoff.md` 参照
 
 #### `guides/` - ユーザー/開発者向けガイド
 
