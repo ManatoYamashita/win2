@@ -1,8 +1,29 @@
 # A8.net パラメータ計測機能 実地検証ログ
 
-**Document Status:** Draft - Awaiting Verification
+**Document Status:** ⏳ **CRITICAL - CSV Export Verification Required (30 min)**
 **Created:** 2025-01-04
-**Last Updated:** 2025-01-04
+**Last Updated:** 2025-01-05
+
+---
+
+## ⚠️ 検証未実施 - 次回セッション最優先タスク
+
+**ステータス:** Step 1-3 完了、**Step 4 未実施**
+
+**残タスク（30分）:**
+- [ ] CSV/Excelダウンロード機能の確認
+- [ ] id1カラムの有無確認
+- [ ] カラム構成の記録
+
+**重要性:**
+- ✅ 技術実装は100%完了済み（id1/eventId付与、Google Sheets連携、GAS処理）
+- ⏳ CSV検証のみが実装完了の最後のステップ
+- 🎯 検証結果により即日運用開始可能
+
+**背景:**
+- 2025-01-05: AFB実装をVercel Cron制限により削除（コミット: b8e9b98）
+- A8.net対応を最優先に変更
+- 詳細: `docs/handoff/2025-01-05-afb-removal-handoff.md`
 
 ---
 

@@ -66,6 +66,7 @@ jobs:
         env:
           PR_BODY: ${{ steps.summary.outputs.body }}
         with:
+          github-token: ${{ secrets.DEV_PR_TOKEN || github.token }}
           script: |
             const owner = context.repo.owner;
             const repo = context.repo.repo;
@@ -77,34 +78,55 @@ jobs:
             const body = process.env.PR_BODY || '# featureブランチ差分概要\n\n- 変更点情報を生成できませんでした。';
             const title = `[CI] ${headBranch} -> dev 自動PR`;
 
-            const { data: existing } = await github.rest.pulls.list({
-              owner,
-              repo,
-              state: 'open',
-              head: `${owner}:${headBranch}`,
-              base: 'dev',
-              per_page: 1
-            });
+            const handleForbiddenError = (error) => {
+              const message = (error && error.message) || '';
+              const status = error && error.status;
+              if (status === 403 && message.includes('not permitted to create or approve pull requests')) {
+                const instructions = [
+                  'GitHub ActionsがPRを作成できません。次のいずれかを実施してください:',
+                  '1. リポジトリ設定 > Actions > General > Workflow permissions で "Allow GitHub Actions to create and approve pull requests" を有効化する',
+                  '2. repoスコープを付与したPATをリポジトリSecret `DEV_PR_TOKEN` として登録する'
+                ].join('\n');
+                core.setFailed(instructions);
+                return true;
+              }
+              return false;
+            };
 
-            if (existing.length > 0) {
-              await github.rest.pulls.update({
+            try {
+              const { data: existing } = await github.rest.pulls.list({
                 owner,
                 repo,
-                pull_number: existing[0].number,
-                title,
-                body
-              });
-              core.setOutput('action', 'updated');
-              core.setOutput('pull_number', existing[0].number);
-            } else {
-              const { data: pr } = await github.rest.pulls.create({
-                owner,
-                repo,
-                head: headBranch,
+                state: 'open',
+                head: `${owner}:${headBranch}`,
                 base: 'dev',
-                title,
-                body
+                per_page: 1
               });
-              core.setOutput('action', 'created');
-              core.setOutput('pull_number', pr.number);
+
+              if (existing.length > 0) {
+                await github.rest.pulls.update({
+                  owner,
+                  repo,
+                  pull_number: existing[0].number,
+                  title,
+                  body
+                });
+                core.setOutput('action', 'updated');
+                core.setOutput('pull_number', existing[0].number);
+              } else {
+                const { data: pr } = await github.rest.pulls.create({
+                  owner,
+                  repo,
+                  head: headBranch,
+                  base: 'dev',
+                  title,
+                  body
+                });
+                core.setOutput('action', 'created');
+                core.setOutput('pull_number', pr.number);
+              }
+            } catch (error) {
+              if (!handleForbiddenError(error)) {
+                throw error;
+              }
             }
