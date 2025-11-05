@@ -14,6 +14,7 @@
 ```text
 docs/
 ├── index.md                  ← 本ファイル（ドキュメント索引・運用ルール）
+├── asp-api-integration.md    ← ASP Webhook/Postback API調査結果（A8.net、AFB、もしも、バリュコマ）
 │
 ├── design/
 │   └── color-guidelines.md   ← ブランド/アクセントカラーの命名規則と運用ルール
@@ -22,7 +23,8 @@ docs/
 │   ├── architecture.md       ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
 │   ├── branch.md             ← Git ブランチ戦略・CI/CD・コミット規約
 │   ├── environment.md        ← 開発環境セットアップ（Node.js / nvm / Turbopack / 環境変数）
-│   └── seo-implementation.md ← SEO実装ガイド（メタデータ、OGP、Twitter Card、構造化データ）
+│   ├── seo-implementation.md ← SEO実装ガイド（メタデータ、OGP、Twitter Card、構造化データ）
+│   └── a8-parameter-tracking-verification.md ← A8.netパラメータ計測機能 実地検証ログ（要管理画面確認）
 │
 ├── guides/                   ← ユーザー/開発者向けガイド
 │   ├── cta-shortcode-guide.md    ← CTAショートコード使用ガイド（クライアント向け）
@@ -33,6 +35,11 @@ docs/
 │
 ├── architecture/             ← アーキテクチャ決定記録・インフラ構成
 │   └── dns-infrastructure.md ← DNS/メールインフラ構成、Wix DNS制限、RESEND_VALIDフィーチャーフラグ
+│
+├── handoff/                  ← セッション引き継ぎ記録（実装中断・変更経緯）
+│   ├── asp-integration-session-handoff.md   ← ASP統合セッション引き継ぎ（AFB実装保留、A8優先）
+│   ├── 2025-01-05-afb-removal-handoff.md    ← AFB実装削除記録（Vercel Cron制限、1181行削除、A8最優先化）
+│   └── afb-postback-integration.md          ← AFBポストバック統合記録（Phase 1完了、本番運用保留）
 │
 └── specs/                    ← プロジェクト仕様・外部連携情報
     ├── spec.md              ← WIN×Ⅱ プロジェクト要件定義書（システム設計・機能要件）
@@ -68,6 +75,7 @@ docs/
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
 | **index.md** | ドキュメント索引・運用ルール | docs配下の構成、更新フロー、PDCAルール |
+| **asp-api-integration.md** | ASP Webhook/Postback API調査結果 | A8.net（パラメータ計測機能要検証）、AFB（リアルタイムポストバック）、もしも、バリューコマース、実装優先度、規約リスク評価 |
 | **design/color-guidelines.md** | ブランドカラー運用ガイド | `win2-primary-orage` を中心としたカラートークン命名、背景/ステータスカラー、運用ルール |
 
 #### `specs/` - 仕様・外部連携
@@ -81,17 +89,24 @@ docs/
 
 #### `specs/asp/` - ASP統合仕様・実装ガイド
 
-**実装優先度: AFB（最優先） > A8.net（集計レポートのみ）**
+**実装優先度: A8.net（最優先・CSV検証待ち） > AFB（Vercel Cron制限により保留）**
 
-| ファイル | 内容 | 主要トピック | 優先度 |
-|---------|------|------------|--------|
-| **afb-implementation-guide.md** | AFBポストバック実装ガイド | Webhook実装、セキュリティ（IPホワイトリスト）、Google Sheets統合、テスト手順、トラブルシューティング | 🔥 **最優先** |
-| **a8net-api.md** | A8.net API仕様（広告主契約前提） | **⚠️ Media Member制限あり**: 個別成果トラッキング不可、API利用不可、代替実装方法（AFB優先、手動CSV、広告主契約変更） | ⏸️ 保留中 |
+**Last Updated:** 2025-01-05
 
-**重要な制限事項:**
-- **A8.net**: 現在のMedia Member契約では個別成果データにアクセスできないため、会員別キャッシュバック機能は実装不可
-- **AFB**: リアルタイムポストバック対応のため、会員別トラッキングが可能（推奨）
-- **実装方針**: AFBを優先実装し、A8.netは集計レポートとして使用
+| ファイル | 内容 | 主要トピック | 優先度 | ステータス |
+|---------|------|------------|--------|-----------|
+| **a8net-api.md** | A8.net API仕様 | **✅ Parameter Tracking Report機能確認済み**: id1-id5カスタムパラメータ対応、CSV export検証待ち（30分）、技術実装100%完了 | 🔥 **最優先** | ⏳ CSV検証待ち |
+| **afb-implementation-guide.md** | AFBポストバック実装ガイド | **⏸️ 実装削除済み（2025-01-05）**: Vercel Free Plan Cron制限により1181行削除、再実装にはGitHub Actions等の代替スケジューラが必要 | ⏸️ 保留中 | ❌ 削除済み |
+
+**重要な変更事項（2025-01-05）:**
+- **A8.net**: Parameter Tracking Report機能の発見により最優先に変更
+  - 技術実装: ✅ 完了（id1/eventId付与、Google Sheets連携、GAS処理）
+  - 残タスク: ⏳ CSV export検証（30分）
+  - リスク: ⚠️ 「ポイントサイト向けではない」警告あり
+- **AFB**: Vercel Cron制限によりデプロイ失敗、実装を完全削除
+  - 削除内容: Webhook, Cron, 型定義, APIクライアント, マッチングアルゴリズム
+  - 再実装: GitHub Actions等の代替スケジューラ構築が必要
+  - 詳細: `docs/handoff/2025-01-05-afb-removal-handoff.md` 参照
 
 #### `guides/` - ユーザー/開発者向けガイド
 
@@ -117,6 +132,7 @@ docs/
 | **dev/environment.md** | 開発環境セットアップ | Node.js 22（nvm）、Turbopackデフォルト設定、必須コマンド、環境変数、チェックリスト |
 | **dev/branch.md** | ブランチ戦略 | 2ブランチ管理（dev/main）、PR規約、コミットメッセージ形式、CI/CD |
 | **dev/seo-implementation.md** | SEO実装ガイド | 全ページのメタデータ、OGP、Twitter Card、JSON-LD構造化データ、検証方法、今後の改善案 |
+| **dev/a8-parameter-tracking-verification.md** | A8.netパラメータ計測機能 実地検証ログ | パラメータ計測レポート確認手順、CSV出力検証、id1パラメータ確認、規約適合性評価、実装判断基準、検証結果記録フォーマット |
 
 ### 今後追加が想定されるドキュメントカテゴリ
 
