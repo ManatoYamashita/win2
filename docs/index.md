@@ -14,6 +14,7 @@
 ```text
 docs/
 ├── index.md                  ← 本ファイル（ドキュメント索引・運用ルール）
+├── asp-api-integration.md    ← ASP Webhook/Postback API調査結果（A8.net、AFB、もしも、バリュコマ）
 │
 ├── design/
 │   └── color-guidelines.md   ← ブランド/アクセントカラーの命名規則と運用ルール
@@ -22,7 +23,8 @@ docs/
 │   ├── architecture.md       ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
 │   ├── branch.md             ← Git ブランチ戦略・CI/CD・コミット規約
 │   ├── environment.md        ← 開発環境セットアップ（Node.js / nvm / Turbopack / 環境変数）
-│   └── seo-implementation.md ← SEO実装ガイド（メタデータ、OGP、Twitter Card、構造化データ）
+│   ├── seo-implementation.md ← SEO実装ガイド（メタデータ、OGP、Twitter Card、構造化データ）
+│   └── a8-parameter-tracking-verification.md ← A8.netパラメータ計測機能 実地検証ログ（要管理画面確認）
 │
 ├── guides/                   ← ユーザー/開発者向けガイド
 │   ├── cta-shortcode-guide.md    ← CTAショートコード使用ガイド（クライアント向け）
@@ -68,6 +70,7 @@ docs/
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
 | **index.md** | ドキュメント索引・運用ルール | docs配下の構成、更新フロー、PDCAルール |
+| **asp-api-integration.md** | ASP Webhook/Postback API調査結果 | A8.net（パラメータ計測機能要検証）、AFB（リアルタイムポストバック）、もしも、バリューコマース、実装優先度、規約リスク評価 |
 | **design/color-guidelines.md** | ブランドカラー運用ガイド | `win2-primary-orage` を中心としたカラートークン命名、背景/ステータスカラー、運用ルール |
 
 #### `specs/` - 仕様・外部連携
@@ -117,6 +120,7 @@ docs/
 | **dev/environment.md** | 開発環境セットアップ | Node.js 22（nvm）、Turbopackデフォルト設定、必須コマンド、環境変数、チェックリスト |
 | **dev/branch.md** | ブランチ戦略 | 2ブランチ管理（dev/main）、PR規約、コミットメッセージ形式、CI/CD |
 | **dev/seo-implementation.md** | SEO実装ガイド | 全ページのメタデータ、OGP、Twitter Card、JSON-LD構造化データ、検証方法、今後の改善案 |
+| **dev/a8-parameter-tracking-verification.md** | A8.netパラメータ計測機能 実地検証ログ | パラメータ計測レポート確認手順、CSV出力検証、id1パラメータ確認、規約適合性評価、実装判断基準、検証結果記録フォーマット |
 
 ### 今後追加が想定されるドキュメントカテゴリ
 

@@ -10,7 +10,7 @@ This document outlines the investigation results for ASP (Affiliate Service Prov
 
 | ASP | Webhook/Postback Support | Public Documentation | Status |
 |-----|--------------------------|---------------------|--------|
-| A8.net | ❌ **Not Available (Media Member)** | Available | ❌ **Blocked - See Details Below** |
+| A8.net | ⚠️ **Parameter Tracking (Unverified)** | Available | 🔄 **Under Review - Management Console Verification Required** |
 | afb (アフィb) | ✅ Real-time Postback System | Limited (Login Required) | ✅ **Primary Implementation Target** |
 | もしもアフィリエイト | ❌ Unknown | None | ⚠️ Contact Support Required |
 | バリューコマース | ❌ Unknown | None | ⚠️ Contact Support Required |
@@ -19,75 +19,209 @@ This document outlines the investigation results for ASP (Affiliate Service Prov
 
 ## A8.net
 
-### ⛔ CRITICAL LIMITATION: Media Member Management Console
+### ⚠️ UNDER REVIEW: Parameter Tracking Report Feature
 
-**Last Verified:** 2025-01-03
+**Last Updated:** 2025-01-04
+**Status:** 🔄 Re-investigation in progress
 
-**Contract Type:** Media Member (Affiliate/Publisher)
-**Management Console:** Media Member Dashboard
+#### 📋 Executive Summary
 
-#### 🚫 **Individual Conversion Tracking: NOT POSSIBLE**
+A8.net's **Parameter Tracking Report (パラメータ計測レポート)** feature was discovered after initial investigation. This feature may allow individual conversion tracking with id1-id5 parameters for media members. **Management console verification is required** to confirm CSV export capability.
 
-**Root Cause:**
-The A8.net **Media Member management console** does NOT provide access to individual conversion details with custom tracking parameters (id1, eventId). Media members can only access **aggregated reports**.
+#### ✅ Newly Discovered Information (2025-01-04)
 
-**Available CSV Downloads (Media Member):**
+**Parameter Tracking Feature (Official Documentation Confirmed):**
+- **Official Support Page:** https://support.a8.net/a8/as/faq/manual/a8-parameter-guide.php
+- **Available to Media Members:** Explicitly stated in official documentation
+- **Custom Parameters:** id1～id5 can be appended to affiliate links
+- **Individual Conversion Tracking:** "成果別の情報" (result-specific information) includes parameter data
+- **Filtering:** Parameter tracking report screen allows filtering by specific parameters
+- **Data Granularity:** "成果別" reports display "成果件数が1件ごとに" (each conversion individually)
 
-| CSV Type | Content | Custom Parameters (id1, eventId) |
-|----------|---------|----------------------------------|
-| Program List | Program details, monthly revenue, click counts | ❌ Not included |
-| Performance Summary | Aggregated revenue by program | ❌ Not included |
-| Conversion Referrer Report | URLs where conversions originated | ⚠️ Partial URL parameters only |
-
-**Example of Downloaded CSV (Program List):**
+**Parameter Usage:**
 ```
-広告主ID, 広告主名, プログラムID, プログラム名, 今月の報酬額, 昨日売上数, 昨日クリック数...
+Format: &id1=value&id2=value...
+- Half-width alphanumeric characters only
+- Maximum 50 bytes per parameter
+- Personal information (PII) must NOT be used
+- Multiple parameters can be combined
 ```
-→ **No individual conversion records, No member IDs (id1), No event IDs**
 
-#### Why This is a Problem for WIN×Ⅱ
+**Parameter Tracking Report Features:**
+- Display result-specific information with parameter data
+- Filter conversions by specific parameter values
+- View individual conversion records (not aggregated)
 
-WIN×Ⅱ requires tracking **which member** generated **which conversion** to calculate individual cashback amounts. However:
+#### ⚠️ Critical Limitations & Compliance Risks
 
-1. **Media Member Console Limitation:**
-   - Only shows "total revenue from Program X"
-   - Cannot identify individual transactions
-   - Cannot retrieve custom tracking parameters
+**1. Advanced Feature - No Official Support:**
+- "パラメータを理解している上級者向けの機能" (For advanced users who understand parameters)
+- **A8.net does NOT provide support for this feature**
+- Self-service troubleshooting required
 
-2. **A8.net's Design Philosophy:**
-   - Affiliates need to know "how much did I earn from which program"
-   - Individual purchase details belong to advertisers (privacy)
-   - Media members don't need granular conversion data
+**2. ⚠️ Point Site Restriction (HIGH RISK):**
+> **Official Statement:** "本機能はポイントサイト向けではありません"
+> (This feature is NOT intended for point sites)
 
-#### Attempted CSV Download Locations
+**Implication for WIN×Ⅱ:**
+- WIN×Ⅱ operates a cashback/point reward model
+- **High risk of terms of service violation**
+- **Account suspension risk**
+- **Legal/contractual review required before implementation**
 
-**Tested Menu:** "Report Download" button on top page
+**3. Program Limitations:**
+- **Amazon and Rakuten programs are NOT supported**
+- Parameter tracking only works with standard affiliate programs
 
-**Result:**
-Downloaded CSV contained only program-level aggregated data, not individual conversion details.
+**4. Data Privacy:**
+- Personal information (email addresses, names, etc.) must NOT be set as parameter values
+- UUID-based member IDs are acceptable
 
-#### Alternative Approaches (All Require Advertiser Contract)
+#### ❓ Unverified Items (Requires Management Console Access)
 
-| Approach | Description | Feasibility for Media Member |
-|----------|-------------|------------------------------|
-| **Advertiser Dashboard** | Access to order confirmation reports with individual details | ❌ Requires advertiser contract |
-| **Session Tracking API** | Send conversion data to A8.net with custom parameters | ❌ Advertiser-only feature |
-| **Webhook/Postback** | A8.net sends conversion notifications to external URL | ⚠️ Unknown if available, likely advertiser-only |
+**1. CSV/Excel Export Functionality**
+- ✅ **Confirmed:** Other A8.net reports (Conversion Referrer Report) support CSV/Excel export
+- ❓ **Unknown:** Whether Parameter Tracking Report also supports export
+- 📝 **Action Required:** Login to management console and verify export options
 
-#### Impact on WIN×Ⅱ Project
+**2. Relationship Between Reports**
+- ❓ Is "Parameter Tracking Report" the same as "成果別 (By Result)" report?
+- ❓ Previous investigation (2025-01-03) tested "Report Download" button - was this the correct location?
+- 📝 **Action Required:** Identify the exact menu path to Parameter Tracking Report
 
-**Status:** ❌ **A8.net individual conversion tracking is BLOCKED**
+**3. Feature Activation Requirements**
+- ❓ Does Parameter Tracking require manual activation/configuration?
+- ❓ Was this feature enabled during previous investigation?
+- 📝 **Action Required:** Check for settings/configuration options
 
-**Implications:**
-- Cannot track which WIN×Ⅱ member generated which A8.net conversion
-- Cannot calculate member-specific cashback from A8.net deals
-- Manual CSV process cannot work (no member ID in available CSVs)
+**4. CSV Column Contents**
+- ❓ If CSV export exists, does it include id1～id5 columns?
+- ❓ What is the exact column structure?
+- 📝 **Action Required:** Download sample CSV and analyze structure
 
-**Recommended Actions:**
-1. ✅ **Implement afb first** (confirmed postback support)
-2. ⏸️ **Contact A8.net support** (ask about media member options for custom tracking)
-3. ⏸️ **Consider advertiser contract** (if business model allows)
-4. ⏸️ **Use A8.net for aggregate reporting only** (total revenue tracking, not member-specific cashback)
+#### 🔄 Contradiction with Previous Assessment (2025-01-03)
+
+**Previous Conclusion:**
+```
+❌ Individual conversion tracking: NOT POSSIBLE
+❌ id1 parameter retrieval: NOT POSSIBLE
+Basis: Downloaded CSV from "Report Download" button contained only aggregated program-level data
+```
+
+**New Information Suggests:**
+```
+✅ Parameter tracking feature exists and is available to media members
+✅ Individual conversion data can be displayed in "成果別" reports
+⚠️ CSV export capability for Parameter Tracking Report: UNCONFIRMED
+```
+
+**Possible Explanations:**
+1. **Different Report Location:** "Parameter Tracking Report" may be a separate menu item from "Report Download"
+2. **Configuration Required:** Feature may need to be enabled/configured before use
+3. **Testing Method:** Previous test may not have used the correct report type
+
+#### 📝 Required Verification Steps
+
+**Priority 1: Management Console Verification (CRITICAL) ✅**
+
+**Step 1: Locate Parameter Tracking Report**
+1. Login to A8.net media member dashboard
+2. Navigate menu to find "パラメータ計測レポート" or "パラメータ計測"
+3. Document the exact menu path
+
+**Step 2: Test Link Creation**
+1. Select a self-back eligible program
+2. Generate affiliate link
+3. Manually append `&id1=test_20250104` to the URL
+4. Complete self-back application
+
+**Step 3: Verify Report Display**
+1. Wait for conversion to be recorded
+2. Access Parameter Tracking Report
+3. Check if conversion with `id1=test_20250104` appears
+4. Document what data fields are displayed
+
+**Step 4: Test CSV Export**
+1. Look for "CSV出力" or "Excelダウンロード" button in Parameter Tracking Report
+2. If found, download the file
+3. Verify if id1 column exists and contains the correct value
+4. Document complete column structure
+
+**Step 5: Policy Compliance Check**
+1. Review A8.net Terms of Service regarding point sites / cashback models
+2. Consider contacting A8.net support to clarify:
+   - Whether cashback reward models are permitted
+   - Whether parameter tracking can be used for member-specific cashback calculation
+   - Any restrictions or guidelines for this use case
+
+**Verification Log Document:** See `docs/dev/a8-parameter-tracking-verification.md`
+
+**Priority 2: Contact A8.net Support (If Verification Successful)**
+
+**Questions to Ask:**
+1. Can media members export CSV data from Parameter Tracking Reports?
+2. Is a cashback/point reward business model compliant with A8.net policies?
+3. Are there any restrictions on using parameter tracking for member-specific conversion attribution?
+4. What is the recommended approach for tracking individual member conversions?
+
+**Risk Assessment:**
+- Contacting support may trigger policy review
+- If cashback model is non-compliant, account could be flagged
+- Consider consulting with legal/business team before reaching out
+
+#### 🎯 Implementation Decision Matrix
+
+**Scenario A: ✅ Parameter Tracking Report Supports CSV Export with id1**
+
+**Actions:**
+- Proceed with A8.net integration for WIN×Ⅱ
+- Existing implementation (id1 parameter appending) is already complete
+- Update documentation with CSV download procedures
+- Create operational manual for Parameter Tracking Report usage
+
+**Timeline:** 1-2 days (documentation only)
+
+**Scenario B: ❌ CSV Export Not Available OR id1 Not Included**
+
+**Actions:**
+- Previous assessment (implementation blocked) was correct
+- Maintain "afb first" priority
+- Use A8.net for aggregate reporting only (no member-specific cashback)
+
+**Timeline:** No additional work required
+
+**Scenario C: ⚠️ Terms of Service Violation Risk Confirmed**
+
+**Actions:**
+- **Discontinue A8.net integration entirely**
+- Remove A8.net deals from platform
+- Focus exclusively on afb and other ASPs
+- Consider alternative ASPs with clear cashback policy support
+
+**Timeline:** 1 day (removal of A8.net references)
+
+#### 📚 Reference: Previous Investigation Results (2025-01-03)
+
+**What Was Tested:**
+- **Location:** "Report Download" button on management console top page
+- **Downloaded:** Program list CSV
+- **Contents:** 広告主ID, 広告主名, プログラムID, プログラム名, 今月の報酬額, 昨日売上数, 昨日クリック数...
+
+**What Was Concluded:**
+- Only program-level aggregated data available
+- No individual conversion records
+- No custom tracking parameters (id1, eventId)
+
+**What May Have Been Missed:**
+- Parameter Tracking Report as a separate menu item
+- Feature activation/configuration requirements
+- Self-back testing with parameter-appended links
+
+#### 🔗 Official Resources
+
+- **Parameter Tracking Guide:** https://support.a8.net/a8/as/faq/manual/a8-parameter-guide.php
+- **Report Usage Guide:** https://support.a8.net/a8/as/faq/manual/report.php
+- **A8.net Help Index:** https://support.a8.net/a8/as/faq/manual/
 
 ---
 
