@@ -137,9 +137,9 @@ jobs:
 
           cat lhci-summary.md >> "$GITHUB_STEP_SUMMARY"
           {
-            echo "body<<'EOF'"
+            echo "body<<EOF"
             cat lhci-summary.md
-            echo 'EOF'
+            echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
       - name: Create or update PR to main

@@ -55,9 +55,9 @@ jobs:
             echo "- origin/${TARGET_BRANCH} ブランチが取得できませんでした。" >> pr-body.md
           fi
           {
-            echo "body<<'EOF'"
+            echo "body<<EOF"
             cat pr-body.md
-            echo 'EOF'
+            echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
       - name: Create or update PR to dev
