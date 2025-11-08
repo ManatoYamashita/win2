@@ -242,3 +242,13 @@
     heroImageFloat 1.2s cubic-bezier(0.1, 0.82, 0.25, 0.99) forwards 0.3s,
     heroImageHover 6s ease-in-out infinite 1.5s;
 }
+
+/* 横スクロール用のカスタムスクロールバー */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}

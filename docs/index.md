@@ -14,60 +14,69 @@
 ```text
 docs/
 ├── index.md                  ← 本ファイル（ドキュメント索引・運用ルール）
-├── email-setup.md            ← Email送信設定ガイド（Resend, 開発環境/本番環境）
-├── resend-setup.md           ← Resend.com 詳細セットアップ手順書（DNS設定・ドメイン検証・APIキー）
-├── microcms-setup.md         ← microCMS設定ガイド（API作成、フィールド定義、環境変数設定）
-├── seo-implementation.md     ← SEO実装ガイド（全ページのメタデータ、OGP、Twitter Card、JSON-LD）
+├── asp-api-integration.md    ← ASP Webhook/Postback API調査結果（A8.net、AFB、もしも、バリュコマ）
 │
-├── specs/                    ← プロジェクト仕様・外部連携情報
-│   ├── spec.md              ← WIN×Ⅱ プロジェクト要件定義書（システム設計・機能要件）
-│   ├── google.md            ← Google Sheets (win2_master) 構成・GAS仕様
-│   ├── asp.md               ← ASP認証情報（A8.net, AFB, もしも, バリュコマ）
-│   └── asp/                 ← ASP統合仕様・実装ガイド（16ファイル）
-│       ├── README.md                    ← ASP統合プロジェクト概要（ナビゲーションハブ）
-│       ├── asp-comparison-report.md     ← 全ASP比較レポート（7ASP詳細分析、800行）
-│       ├── a8net-api.md                 ← A8.net API仕様（Media Member制限あり）
-│       ├── afb-implementation-guide.md  ← AFBポストバック実装ガイド（Phase 1完了）
-│       ├── valuecommerce/               ← ValueCommerce詳細ドキュメント（Phase 2）
-│       │   ├── overview.md              │  - API概要、対応機能
-│       │   ├── order-api-guide.md       │  - 注文レポートAPI実装ガイド
-│       │   ├── authentication-setup.md  │  - OAuth 1.0a 認証設定
-│       │   └── troubleshooting.md       │  - トラブルシューティング
-│       ├── moshimo-overview.md          ← もしもアフィリエイト概要（Phase 3候補）
-│       ├── accesstrade-overview.md      ← AccessTrade概要（Phase 3候補）
-│       ├── linkshare-overview.md        ← LinkShare（楽天）概要（Phase 4候補）
-│       ├── janet-overview.md            ← JANet概要（Phase 4候補）
-│       ├── infotop-overview.md          ← infotop概要（Phase 5候補）
-│       └── common/                      ← 共通技術ドキュメント
-│           ├── tracking-parameters.md   │  - カスタムトラッキングパラメータ仕様
-│           ├── conversion-matching.md   │  - 成果マッチングアルゴリズム
-│           ├── error-handling.md        │  - エラーハンドリング戦略
-│           ├── testing-strategy.md      │  - テスト戦略とテストケース
-│           └── security-considerations.md│  - セキュリティベストプラクティス
+├── design/
+│   └── color-guidelines.md   ← ブランド/アクセントカラーの命名規則と運用ルール
+│
+├── dev/
+│   ├── architecture.md       ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
+│   ├── branch.md             ← Git ブランチ戦略・CI/CD・コミット規約
+│   ├── environment.md        ← 開発環境セットアップ（Node.js / nvm / Turbopack / 環境変数）
+│   ├── seo-implementation.md ← SEO実装ガイド（メタデータ、OGP、Twitter Card、構造化データ）
+│   └── a8-parameter-tracking-verification.md ← A8.netパラメータ計測機能 実地検証ログ（要管理画面確認）
 │
 ├── guides/                   ← ユーザー/開発者向けガイド
 │   ├── cta-shortcode-guide.md    ← CTAショートコード使用ガイド（クライアント向け）
-│   └── cta-technical-guide.md    ← CTAショートコード技術仕様（開発者向け）
+│   ├── cta-technical-guide.md    ← CTAショートコード技術仕様（開発者向け）
+│   ├── email-setup.md            ← Email送信設定ガイド（Resend, 環境別手順）
+│   ├── microcms-setup.md         ← microCMS設定ガイド（API作成、フィールド定義、環境変数設定）
+│   └── resend-setup.md           ← Resend.com 詳細セットアップ手順書（DNS設定・ドメイン検証・APIキー）
 │
 ├── architecture/             ← アーキテクチャ決定記録・インフラ構成
 │   └── dns-infrastructure.md ← DNS/メールインフラ構成、Wix DNS制限、RESEND_VALIDフィーチャーフラグ
 │
-└── dev/                      ← 開発ワークフロー・規約
-    ├── architecture.md      ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
-    ├── environment.md       ← 開発環境セットアップ（Node.js / nvm / Turbopack / 環境変数）
-    └── branch.md            ← Git ブランチ戦略・CI/CD・コミット規約
+├── handoff/                  ← セッション引き継ぎ記録（実装中断・変更経緯）
+│   ├── asp-integration-session-handoff.md   ← ASP統合セッション引き継ぎ（AFB実装保留、A8優先）
+│   ├── 2025-01-05-afb-removal-handoff.md    ← AFB実装削除記録（Vercel Cron制限、1181行削除、A8最優先化）
+│   └── afb-postback-integration.md          ← AFBポストバック統合記録（Phase 1完了、本番運用保留）
+│
+└── specs/                    ← プロジェクト仕様・外部連携情報
+    ├── spec.md              ← WIN×Ⅱ プロジェクト要件定義書（システム設計・機能要件）
+    ├── google.md            ← Google Sheets (win2_master) 構成・GAS仕様
+    ├── asp.md               ← ASP認証情報（A8.net, AFB, もしも, バリュコマ）
+    └── asp/                 ← ASP統合仕様・実装ガイド（16ファイル）
+        ├── README.md                    ← ASP統合プロジェクト概要（ナビゲーションハブ）
+        ├── asp-comparison-report.md     ← 全ASP比較レポート（7ASP詳細分析、800行）
+        ├── a8net-api.md                 ← A8.net API仕様（Media Member制限あり）
+        ├── afb-implementation-guide.md  ← AFBポストバック実装ガイド（Phase 1完了）
+        ├── valuecommerce/               ← ValueCommerce詳細ドキュメント（Phase 2）
+        │   ├── overview.md              │  - API概要、対応機能
+        │   ├── order-api-guide.md       │  - 注文レポートAPI実装ガイド
+        │   ├── authentication-setup.md  │  - OAuth 1.0a 認証設定
+        │   └── troubleshooting.md       │  - トラブルシューティング
+        ├── moshimo-overview.md          ← もしもアフィリエイト概要（Phase 3候補）
+        ├── accesstrade-overview.md      ← AccessTrade概要（Phase 3候補）
+        ├── linkshare-overview.md        ← LinkShare（楽天）概要（Phase 4候補）
+        ├── janet-overview.md            ← JANet概要（Phase 4候補）
+        ├── infotop-overview.md          ← infotop概要（Phase 5候補）
+        └── common/                      ← 共通技術ドキュメント
+            ├── tracking-parameters.md   │  - カスタムトラッキングパラメータ仕様
+            ├── conversion-matching.md   │  - 成果マッチングアルゴリズム
+            ├── error-handling.md        │  - エラーハンドリング戦略
+            ├── testing-strategy.md      │  - テスト戦略とテストケース
+            └── security-considerations.md│  - セキュリティベストプラクティス
 ```
 
 ### ドキュメント概要
 
-#### ルートレベル - 環境設定・運用
+#### ルートレベル・デザインガイドライン
 
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
-| **email-setup.md** | Email送信設定ガイド | Resend設定、開発環境用セットアップ、ドメイン取得計画、トラブルシューティング |
-| **resend-setup.md** | Resend.com詳細セットアップ手順書 | アカウント作成、ドメイン追加、DNS設定（SPF/DKIM/DMARC）、ドメイン検証、APIキー取得、テスト送信、トラブルシューティング |
-| **microcms-setup.md** | microCMS設定ガイド | API作成（blogs/deals/categories）、フィールド定義、サンプルデータ、環境変数設定、トラブルシューティング |
-| **seo-implementation.md** | SEO実装ガイド | 全ページのメタデータ、OGP、Twitter Card、JSON-LD構造化データ、検証方法、今後の改善案 |
+| **index.md** | ドキュメント索引・運用ルール | docs配下の構成、更新フロー、PDCAルール |
+| **asp-api-integration.md** | ASP Webhook/Postback API調査結果 | A8.net（パラメータ計測機能要検証）、AFB（リアルタイムポストバック）、もしも、バリューコマース、実装優先度、規約リスク評価 |
+| **design/color-guidelines.md** | ブランドカラー運用ガイド | `win2-primary-orage` を中心としたカラートークン命名、背景/ステータスカラー、運用ルール |
 
 #### `specs/` - 仕様・外部連携
 
@@ -75,28 +84,39 @@ docs/
 |---------|------|------------|
 | **spec.md** | プロジェクト要件定義書 | 技術スタック、データフロー、API設計、画面設計、開発フェーズ |
 | **google.md** | Google Sheets構成 | 会員リスト、クリックログ、成果データ、GASコード |
-| **asp.md** | ASP認証情報 | A8.net, AFB, もしも, バリューコマース のログイン情報 |
+
+> ※ ASPなどの認証情報はセキュアストレージ（社内共有ドライブ等）で管理し、リポジトリには保存しないこと。
 
 #### `specs/asp/` - ASP統合仕様・実装ガイド
 
-**実装優先度: AFB（最優先） > A8.net（集計レポートのみ）**
+**実装優先度: A8.net（最優先・CSV検証待ち） > AFB（Vercel Cron制限により保留）**
 
-| ファイル | 内容 | 主要トピック | 優先度 |
-|---------|------|------------|--------|
-| **afb-implementation-guide.md** | AFBポストバック実装ガイド | Webhook実装、セキュリティ（IPホワイトリスト）、Google Sheets統合、テスト手順、トラブルシューティング | 🔥 **最優先** |
-| **a8net-api.md** | A8.net API仕様（広告主契約前提） | **⚠️ Media Member制限あり**: 個別成果トラッキング不可、API利用不可、代替実装方法（AFB優先、手動CSV、広告主契約変更） | ⏸️ 保留中 |
+**Last Updated:** 2025-01-05
 
-**重要な制限事項:**
-- **A8.net**: 現在のMedia Member契約では個別成果データにアクセスできないため、会員別キャッシュバック機能は実装不可
-- **AFB**: リアルタイムポストバック対応のため、会員別トラッキングが可能（推奨）
-- **実装方針**: AFBを優先実装し、A8.netは集計レポートとして使用
+| ファイル | 内容 | 主要トピック | 優先度 | ステータス |
+|---------|------|------------|--------|-----------|
+| **a8net-api.md** | A8.net API仕様 | **✅ Parameter Tracking Report機能確認済み**: id1-id5カスタムパラメータ対応、CSV export検証待ち（30分）、技術実装100%完了 | 🔥 **最優先** | ⏳ CSV検証待ち |
+| **afb-implementation-guide.md** | AFBポストバック実装ガイド | **⏸️ 実装削除済み（2025-01-05）**: Vercel Free Plan Cron制限により1181行削除、再実装にはGitHub Actions等の代替スケジューラが必要 | ⏸️ 保留中 | ❌ 削除済み |
+
+**重要な変更事項（2025-01-05）:**
+- **A8.net**: Parameter Tracking Report機能の発見により最優先に変更
+  - 技術実装: ✅ 完了（id1/eventId付与、Google Sheets連携、GAS処理）
+  - 残タスク: ⏳ CSV export検証（30分）
+  - リスク: ⚠️ 「ポイントサイト向けではない」警告あり
+- **AFB**: Vercel Cron制限によりデプロイ失敗、実装を完全削除
+  - 削除内容: Webhook, Cron, 型定義, APIクライアント, マッチングアルゴリズム
+  - 再実装: GitHub Actions等の代替スケジューラ構築が必要
+  - 詳細: `docs/handoff/2025-01-05-afb-removal-handoff.md` 参照
 
 #### `guides/` - ユーザー/開発者向けガイド
 
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
-| **cta-shortcode-guide.md** | CTAショートコード使用ガイド | 案件登録手順（Google Sheets）、ブログ記事でのショートコード使用方法、トラッキング仕組み、FAQ、トラブルシューティング |
-| **cta-technical-guide.md** | CTAショートコード技術仕様 | システムアーキテクチャ、BlogContentコンポーネント実装、/api/track-click仕様、GAS自動化、デバッグ手法、テスト戦略、パフォーマンス・セキュリティ |
+| **guides/cta-shortcode-guide.md** | CTAショートコード使用ガイド | 案件登録手順（Google Sheets）、ブログ記事でのショートコード使用方法、トラッキング仕組み、FAQ、トラブルシューティング |
+| **guides/cta-technical-guide.md** | CTAショートコード技術仕様 | システムアーキテクチャ、BlogContentコンポーネント実装、/api/track-click仕様、GAS自動化、デバッグ手法、テスト戦略、パフォーマンス・セキュリティ |
+| **guides/email-setup.md** | Email送信設定ガイド | Resend設定、開発環境用セットアップ、ドメイン取得計画、トラブルシューティング |
+| **guides/resend-setup.md** | Resend.com詳細セットアップ手順書 | アカウント作成、ドメイン追加、DNS設定（SPF/DKIM/DMARC）、ドメイン検証、APIキー取得、テスト送信、トラブルシューティング |
+| **guides/microcms-setup.md** | microCMS設定ガイド | API作成（blogs/deals/categories）、フィールド定義、サンプルデータ、環境変数設定、トラブルシューティング |
 
 #### `architecture/` - アーキテクチャ決定記録・インフラ構成
 
@@ -108,9 +128,11 @@ docs/
 
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
-| **architecture.md** | アーキテクチャ詳細 | ディレクトリ構成、TypeScript/TailwindCSS設定、実装済み機能、データフロー |
-| **environment.md** | 開発環境セットアップ | Node.js 22（nvm）、Turbopackデフォルト設定、必須コマンド、環境変数、チェックリスト |
-| **branch.md** | ブランチ戦略 | 2ブランチ管理（dev/main）、PR規約、コミットメッセージ形式、CI/CD |
+| **dev/architecture.md** | アーキテクチャ詳細 | ディレクトリ構成、TypeScript/TailwindCSS設定、実装済み機能、データフロー |
+| **dev/environment.md** | 開発環境セットアップ | Node.js 22（nvm）、Turbopackデフォルト設定、必須コマンド、環境変数、チェックリスト |
+| **dev/branch.md** | ブランチ戦略 | 2ブランチ管理（dev/main）、PR規約、コミットメッセージ形式、CI/CD |
+| **dev/seo-implementation.md** | SEO実装ガイド | 全ページのメタデータ、OGP、Twitter Card、JSON-LD構造化データ、検証方法、今後の改善案 |
+| **dev/a8-parameter-tracking-verification.md** | A8.netパラメータ計測機能 実地検証ログ | パラメータ計測レポート確認手順、CSV出力検証、id1パラメータ確認、規約適合性評価、実装判断基準、検証結果記録フォーマット |
 
 ### 今後追加が想定されるドキュメントカテゴリ
 
@@ -146,7 +168,7 @@ docs/
 ### 3. 秘匿情報の管理
 
 6. **PII/秘匿情報の取り扱い**:
-   - `docs/specs/asp.md` には ASP 認証情報が含まれるため、**パブリックリポジトリには含めない**
+   - ASPや各種外部サービスの認証情報はリポジトリに保存せず、セキュアストレージ（Password Manager / Secrets Manager 等）で管理する
    - 秘匿情報は `.gitignore` に追加するか、環境変数・シークレット管理サービスで管理
    - 社外提供するドキュメントは `docs/` から秘匿情報を除外したものを提供
 
@@ -157,7 +179,7 @@ docs/
 ### 命名規則
 
 - ドキュメントは目的が分かる短い英語名（`kebab-case.md` 推奨）
-- 日本語ファイル名も許容（既存: `google.md`, `asp.md` など）
+- 日本語ファイル名も許容（既存: `google.md` など）
 - カテゴリディレクトリは英語（`specs/`, `dev/`, `api/` など）
 
 ### 分割基準

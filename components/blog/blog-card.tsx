@@ -20,7 +20,7 @@ const PLACEHOLDER_THUMBNAIL = "/assets/images/blog-placeholder.webp";
  * トップページ、ブログ一覧、カテゴリページで使用
  */
 export function BlogCard({ blog }: BlogCardProps) {
-  const categories = blog.category && blog.category.length > 0 ? blog.category : [FALLBACK_CATEGORY];
+  const categories = blog.category ? [blog.category] : [FALLBACK_CATEGORY];
   const thumbnailUrl = blog.thumbnail?.url ?? PLACEHOLDER_THUMBNAIL;
 
   return (
@@ -28,7 +28,7 @@ export function BlogCard({ blog }: BlogCardProps) {
       <Card className="overflow-hidden transition-all hover:shadow-lg bg-orange-50 hover:bg-orange-100">
         <div className="flex flex-col md:flex-row">
           {/* 左側: サムネイル画像 */}
-          <div className="relative w-full md:w-80 h-48 md:h-auto md:self-stretch flex-shrink-0 overflow-hidden">
+          <div className="relative w-full md:w-80 h-48 md:h-auto md:self-stretch flex-shrink-0 overflow-hidden bg-gray-100">
             <Image
               src={thumbnailUrl}
               alt={blog.title}

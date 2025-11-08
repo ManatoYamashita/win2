@@ -226,15 +226,22 @@ win2/
 │
 ├── docs/                   # プロジェクトドキュメント
 │   ├── index.md            # ドキュメント索引
-│   ├── email-setup.md      # Email送信設定（Phase 2）
-│   ├── microcms-setup.md   # microCMS設定（Phase 3）
+│   ├── design/             # デザインガイドライン
+│   │   └── color-guidelines.md # カラートークン定義
+│   ├── guides/             # 手順書・ガイド
+│   │   ├── cta-shortcode-guide.md
+│   │   ├── cta-technical-guide.md
+│   │   ├── email-setup.md
+│   │   ├── microcms-setup.md
+│   │   └── resend-setup.md
 │   ├── specs/              # 要件定義・仕様
 │   │   ├── spec.md         # 要件定義書
-│   │   ├── google.md       # Google Sheets 構成
-│   │   └── asp.md          # ASP認証情報（秘匿）
+│   │   └── google.md       # Google Sheets 構成
 │   └── dev/                # 開発ドキュメント
 │       ├── architecture.md # アーキテクチャ詳細
-│       └── branch.md       # Git ブランチ戦略
+│       ├── branch.md       # Git ブランチ戦略
+│       ├── environment.md  # 開発環境セットアップ
+│       └── seo-implementation.md # SEO実装ガイド
 │
 ├── .env.local              # 環境変数（Git管理外）
 ├── .env.example            # 環境変数テンプレート

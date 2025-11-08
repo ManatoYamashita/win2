@@ -67,12 +67,21 @@ win2/
 │
 ├── docs/                       # プロジェクトドキュメント
 │   ├── index.md                # ドキュメント索引
+│   ├── design/                 # デザインガイドライン
+│   │   └── color-guidelines.md # カラートークン定義
 │   ├── specs/                  # 仕様書
 │   │   ├── spec.md             # 要件定義書
-│   │   ├── google.md           # Google Sheets 構成
-│   │   └── asp.md              # ASP 認証情報（秘匿）
+│   │   └── google.md           # Google Sheets 構成
+│   ├── guides/                 # 利用ガイド・手順書
+│   │   ├── cta-shortcode-guide.md
+│   │   ├── cta-technical-guide.md
+│   │   ├── email-setup.md
+│   │   ├── microcms-setup.md
+│   │   └── resend-setup.md
 │   └── dev/                    # 開発ドキュメント
 │       ├── branch.md           # Git ブランチ戦略
+│       ├── environment.md      # 開発環境セットアップ
+│       ├── seo-implementation.md # SEO実装ガイド
 │       └── architecture.md     # 本ファイル
 │
 ├── public/                     # 静的ファイル（ブランドアセット: /assets/win2/logo.webp など）

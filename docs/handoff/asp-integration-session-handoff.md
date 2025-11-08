@@ -75,42 +75,44 @@
 
 ## 🔜 次回セッションで実装すべきタスク
 
-### フェーズ1続き: APIポーリング実装（残り50%、推定2-3時間）
+### ⚠️ AFB実装の完全撤去 (2025-01-05)
 
-#### タスク1: Vercel Cronジョブ実装
-**ファイル:** `app/api/cron/sync-afb-conversions/route.ts`
+**撤去理由:**
+- Vercel Free Plan のCron実行制限によりデプロイ失敗
+- A8.net対応を最優先するための方針変更
 
-```typescript
-// 実装内容:
-// - 10分毎or1時間毎にAFB APIをポーリング
-// - 過去7日間の成果データを取得
-// - 取得データをGoogle Sheets「成果CSV_RAW」に記録
-// - 重複チェック（commit_idで判定）
-// - エラーハンドリングとリトライロジック
-```
+**削除済みファイル:**
+- ✅ `app/api/webhooks/afb-postback/route.ts` - AFB Postback受信エンドポイント
+- ✅ `types/afb-postback.ts` - AFB Postback型定義
+- ✅ `types/afb-api.ts` - AFB API型定義
+- ✅ `lib/asp/afb-client.ts` - AFB APIクライアント
+- ✅ `lib/matching/conversion-matcher.ts` - 自動マッチングアルゴリズム
+- ✅ `app/api/track-click/route.ts` 内のAFB専用処理（paid パラメータ追加）
 
-**参考:**
-- Vercel Cron: https://vercel.com/docs/cron-jobs
-- 既存実装: `lib/asp/afb-client.ts` の `fetchAfbConversionsLastNDays()`
-- Google Sheets書き込み: `lib/sheets.ts` の `writeConversionData()`
+**環境変数削除:**
+- ✅ `.env.example` から `AFB_PARTNER_ID` と `AFB_API_KEY` をコメントアウト
 
-#### タスク2: vercel.json設定
-**ファイル:** `vercel.json`（新規作成 or 既存更新）
+**ドキュメント保持:**
+- 📝 `docs/specs/asp/afb-postback.md` - 将来の参照用に保持
+- 📝 `docs/specs/asp/afb-implementation-guide.md` - 将来の参照用に保持
+- 📝 `docs/handoff/afb-postback-integration.md` - 将来の参照用に保持
 
-```json
-{
-  "crons": [
-    {
-      "path": "/api/cron/sync-afb-conversions",
-      "schedule": "*/10 * * * *"
-    }
-  ]
-}
-```
+---
 
-**注意:**
-- 開発環境では動作しない（本番環境のみ）
-- ローカルテストは手動でエンドポイントを叩く
+### フェーズ1: A8.net Parameter Tracking Report 対応（最優先）
+
+#### タスク1: CSV Export Verification（30分）⭐ CRITICAL
+- A8.net管理画面にログイン
+- Parameter Tracking Report (`https://media-console.a8.net/report/parameter#`) にアクセス
+- CSV/Excelダウンロードボタンを確認
+- サンプルCSVをダウンロードし、id1カラムの有無を確認
+- 結果を `docs/dev/a8-parameter-tracking-verification.md` に記録
+
+#### タスク2: 運用マニュアル作成（CSV検証が成功した場合のみ）
+- 毎日のCSVダウンロード手順
+- Google Sheets「成果CSV_RAW」へのペースト方法
+- トラブルシューティング
+- GAS実行確認手順
 
 #### タスク3: 自動マッチングアルゴリズム実装
 **ファイル:** `lib/matching/conversion-matcher.ts`
@@ -269,7 +271,7 @@ node scripts/test-afb-api.js
 
 ```bash
 # ローカルでエンドポイントを直接叩く
-curl http://localhost:3000/api/cron/sync-afb-conversions
+// AFB Cronエンドポイントは現在撤去済み。再実装時にテストコマンドを更新すること。
 
 # または Vercel Dashboard → Deployments → [最新デプロイ] → Crons
 ```

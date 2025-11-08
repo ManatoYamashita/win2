@@ -407,7 +407,7 @@ See `.env.example` in project root for a complete template with all required var
 
 ## External Service Credentials
 
-See `docs/asp.md` for ASP login credentials (A8.net, AFB, もしもアフィリエイト, バリューコマース).
+ASPログイン認証情報（A8.net, AFB, もしもアフィリエイト, バリューコマース）はリポジトリ外のセキュアストレージで管理してください（例: 共有パスワードマネージャ）。
 
 Google Sheets: See `docs/google.md` for spreadsheet URL and GAS editor link.
 
