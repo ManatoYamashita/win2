@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
@@ -21,10 +21,25 @@ export function Header() {
   const { data: session, status } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const navigation = useMemo(() => {
@@ -67,6 +82,8 @@ export function Header() {
   };
 
   const isAuthenticated = !!session;
+  const userInitial = session?.user?.name?.[0]?.toUpperCase() ?? "P";
+  const userName = session?.user?.name ?? "プロフィール";
 
   // Mobile menu portal content
   const mobileMenuPortal = isMounted ? createPortal(
@@ -76,7 +93,7 @@ export function Header() {
           "fixed inset-0 z-[9998] bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300 md:hidden",
           isMobileMenuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         )}
-        aria-hidden={!isMobileMenuOpen}
+        aria-hidden={isMobileMenuOpen ? "false" : "true"}
         onClick={() => setIsMobileMenuOpen(false)}
       />
 
@@ -85,7 +102,7 @@ export function Header() {
           "fixed inset-y-0 right-0 z-[9999] w-[80%] translate-x-full bg-white shadow-[-12px_0_36px_rgba(24,25,28,0.16)] transition-transform duration-300 md:hidden",
           isMobileMenuOpen && "translate-x-0"
         )}
-        aria-hidden={!isMobileMenuOpen}
+        aria-hidden={isMobileMenuOpen ? "false" : "true"}
       >
         <div className="flex items-center justify-between border-b border-win2-surface-cream-200 px-5 py-4">
           <span className="text-sm font-semibold text-win2-neutral-900">メニュー</span>
@@ -194,13 +211,55 @@ export function Header() {
 
           <div className="hidden items-center gap-4 md:flex">
             {isAuthenticated ? (
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="text-sm font-medium text-slate-600 transition hover:text-win2-primary-orage"
-              >
-                ログアウト
-              </button>
+              <div className="relative" ref={profileMenuRef}>
+                <button
+                  type="button"
+                  onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                  className="flex items-center gap-3 rounded-full border border-win2-surface-cream-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-win2-primary-orage"
+                  aria-haspopup="menu"
+                  aria-expanded={isProfileMenuOpen ? "true" : "false"}
+                >
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage text-sm font-bold text-white">
+                    {userInitial}
+                  </span>
+                  <span className="hidden text-left leading-tight sm:flex sm:flex-col">
+                    <span className="text-xs font-medium text-slate-500">ログイン中</span>
+                    <span>{userName}</span>
+                  </span>
+                  <svg
+                    className={cn(
+                      "h-4 w-4 text-slate-500 transition-transform",
+                      isProfileMenuOpen && "rotate-180"
+                    )}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {isProfileMenuOpen && (
+                  <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-win2-surface-cream-200 bg-white p-3 text-sm text-slate-700 shadow-xl">
+                    <Link
+                      href="/mypage"
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 font-medium transition hover:bg-win2-surface-cream-100"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    >
+                      マイページ
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                        handleSignOut();
+                      }}
+                      className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left font-medium text-win2-accent-rose transition hover:bg-win2-surface-cream-100"
+                    >
+                      ログアウト
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link
