@@ -93,7 +93,7 @@ export function Header() {
           "fixed inset-0 z-[9998] bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300 md:hidden",
           isMobileMenuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         )}
-        aria-hidden={isMobileMenuOpen ? "false" : "true"}
+        aria-hidden={!isMobileMenuOpen ? "true" : "false"}
         onClick={() => setIsMobileMenuOpen(false)}
       />
 
@@ -102,7 +102,7 @@ export function Header() {
           "fixed inset-y-0 right-0 z-[9999] w-[80%] translate-x-full bg-white shadow-[-12px_0_36px_rgba(24,25,28,0.16)] transition-transform duration-300 md:hidden",
           isMobileMenuOpen && "translate-x-0"
         )}
-        aria-hidden={isMobileMenuOpen ? "false" : "true"}
+        aria-hidden={!isMobileMenuOpen ? "true" : "false"}
       >
         <div className="flex items-center justify-between border-b border-win2-surface-cream-200 px-5 py-4">
           <span className="text-sm font-semibold text-win2-neutral-900">メニュー</span>

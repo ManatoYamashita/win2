@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { useSession } from "next-auth/react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { cn } from "@/lib/utils";
 
@@ -89,6 +90,8 @@ const achievementImages = [
   },
 ];
 
+type CtaResolver = (defaultLabel: string) => { href: string; label: string };
+
 const testimonials = [
   {
     age: "20代",
@@ -139,23 +142,31 @@ const faqItems = [
 ];
 
 export function LandingPage() {
+  const { data: session } = useSession();
+  const isAuthenticated = Boolean(session);
+
+  const resolveCta: CtaResolver = (defaultLabel) => ({
+    href: isAuthenticated ? "/blog" : "/register",
+    label: isAuthenticated ? "最新情報を見る" : defaultLabel,
+  });
+
   return (
     <main className="bg-win2-surface-cream-100 text-slate-900">
-      <HeroSection />
+      <HeroSection resolveCta={resolveCta} />
       <ProblemSection />
-      <IntroductionBoxSection />
+      <IntroductionBoxSection resolveCta={resolveCta} />
       <ServiceSection />
       <MeritSection />
-      <HighlightSection />
+      <HighlightSection resolveCta={resolveCta} />
       <AchievementSection />
       <TestimonialsSection />
       <FaqSection />
-      <BottomCtaSection />
+      <BottomCtaSection resolveCta={resolveCta} />
     </main>
   );
 }
 
-function HeroSection() {
+function HeroSection({ resolveCta }: { resolveCta: CtaResolver }) {
   const { ref } = useScrollReveal<HTMLDivElement>();
   const [isMounted, setIsMounted] = useState(false);
   const headlineRef = useRef<HTMLHeadingElement | null>(null);
@@ -263,12 +274,17 @@ function HeroSection() {
               isMounted && playKey ? "animate-hero-cta" : "animate-none"
             )}
           >
-            <Link
-              href="/register"
-              className="rounded-full bg-win2-primary-orage px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-primary-orage/25 transition hover:bg-win2-accent-amber"
-            >
-              無料メルマガ会員登録はこちら
-            </Link>
+            {(() => {
+              const heroCta = resolveCta("無料メルマガ会員登録はこちら");
+              return (
+                <Link
+                  href={heroCta.href}
+                  className="rounded-full bg-win2-primary-orage px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-primary-orage/25 transition hover:bg-win2-accent-amber"
+                >
+                  {heroCta.label}
+                </Link>
+              );
+            })()}
             <Link
               href="/login"
               className="rounded-full border border-win2-accent-rose bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-win2-surface-rose-100"
@@ -399,7 +415,7 @@ function ProblemSection() {
   );
 }
 
-function IntroductionBoxSection() {
+function IntroductionBoxSection({ resolveCta }: { resolveCta: CtaResolver }) {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
@@ -432,12 +448,17 @@ function IntroductionBoxSection() {
 
         {/* CTAボタン */}
         <div className="mt-8 text-center">
-          <Link
-            href="/register"
-            className="inline-block rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-12 py-4 text-base font-bold text-white shadow-lg shadow-win2-accent-rose/30 transition hover:opacity-90 md:text-lg"
-          >
-            メルマガ会員登録はこちら
-          </Link>
+          {(() => {
+            const introductionCta = resolveCta("メルマガ会員登録はこちら");
+            return (
+              <Link
+                href={introductionCta.href}
+                className="inline-block rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-12 py-4 text-base font-bold text-white shadow-lg shadow-win2-accent-rose/30 transition hover:opacity-90 md:text-lg"
+              >
+                {introductionCta.label}
+              </Link>
+            );
+          })()}
         </div>
       </div>
     </section>
@@ -634,7 +655,7 @@ function MeritSection() {
   );
 }
 
-function HighlightSection() {
+function HighlightSection({ resolveCta }: { resolveCta: CtaResolver }) {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
@@ -723,12 +744,17 @@ function HighlightSection() {
 
         {/* CTA ボタン（中央揃え） */}
         <div className="mx-auto max-w-[1100px] px-6 text-center lg:px-8">
-          <Link
-            href="/register"
-            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-12 py-3 text-base font-semibold text-white shadow-lg shadow-win2-accent-rose/30 transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-rose/40"
-          >
-            無料メルマガ会員登録で最新情報を受け取る
-          </Link>
+          {(() => {
+            const highlightCta = resolveCta("無料メルマガ会員登録で最新情報を受け取る");
+            return (
+              <Link
+                href={highlightCta.href}
+                className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-12 py-3 text-base font-semibold text-white shadow-lg shadow-win2-accent-rose/30 transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-rose/40"
+              >
+                {highlightCta.label}
+              </Link>
+            );
+          })()}
         </div>
       </div>
     </section>
@@ -928,7 +954,7 @@ function FaqSection() {
   );
 }
 
-function BottomCtaSection() {
+function BottomCtaSection({ resolveCta }: { resolveCta: CtaResolver }) {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
@@ -946,12 +972,17 @@ function BottomCtaSection() {
           暮らしをもっとお得に、もっとスマートに。WIN×Ⅱの無料メルマガ会員登録でキャッシュバック特典と最新情報を手に入れてください。
         </p>
         <div className="flex flex-wrap justify-center gap-4">
-          <Link
-            href="/register"
-            className="rounded-full bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-white/90"
-          >
-            無料メルマガ会員登録はこちら
-          </Link>
+          {(() => {
+            const bottomCta = resolveCta("無料メルマガ会員登録はこちら");
+            return (
+              <Link
+                href={bottomCta.href}
+                className="rounded-full bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-white/90"
+              >
+                {bottomCta.label}
+              </Link>
+            );
+          })()}
           <Link
             href="/blog"
             className="rounded-full border border-white/80 px-10 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
