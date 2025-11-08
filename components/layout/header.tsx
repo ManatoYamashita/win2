@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
 
@@ -21,10 +21,25 @@ export function Header() {
   const { data: session, status } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const pathname = usePathname();
+  const profileMenuRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setIsProfileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   const navigation = useMemo(() => {
@@ -47,12 +62,6 @@ export function Header() {
         label: "マイページ",
         isActive: pathname.startsWith("/mypage"),
       });
-    } else {
-      items.push({
-        href: "/register",
-        label: "無料メルマガ会員登録",
-        isActive: pathname === "/register",
-      });
     }
 
     return items;
@@ -73,6 +82,8 @@ export function Header() {
   };
 
   const isAuthenticated = !!session;
+  const userInitial = session?.user?.name?.[0]?.toUpperCase() ?? "P";
+  const userName = session?.user?.name ?? "プロフィール";
 
   // Mobile menu portal content
   const mobileMenuPortal = isMounted ? createPortal(
@@ -191,40 +202,64 @@ export function Header() {
           </Link>
 
           <nav className="hidden items-center gap-7 md:flex">
-            {navigation.map((item) =>
-                item.href === "/register" ? (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-6 py-2 text-sm font-semibold text-white shadow-md shadow-win2-accent-rose/25 transition hover:opacity-90"
-                  >
-                    無料メルマガ会員登録
-                  </Link>
-                ) : (
-                  <Link key={item.href} href={item.href} className={getLinkClasses(item.isActive)}>
-                    {item.label}
-                  </Link>
-                )
-            )}
+            {navigation.map((item) => (
+              <Link key={item.href} href={item.href} className={getLinkClasses(item.isActive)}>
+                {item.label}
+              </Link>
+            ))}
           </nav>
 
           <div className="hidden items-center gap-4 md:flex">
             {isAuthenticated ? (
-              <>
-                <Link
-                  href="/mypage"
-                  className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-6 py-2 text-sm font-semibold text-white shadow-md shadow-win2-accent-rose/25 transition hover:opacity-90"
-                >
-                  プロフィールページ
-                </Link>
+              <div className="relative" ref={profileMenuRef}>
                 <button
                   type="button"
-                  onClick={handleSignOut}
-                  className="text-sm font-medium text-slate-600 transition hover:text-win2-primary-orage"
+                  onClick={() => setIsProfileMenuOpen((prev) => !prev)}
+                  className="flex items-center gap-3 rounded-full border border-win2-surface-cream-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-win2-primary-orage"
+                  aria-haspopup="menu"
+                  aria-expanded={isProfileMenuOpen}
                 >
-                  ログアウト
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage text-sm font-bold text-white">
+                    {userInitial}
+                  </span>
+                  <span className="hidden text-left leading-tight sm:flex sm:flex-col">
+                    <span className="text-xs font-medium text-slate-500">ログイン中</span>
+                    <span>{userName}</span>
+                  </span>
+                  <svg
+                    className={cn(
+                      "h-4 w-4 text-slate-500 transition-transform",
+                      isProfileMenuOpen && "rotate-180"
+                    )}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
                 </button>
-              </>
+                {isProfileMenuOpen && (
+                  <div className="absolute right-0 mt-3 w-56 rounded-2xl border border-win2-surface-cream-200 bg-white p-3 text-sm text-slate-700 shadow-xl">
+                    <Link
+                      href="/mypage"
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 font-medium transition hover:bg-win2-surface-cream-100"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    >
+                      マイページ
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsProfileMenuOpen(false);
+                        handleSignOut();
+                      }}
+                      className="mt-1 flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left font-medium text-win2-accent-rose transition hover:bg-win2-surface-cream-100"
+                    >
+                      ログアウト
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <Link
