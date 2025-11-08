@@ -7,13 +7,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -27,6 +26,8 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { loginSchema, LoginInput } from "@/lib/validations/auth";
+import { cn } from "@/lib/utils";
+import { ArrowRight, BookOpenCheck } from "lucide-react";
 
 function LoginPageContent() {
   const searchParams = useSearchParams();
@@ -64,6 +65,7 @@ function LoginPageContent() {
       }
 
       toast({
+        variant: "success",
         title: "ログイン成功",
         description: "マイページにリダイレクトしています...",
       });
@@ -83,15 +85,16 @@ function LoginPageContent() {
   };
 
   return (
-    <div className="container mx-auto flex min-h-screen items-center justify-center py-12 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>ログイン</CardTitle>
-          <CardDescription>
-            WIN×Ⅱにログインします。メールアドレスとパスワードを入力してください。
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="min-h-screen bg-gradient-to-b from-win2-surface-stone-50 via-white to-win2-surface-cream-100 py-16">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-10 px-4 lg:flex-row lg:px-6">
+        <Card className="w-full max-w-xl border-0 shadow-[0_25px_60px_rgba(15,23,42,0.08)] lg:max-w-md mx-auto">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-slate-900">ログイン</CardTitle>
+            <CardDescription className="text-slate-600">
+              メールアドレスとパスワードを入力してマイページにアクセスします。
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="border-t border-win2-surface-cream-200 bg-win2-surface-cream-50">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -134,21 +137,24 @@ function LoginPageContent() {
                 )}
               />
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button
+                type="submit"
+                className="w-full rounded-full bg-gradient-to-r from-win2-accent-rose via-win2-primary-orage to-win2-accent-amber text-base font-semibold text-white shadow-lg shadow-win2-accent-rose/30 transition hover:opacity-90"
+                disabled={isLoading}
+              >
                 {isLoading ? "ログイン中..." : "ログイン"}
               </Button>
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
+          <div className="px-6 pb-6 text-center text-sm text-slate-500">
             アカウントをお持ちでない方は{" "}
-            <Link href="/register" className="text-primary hover:underline">
+            <Link href="/register" className="font-semibold text-win2-primary-orage hover:underline">
               会員登録
             </Link>
-          </p>
-        </CardFooter>
-      </Card>
+          </div>
+        </Card>
+      </div>
     </div>
   );
 }

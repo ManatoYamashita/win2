@@ -1,5 +1,9 @@
+'use client';
+
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
 import type { BlogResponse, Category } from "@/types/microcms";
 import { Card } from "@/components/ui/card";
 import { extractExcerpt } from "@/lib/blog-utils";
@@ -20,13 +24,24 @@ const PLACEHOLDER_THUMBNAIL = "/assets/images/blog-placeholder.webp";
  * トップページ、ブログ一覧、カテゴリページで使用
  */
 export function BlogCard({ blog }: BlogCardProps) {
+  const [isNavigating, setIsNavigating] = useState(false);
   const categories = blog.category ? [blog.category] : [FALLBACK_CATEGORY];
   const thumbnailUrl = blog.thumbnail?.url ?? PLACEHOLDER_THUMBNAIL;
 
   return (
-    <Link href={`/blog/${blog.id}`} className="block group">
-      <Card className="overflow-hidden transition-all hover:shadow-lg bg-orange-50 hover:bg-orange-100">
-        <div className="flex flex-col md:flex-row">
+    <Link
+      href={`/blog/${blog.id}`}
+      className="block group"
+      onClick={() => setIsNavigating(true)}
+      aria-busy={isNavigating}
+    >
+      <Card className="relative overflow-hidden transition-all hover:shadow-lg bg-orange-50 hover:bg-orange-100">
+        {isNavigating && (
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80 backdrop-blur-sm">
+            <Loader2 className="h-6 w-6 animate-spin text-win2-primary-orage" />
+          </div>
+        )}
+        <div className="flex flex-col md:flex-row opacity-100 transition-opacity">
           {/* 左側: サムネイル画像 */}
           <div className="relative w-full md:w-80 h-48 md:h-auto md:self-stretch flex-shrink-0 overflow-hidden bg-gray-100">
             <Image

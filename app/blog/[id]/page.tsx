@@ -6,6 +6,7 @@ import { getBlogById } from "@/lib/microcms";
 import { formatDate } from "@/lib/utils";
 import { extractExcerpt } from "@/lib/blog-utils";
 import { BlogContent } from "@/components/blog/blog-content";
+import { BackToBlogLink } from "@/components/blog/back-to-blog-link";
 // import { DealCTAButton } from "@/components/deal/deal-cta-button"; // 将来的にGoogle Sheets APIから案件取得時に使用
 
 interface BlogDetailPageProps {
@@ -141,7 +142,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
   };
 
   // サムネイル画像のURL（なければplaceholder）
-  const thumbnailUrl = blog.thumbnail?.url || `${appUrl}/ogp.jpg`;
+  const thumbnailUrl = blog.thumbnail?.url || "/ogp.jpg";
 
   // カテゴリ情報（なければデフォルト）
   const categoryId = blog.category?.id || "other";
@@ -233,12 +234,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
       {/* ブログ一覧へ戻るリンク */}
       <div className="mt-12 text-center">
-        <Link
-          href="/blog"
-          className="inline-block px-6 py-3 text-orange-600 border border-orange-600 rounded-lg hover:bg-orange-50 transition-colors"
-        >
-          ブログ一覧へ戻る
-        </Link>
+        <BackToBlogLink />
       </div>
     </article>
   );
