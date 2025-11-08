@@ -52,13 +52,14 @@ export default function ForgotPasswordPage() {
 
       const result = await response.json();
 
-      if (result.success) {
-        setIsSuccess(true);
-        toast({
-          title: "成功",
-          description: result.message,
-        });
-      } else {
+        if (result.success) {
+          setIsSuccess(true);
+          toast({
+            variant: "success",
+            title: "成功",
+            description: result.message,
+          });
+        } else {
         toast({
           variant: "destructive",
           title: "エラー",

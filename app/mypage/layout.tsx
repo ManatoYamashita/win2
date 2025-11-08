@@ -92,7 +92,7 @@ export default function MypageLayout({
                 </Link>
                 <Link
                   href="/api/auth/signout"
-                  className="block px-4 py-2 rounded-md hover:bg-accent transition-colors text-destructive"
+                  className="block px-4 py-2 rounded-md hover:bg-accent transition-colors text-destructive whitespace-nowrap"
                 >
                   ログアウト
                 </Link>

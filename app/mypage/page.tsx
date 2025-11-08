@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -10,10 +11,11 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { MemberRow } from "@/lib/sheets";
 import { AlertCircle, Mail, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 /**
  * マイページ - 登録情報表示
@@ -39,6 +41,7 @@ export default function MypagePage() {
 
       if (data.success) {
         toast({
+          variant: "success",
           title: "成功",
           description: data.message,
         });
@@ -91,72 +94,96 @@ export default function MypagePage() {
 
   if (status === "loading" || isLoading) {
     return (
-      <Card>
-        <CardContent className="p-12">
-          <p className="text-center text-muted-foreground">読み込み中...</p>
-        </CardContent>
-      </Card>
+      <div className="min-h-screen px-4 py-16">
+        <Card className="mx-auto max-w-md border-0 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
+          <CardContent className="p-12 text-center text-muted-foreground">
+            読み込み中です...
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   if (!member) {
     return (
-      <Card>
-        <CardContent className="p-12">
-          <p className="text-center text-destructive">
-            会員情報が見つかりません
-          </p>
-        </CardContent>
-      </Card>
+      <div className="min-h-screen bg-gradient-to-b from-win2-surface-cream-50 via-white to-win2-surface-cream-100 px-4">
+        <Card className="mx-auto max-w-md border-0 shadow-[0_20px_50px_rgba(244,63,94,0.15)]">
+          <CardContent className="p-12 text-center text-destructive">
+            会員情報が見つかりませんでした
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>登録情報</CardTitle>
-        <CardDescription>
-          現在登録されている会員情報を表示しています
-        </CardDescription>
-      </CardHeader>
-
-      {/* Phase 2: メール未認証の警告バナー */}
-      {member.emailVerified === false && (
-        <div className="mx-6 mb-4 p-4 border-l-4 border-yellow-500 bg-yellow-50 rounded-md">
-          <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
-            <div className="flex-1 space-y-2">
-              <p className="text-sm font-medium text-yellow-800">
-                メールアドレスが未認証です
-              </p>
-              <p className="text-sm text-yellow-700">
-                登録時に送信した認証メールのリンクをクリックして、メールアドレスの認証を完了してください。
-              </p>
-              <Button
-                onClick={handleResendVerification}
-                disabled={isResending}
-                size="sm"
-                variant="outline"
-                className="mt-2"
-              >
-                {isResending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    送信中...
-                  </>
-                ) : (
-                  <>
-                    <Mail className="mr-2 h-4 w-4" />
-                    認証メールを再送信
-                  </>
-                )}
-              </Button>
-            </div>
+    <div className="min-h-screen bg-gradient-to-b from-win2-surface-cream-50 via-white to-win2-surface-cream-100 px-4">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
+        <div className="rounded-3xl bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage p-8 text-white shadow-[0_30px_70px_rgba(242,111,54,0.35)]">
+          <p className="text-sm font-semibold uppercase tracking-[0.35em] text-white/80">
+            WIN×Ⅱ MEMBER DASHBOARD
+          </p>
+          <h1 className="mt-3 text-3xl font-bold md:text-4xl">
+            こんにちは、{member.name} さん
+          </h1>
+          <p className="mt-3 text-sm text-white/80 md:text-base">
+            登録情報の確認とメール認証のステータスはいつでもこちらでチェックできます。最新のキャンペーンはブログにて公開中です。
+          </p>
+          <div className="mt-6 flex flex-wrap gap-4">
+            <Link
+              href="/blog"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "rounded-full bg-white px-8 text-win2-primary-orage shadow-lg shadow-white/30 hover:bg-white/90"
+              )}
+            >
+              ブログで最新情報を見る
+            </Link>
           </div>
         </div>
-      )}
+        <Card className="border-0 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
+          <CardHeader>
+            <CardTitle>登録情報</CardTitle>
+            <CardDescription>現在登録されている会員情報を表示しています</CardDescription>
+          </CardHeader>
 
-      <CardContent className="space-y-6">
+          {/* Phase 2: メール未認証の警告バナー */}
+          {member.emailVerified === false && (
+            <div className="mx-6 mb-4 rounded-md border-l-4 border-yellow-500 bg-yellow-50 p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="mt-0.5 h-5 w-5 text-yellow-600" />
+                <div className="flex-1 space-y-2">
+                  <p className="text-sm font-medium text-yellow-800">
+                    メールアドレスが未認証です
+                  </p>
+                  <p className="text-sm text-yellow-700">
+                    登録時に送信した認証メールのリンクをクリックして、メールアドレスの認証を完了してください。
+                  </p>
+                  <Button
+                    onClick={handleResendVerification}
+                    disabled={isResending}
+                    size="sm"
+                    variant="outline"
+                    className="mt-2"
+                  >
+                    {isResending ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        送信中...
+                      </>
+                    ) : (
+                      <>
+                        <Mail className="mr-2 h-4 w-4" />
+                        認証メールを再送信
+                      </>
+                    )}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <CardContent className="space-y-6">
         {/* 会員ID */}
         {/* <div className="space-y-2">
           <Label>会員ID</Label>
@@ -208,7 +235,9 @@ export default function MypagePage() {
             {new Date(member.registeredAt).toLocaleString("ja-JP")}
           </p>
         </div>
-      </CardContent>
-    </Card>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
   );
 }

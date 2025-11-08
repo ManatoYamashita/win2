@@ -42,9 +42,20 @@ export function DealCTAButton({
 
       const data = await response.json();
 
-      if (data.success && data.trackingUrl) {
-        // トラッキングURLにリダイレクト
-        window.location.href = data.trackingUrl;
+      if (data.trackingUrl) {
+        // デバッグ用: 生成されたトラッキングURLをコンソールに出力
+        console.log('[DEBUG] Generated tracking URL:', data.trackingUrl);
+
+        // 別タブでアフィリエイトページを開く
+        window.open(data.trackingUrl, '_blank');
+
+        // 成功フィードバック
+        toast({
+          title: "アフィリエイトページを開きました",
+          description: "新しいタブで案件ページが開きます",
+        });
+
+        setIsLoading(false);
       } else {
         toast({
           variant: "destructive",

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Script from "next/script";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { Toaster } from "@/components/ui/toaster";
 import { Header } from "@/components/layout/header";
@@ -63,6 +64,12 @@ export default function RootLayout({
   // Suppress hydration mismatches caused by dev tools injecting CSS variables on the root element.
   return (
     <html lang="ja" suppressHydrationWarning>
+      <head>
+        <Script src="//statics.a8.net/a8link/a8linkmgr.js" strategy="beforeInteractive" />
+        <Script id="a8-link-manager" strategy="beforeInteractive">
+          {`a8linkmgr({ "config_id": "HuZKNnS5y7gWvFU1Ni2g" });`}
+        </Script>
+      </head>
       {/* Google Tag Manager - Script */}
       <GoogleTagManager gtmId={gtmId} />
 
