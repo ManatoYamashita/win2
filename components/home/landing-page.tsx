@@ -725,7 +725,7 @@ function HighlightSection() {
         <div className="mx-auto max-w-[1100px] px-6 text-center lg:px-8">
           <Link
             href="/register"
-            className="inline-flex items-center justify-center rounded-full bg-win2-accent-rose px-12 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-accent-rose/25 transition hover:bg-win2-accent-rose-dark focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-rose/40"
+            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-12 py-3 text-base font-semibold text-white shadow-lg shadow-win2-accent-rose/30 transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-win2-accent-rose/40"
           >
             無料メルマガ会員登録で最新情報を受け取る
           </Link>
