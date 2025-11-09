@@ -5,6 +5,7 @@ import { getMemberByEmail, addMember } from "@/lib/sheets";
 import { registerSchema } from "@/lib/validations/auth";
 import { generateVerificationToken } from "@/lib/tokens";
 import { sendVerificationEmail, isResendValid } from "@/lib/email";
+import { formatJapaneseDateTime } from "@/lib/utils";
 
 /**
  * 会員登録API
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
     const memberId = randomUUID();
 
     // 登録日時
-    const registeredAt = new Date().toISOString();
+    const registeredAt = formatJapaneseDateTime(new Date());
 
     // RESEND_VALID による条件分岐
     if (isResendValid) {

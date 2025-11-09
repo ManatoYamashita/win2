@@ -22,3 +22,39 @@ export function formatDate(dateString: string): string {
 
   return `${year}年${month}月${day}日`;
 }
+
+/**
+ * 日本時間の日時を「YYYY年MM月DD日 HH時MM分SS秒」形式に整形
+ *
+ * @param input DateインスタンスまたはISO8601文字列
+ */
+export function formatJapaneseDateTime(input: string | Date): string {
+  const date = typeof input === "string" ? new Date(input) : input;
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  const formatter = new Intl.DateTimeFormat("ja-JP", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(date);
+  const getPart = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((part) => part.type === type)?.value ?? "";
+
+  const year = getPart("year");
+  const month = getPart("month");
+  const day = getPart("day");
+  const hour = getPart("hour");
+  const minute = getPart("minute");
+  const second = getPart("second");
+
+  return `${year}年${month}月${day}日 ${hour}時${minute}分${second}秒`;
+}

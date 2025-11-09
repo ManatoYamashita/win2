@@ -21,7 +21,7 @@ export const SHEET_NAMES = {
  * E: 生年月日
  * F: 郵便番号
  * G: 電話番号
- * H: 登録日時
+ * H: 登録日時 (日本時間表記)
  * I: emailVerified (TRUE/FALSE) - Phase 2追加
  */
 export interface MemberRow {
@@ -50,11 +50,9 @@ export interface MemberRow {
 export interface DealRow {
   dealId: string;
   dealName: string;
-  aspName: string;
   affiliateUrl: string;
-  rewardAmount: number;
-  cashbackRate: number;
-  isActive: boolean;
+  companyName?: string;
+  rawAffiliateUrl?: string;
 }
 
 /**
@@ -162,6 +160,15 @@ export async function appendToSheet(
     console.error(`Error appending to sheet ${sheetName}:`, error);
     throw error;
   }
+}
+
+function extractAffiliateUrl(row: string[]): string {
+  const primary = row[0]?.trim();
+  if (primary) {
+    return primary;
+  }
+  const fallback = row[4]?.trim();
+  return fallback || "";
 }
 
 /**
@@ -390,30 +397,27 @@ export async function updateMemberEmailVerified(
  */
 export async function getDealById(dealId: string): Promise<DealRow | null> {
   try {
-    const rows = await readSheet(SHEET_NAMES.DEALS, "A2:G");
+    const rows = await readSheet(SHEET_NAMES.DEALS, "A2:E");
 
     // B列（案件ID）で検索
-    const dealRow = rows.find(row => row[1] === dealId);
-
-    if (!dealRow) {
+    const index = rows.findIndex(row => row[1] === dealId);
+    if (index === -1) {
       return null;
     }
 
-    // G列（有効/無効）がTRUEの案件のみ返す
-    const isActive = dealRow[6] === "TRUE" || dealRow[6] === "true";
-    if (!isActive) {
-      console.log(`Deal ${dealId} is inactive`);
+    const dealRow = rows[index];
+    const affiliateUrl = extractAffiliateUrl(dealRow);
+    if (!affiliateUrl) {
+      console.warn(`Deal ${dealId} is missing affiliate URL`);
       return null;
     }
 
     return {
       dealId: dealRow[1] || "",           // B列: 案件ID
       dealName: dealRow[2] || "",         // C列: 案件名
-      aspName: dealRow[3] || "",          // D列: ASP名
-      affiliateUrl: dealRow[0] || "",     // A列: アフィリエイトURL
-      rewardAmount: parseFloat(dealRow[4] ?? "0") || 0,     // E列: 報酬額
-      cashbackRate: parseFloat(dealRow[5] ?? "0.2") || 0.2, // F列: キャッシュバック率
-      isActive: true, // Already filtered above
+      affiliateUrl,
+      companyName: dealRow[3] || "",
+      rawAffiliateUrl: dealRow[4] || "",
     };
   } catch (error) {
     console.error("Error getting deal by ID:", error);
@@ -427,22 +431,23 @@ export async function getDealById(dealId: string): Promise<DealRow | null> {
  */
 export async function getAllActiveDeals(): Promise<DealRow[]> {
   try {
-    const rows = await readSheet(SHEET_NAMES.DEALS, "A2:G");
+    const rows = await readSheet(SHEET_NAMES.DEALS, "A2:E");
 
     const deals = rows
-      .filter(row => {
-        const isActive = row[6] === "TRUE" || row[6] === "true";
-        return isActive && row[1]; // B列（案件ID）が存在し、有効/無効がTRUE
+      .map(row => {
+        const affiliateUrl = extractAffiliateUrl(row);
+        if (!row[1] || !affiliateUrl) {
+          return null;
+        }
+        return {
+          dealId: row[1] || "",
+          dealName: row[2] || "",
+          affiliateUrl,
+          companyName: row[3] || "",
+          rawAffiliateUrl: row[4] || "",
+        } satisfies DealRow;
       })
-      .map(row => ({
-        dealId: row[1] || "",           // B列: 案件ID
-        dealName: row[2] || "",         // C列: 案件名
-        aspName: row[3] || "",          // D列: ASP名
-        affiliateUrl: row[0] || "",     // A列: アフィリエイトURL
-        rewardAmount: parseFloat(row[4] ?? "0") || 0,     // E列: 報酬額
-        cashbackRate: parseFloat(row[5] ?? "0.2") || 0.2, // F列: キャッシュバック率
-        isActive: true,
-      }));
+      .filter((row): row is DealRow => Boolean(row));
 
     return deals;
   } catch (error) {

@@ -15,7 +15,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { MemberRow } from "@/lib/sheets";
 import { AlertCircle, Mail, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, formatJapaneseDateTime } from "@/lib/utils";
 
 /**
  * マイページ - 登録情報表示
@@ -232,7 +232,9 @@ export default function MypagePage() {
         <div className="space-y-2">
           <Label>登録日時</Label>
           <p className="text-sm p-3 border rounded-md">
-            {new Date(member.registeredAt).toLocaleString("ja-JP")}
+            {member.registeredAt.includes("年")
+              ? member.registeredAt
+              : formatJapaneseDateTime(member.registeredAt)}
           </p>
         </div>
           </CardContent>
