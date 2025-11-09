@@ -406,6 +406,9 @@ export async function getDealById(dealId: string): Promise<DealRow | null> {
     }
 
     const dealRow = rows[index];
+    if (!dealRow) {
+      return null;
+    }
     const affiliateUrl = extractAffiliateUrl(dealRow);
     if (!affiliateUrl) {
       console.warn(`Deal ${dealId} is missing affiliate URL`);
@@ -434,7 +437,7 @@ export async function getAllActiveDeals(): Promise<DealRow[]> {
     const rows = await readSheet(SHEET_NAMES.DEALS, "A2:E");
 
     const deals = rows
-      .map(row => {
+      .map((row) => {
         const affiliateUrl = extractAffiliateUrl(row);
         if (!row[1] || !affiliateUrl) {
           return null;
@@ -447,7 +450,7 @@ export async function getAllActiveDeals(): Promise<DealRow[]> {
           rawAffiliateUrl: row[4] || "",
         } satisfies DealRow;
       })
-      .filter((row): row is DealRow => Boolean(row));
+      .filter(Boolean) as DealRow[];
 
     return deals;
   } catch (error) {
