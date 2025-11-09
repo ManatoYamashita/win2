@@ -24,7 +24,9 @@ docs/
 │   ├── branch.md             ← Git ブランチ戦略・CI/CD・コミット規約
 │   ├── environment.md        ← 開発環境セットアップ（Node.js / nvm / Turbopack / 環境変数）
 │   ├── seo-implementation.md ← SEO実装ガイド（メタデータ、OGP、Twitter Card、構造化データ）
-│   └── a8-parameter-tracking-verification.md ← A8.netパラメータ計測機能 実地検証ログ（要管理画面確認）
+│   ├── a8-parameter-tracking-verification.md ← A8.netパラメータ計測機能 実地検証ログ（4週間検証、利用不可の可能性大）
+│   ├── a8-support-inquiry-final.md ← A8.netサポート問い合わせ最終版（公式ドキュメントURL統合）
+│   └── github-issue-22-update.md ← GitHub Issue #22 更新用テンプレート（検証完了報告）
 │
 ├── guides/                   ← ユーザー/開発者向けガイド
 │   ├── cta-shortcode-guide.md    ← CTAショートコード使用ガイド（クライアント向け）
@@ -132,7 +134,9 @@ docs/
 | **dev/environment.md** | 開発環境セットアップ | Node.js 22（nvm）、Turbopackデフォルト設定、必須コマンド、環境変数、チェックリスト |
 | **dev/branch.md** | ブランチ戦略 | 2ブランチ管理（dev/main）、PR規約、コミットメッセージ形式、CI/CD |
 | **dev/seo-implementation.md** | SEO実装ガイド | 全ページのメタデータ、OGP、Twitter Card、JSON-LD構造化データ、検証方法、今後の改善案 |
-| **dev/a8-parameter-tracking-verification.md** | A8.netパラメータ計測機能 実地検証ログ | パラメータ計測レポート確認手順、CSV出力検証、id1パラメータ確認、規約適合性評価、実装判断基準、検証結果記録フォーマット |
+| **dev/a8-parameter-tracking-verification.md** | A8.netパラメータ計測機能 実地検証ログ | 4週間検証（2025-10-13〜2025-01-09）、9回クリック記録、Parameter Tracking Report表示なし、暫定結論（Media Member利用不可の可能性大）、サポート問い合わせ推奨 |
+| **dev/a8-support-inquiry-final.md** | A8.netサポート問い合わせ最終版 | 公式ドキュメントURL統合、4つの質問項目、期待される回答パターン4種、回答後のアクション（利用可/不可）、問い合わせ記録フォーマット |
+| **dev/github-issue-22-update.md** | GitHub Issue #22 更新用テンプレート | 検証完了報告、技術実装100%完了、検証結果サマリー、次のアクション（サポート問い合わせ、代替ASP調査）、タイムライン |
 
 ### 今後追加が想定されるドキュメントカテゴリ
 
@@ -235,6 +239,60 @@ docs/
 ## 更新履歴
 
 このセクションは、ドキュメントの主要な更新を記録します。
+
+### 2025-01-09
+
+#### A8.net Parameter Tracking検証完了 - Media Member契約では利用不可の可能性が高い（Issue #22）
+- **dev/a8-support-inquiry-final.md**: 新規作成（A8.netサポート問い合わせ最終版 v1.0.0）
+  - 公式ドキュメントURL統合（パラメータ計測ガイド、新レポートヘルプ、レポートリニューアル案内）
+  - 検証期間と実施内容の詳細記述（2025-10-13〜2025-01-09、9回クリック）
+  - 問題状況の明確化（Parameter Tracking Report表示なし、複数検索条件でも表示されず）
+  - 4つの質問項目（利用可否、正しい手順、データ反映時間、代替方法）
+  - 期待される回答パターン4種（利用可能、利用不可、条件付き、設定必要）
+  - 回答後のアクションプラン（利用可/不可それぞれのタイムライン）
+  - 問い合わせ記録フォーマット
+- **dev/github-issue-22-update.md**: 既存（GitHub Issue #22更新用テンプレート v1.0.0）
+  - 検証完了レポート（2025-10-13〜2025-01-09、約4週間）
+  - WIN×Ⅱシステム実装100%完了確認（id1/eventId付与、Google Sheets記録、GAS処理）
+  - A8.net連携確認（過去30日間で9回クリック記録、日別レポートで確認済み）
+  - Parameter Tracking Report検証結果（データ表示なし、複数条件試行も表示されず）
+  - 暫定結論（Media Member契約では利用不可の可能性が極めて高い）
+  - 次のアクション（サポート問い合わせ、代替ASP調査）
+  - タイムライン（1週間以内にIssue完了判定）
+- **asp-api-integration.md**: 更新（A8.net検証結果セクション追加 v2.1.0）
+  - 「Verification Results (2025-01-09) - Parameter Tracking Unavailable」セクション新設
+  - Executive Summary（4週間テスト、Parameter Tracking表示なし、Media Member制限可能性）
+  - Verification Timeline（5フェーズ表形式）
+  - Detailed Test Results（WIN×Ⅱ実装100%、A8.net記録正常、Parameter Tracking表示なし）
+  - 30-Day Click History（日付別9回クリック詳細）
+  - Tentative Conclusion（5つの証拠）
+  - Next Actions（Priority 1: サポート問い合わせ、Priority 2: 代替ASP調査）
+  - Implementation Decision Matrix（Scenario A/B）
+  - Related Documentation（4ドキュメントへのリンク）
+  - Official A8.net Documentation References（3公式ドキュメント）
+- **CLAUDE.md**: 更新（Phase 2-4セクション追加 v2.0.1）
+  - 「Phase 2-4: A8.net Parameter Tracking検証」セクション新設
+  - Status（検証完了、Media Member利用不可の可能性）
+  - Technical Implementation（100%完了、id1/eventId付与、Google Sheets連携）
+  - System Verification（9回クリック、A8.net記録確認済み）
+  - Parameter Tracking Report Results（データ表示なし、複数検索パターン試行）
+  - Documentation Created（4ドキュメント作成完了）
+  - Next Actions（3つの優先度付きアクション）
+  - Implementation Status Summary（技術実装完了、機能利用不可、ドキュメント完了）
+- **index.md**: 更新（新規ドキュメント参照追加 v2.1.0）
+  - ツリー構造に `a8-support-inquiry-final.md` と `github-issue-22-update.md` を追加
+  - ドキュメント概要テーブルに新規ドキュメント2件を追加
+  - 更新履歴セクションに 2025-01-09 エントリ追加
+- **検証結果**:
+  - WIN×Ⅱシステム: ✅ 正常動作（id1/eventId付与、Google Sheets記録、GAS処理）
+  - A8.net連携: ✅ 正常動作（9回クリック記録確認）
+  - Parameter Tracking Report: ❌ データ表示なし（3週間以上経過、複数検索条件試行も表示されず）
+  - 暫定結論: Media Member契約では Parameter Tracking 機能が利用できない可能性が極めて高い
+- **次のステップ**:
+  - Priority 1: A8.netサポートへ問い合わせ（`a8-support-inquiry-final.md` 使用）
+  - Priority 2: 代替ASP調査（もしも、バリューコマース、AFB再実装）
+  - Priority 3: GitHub Issue #22更新（`github-issue-22-update.md` 使用）
+- **ステータス**: 検証完了、ドキュメント作成完了、サポート問い合わせ待ち
 
 ### 2025-01-04
 

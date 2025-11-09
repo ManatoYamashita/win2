@@ -16,6 +16,29 @@ import { useToast } from "@/hooks/use-toast";
 import { MemberRow } from "@/lib/sheets";
 import { AlertCircle, Mail, Loader2 } from "lucide-react";
 import { cn, formatJapaneseDateTime } from "@/lib/utils";
+import { motion } from "framer-motion";
+
+const containerVariants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const fadeUpVariants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: [0.22, 1, 0.36, 1],
+    },
+  },
+};
 
 /**
  * マイページ - 登録情報表示
@@ -118,8 +141,16 @@ export default function MypagePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-win2-surface-cream-50 via-white to-win2-surface-cream-100 px-4">
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-8">
-        <div className="rounded-3xl bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage p-8 text-white shadow-[0_30px_70px_rgba(242,111,54,0.35)]">
+      <motion.div
+        className="mx-auto flex w-full max-w-5xl flex-col gap-8"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div
+          variants={fadeUpVariants}
+          className="rounded-3xl bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage p-8 text-white shadow-[0_30px_70px_rgba(242,111,54,0.35)]"
+        >
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-white/80">
             WIN×Ⅱ MEMBER DASHBOARD
           </p>
@@ -140,8 +171,9 @@ export default function MypagePage() {
               ブログで最新情報を見る
             </Link>
           </div>
-        </div>
-        <Card className="border-0 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
+        </motion.div>
+        <motion.div variants={fadeUpVariants}>
+          <Card className="border-0 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
           <CardHeader>
             <CardTitle>登録情報</CardTitle>
             <CardDescription>現在登録されている会員情報を表示しています</CardDescription>
@@ -239,7 +271,8 @@ export default function MypagePage() {
         </div>
           </CardContent>
         </Card>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }
