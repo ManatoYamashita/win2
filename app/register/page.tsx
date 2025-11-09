@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Card,
@@ -27,26 +27,7 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema, RegisterInput } from "@/lib/validations/auth";
-import { CheckCircle2, Shield, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-const registrationHighlights = [
-  {
-    icon: Sparkles,
-    title: "300件以上の厳選サービス",
-    description: "家計・転職・不動産まで暮らし全体をカバー。",
-  },
-  {
-    icon: Shield,
-    title: "安心の会員サポート",
-    description: "無料メルマガで特典と最新案件をお届け。",
-  },
-  {
-    icon: CheckCircle2,
-    title: "最短2分で登録完了",
-    description: "入力後すぐにマイページへアクセス可能。",
-  },
-];
 
 export default function RegisterPage() {
   const router = useRouter();

@@ -4,6 +4,7 @@ import { authOptions } from "@/lib/auth";
 import { addClickLog, getDealById } from "@/lib/sheets";
 import { trackClickSchema } from "@/lib/validations/tracking";
 import { getOrCreateGuestUuid, setGuestUuidCookie } from "@/lib/guest-uuid";
+import { formatJapaneseDateTime } from "@/lib/utils";
 
 /**
  * クリック追跡API
@@ -94,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     // 5. Google Sheets「クリックログ」に記録
     await addClickLog({
-      timestamp: new Date().toISOString(),
+      timestamp: formatJapaneseDateTime(new Date()),
       memberId: trackingId,
       dealName: deal.dealName,
       dealId: dealId,

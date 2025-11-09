@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Card,
@@ -26,8 +26,6 @@ import {
 } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { loginSchema, LoginInput } from "@/lib/validations/auth";
-import { cn } from "@/lib/utils";
-import { ArrowRight, BookOpenCheck } from "lucide-react";
 
 function LoginPageContent() {
   const searchParams = useSearchParams();

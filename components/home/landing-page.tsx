@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { cn } from "@/lib/utils";
@@ -262,7 +261,7 @@ function HeroSection({ resolveCta }: { resolveCta: CtaResolver }) {
                 <p className="text-xs font-semibold text-win2-primary-orage">{stat.title}</p>
                 <p className="mt-2 text-2xl font-bold text-win2-neutral-950">
                   {stat.value}
-                  <span className="ml-1 text-base font-semibold text-slate-600">{stat.unit}</span>
+                  <span className="ml-1 text-base font-semibold text-slate-600 whitespace-nowrap">{stat.unit}</span>
                 </p>
               </div>
             ))}
