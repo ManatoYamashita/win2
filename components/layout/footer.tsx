@@ -28,32 +28,20 @@ export function Footer() {
           </Link>
         </div>
 
-        {/* 著作権表示 */}
-        <div className="text-center text-sm text-gray-600">
-          <p>&copy; {currentYear} WIN×Ⅱ. All rights reserved.</p>
-        </div>
-
-        {/* オプション: フッターリンク（必要に応じてコメント解除） */}
-        {/* <div className="flex justify-center space-x-6 mt-4 text-sm">
-          <Link
-            href="/terms"
-            className="text-gray-600 hover:text-orange-600 transition-colors"
-          >
-            利用規約
-          </Link>
+        {/* フッターリンク */}
+        <div className="flex justify-center space-x-6 mt-4 text-sm">
           <Link
             href="/privacy"
             className="text-gray-600 hover:text-orange-600 transition-colors"
           >
             プライバシーポリシー
           </Link>
-          <Link
-            href="/contact"
-            className="text-gray-600 hover:text-orange-600 transition-colors"
-          >
-            お問い合わせ
-          </Link>
-        </div> */}
+        </div>
+
+        {/* 著作権表示 */}
+        <div className="text-center text-sm text-gray-600 mt-4">
+          <p>&copy; {currentYear} WIN×Ⅱ. All rights reserved.</p>
+        </div>
       </div>
     </footer>
   );

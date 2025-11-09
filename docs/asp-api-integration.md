@@ -156,6 +156,180 @@ Basis: Downloaded CSV from "Report Download" button contained only aggregated pr
 
 **Verification Log Document:** See `docs/dev/a8-parameter-tracking-verification.md`
 
+---
+
+### 📊 Verification Results (2025-01-09) - Parameter Tracking Unavailable
+
+**Last Updated:** 2025-01-09
+**Status:** 🔴 **Verification Complete - Feature Likely Unavailable for Media Members**
+
+#### Executive Summary
+
+After 4 weeks of testing (2025-10-13 to 2025-01-09) with the WIN×Ⅱ system correctly generating id1-parameterized affiliate links, the **Parameter Tracking Report shows no data despite A8.net's daily reports confirming 9 clicks**. The technical implementation is working correctly, but **Parameter Tracking functionality appears to be unavailable for Media Member contracts**.
+
+#### Verification Timeline
+
+| Phase | Period | Result |
+|-------|--------|--------|
+| **System Implementation** | 2025-10-13 | ✅ Complete (id1 + eventId parameters, Google Sheets logging, GAS processing) |
+| **Testing Period** | 2025-10-13 to 2025-01-09 (4 weeks) | ✅ 9 clicks recorded across multiple members |
+| **A8.net Daily Report Check** | 2025-01-09 | ✅ All 9 clicks confirmed in New Report B version |
+| **Parameter Tracking Report Check** | 2025-01-09 (3+ weeks after first click) | ❌ **No data displayed** despite multiple search patterns |
+| **CSV Export Check** | N/A | ⏸️ **Unable to verify** (no data to export) |
+
+#### Detailed Test Results
+
+**1. WIN×Ⅱ System Implementation** ✅ **100% Complete**
+- id1 parameter appending: ✅ Working (`/api/track-click` generates `?id1={memberId}`)
+- eventId parameter appending: ✅ Working (UUID v4 generated per click)
+- Google Sheets logging: ✅ Working (all clicks recorded in "クリックログ")
+- Debug logging: ✅ Working (console.log shows full tracking URL)
+- New tab opening: ✅ Working (affiliate pages open correctly)
+- Success toast notification: ✅ Working (user feedback implemented)
+
+**2. A8.net Click Recording** ✅ **Normal Operation**
+- **30-Day Click History (2025-10-13 to 2025-01-09)**:
+  - 2025-11-08: 2 clicks
+  - 2025-11-05: 2 clicks
+  - 2025-11-03: 1 click
+  - 2025-10-26: 1 click
+  - 2025-10-16: 1 click
+  - 2025-10-14: 1 click
+  - 2025-10-13: 1 click (initial test)
+- **Total**: 9 clicks confirmed in A8.net "New Report B" version
+- **Data Source**: https://pub.a8.net/a8v2/media/generatingdailyReportAction.do?action=report
+- **Conclusion**: A8.net is successfully receiving and recording clicks with id1 parameters
+
+**3. Parameter Tracking Report** ❌ **No Data Displayed**
+- **Report URL**: https://media-console.a8.net/report/parameter#
+- **Search Patterns Tested** (all returned "指定された条件で表示できるレポートデータがありません"):
+  1. Period expansion (past 1 month, past 3 months)
+  2. Specific memberId search (tested 3 different member UUIDs)
+  3. Program name search
+  4. All conditions blank (no filters)
+- **Elapsed Time**: 3+ weeks since first click (2025-10-13)
+- **Data Lag Hypothesis**: ❌ **Ruled Out** (sufficient time has passed for data to appear)
+
+**4. CSV Export Verification** ⏸️ **Unable to Confirm**
+- **Reason**: Parameter Tracking Report shows no data, cannot locate CSV export button
+- **id1 Column Check**: ⏸️ **Unable to verify** (no data available to export)
+
+#### Tentative Conclusion
+
+**Parameter Tracking feature is highly likely to be unavailable for Media Member contracts.**
+
+**Evidence**:
+1. WIN×Ⅱ system has been operating correctly for 4 weeks (2025-10-13 onwards)
+2. A8.net daily reports confirm 9 clicks over 30 days
+3. Parameter Tracking Report shows zero data after 3+ weeks
+4. Multiple search conditions (period, memberId, program) all yield no results
+5. Data lag explanation is ruled out (3+ weeks is more than sufficient)
+
+**Alternative Explanations**:
+- Feature may require special activation/configuration not documented
+- Media Member contract may have limited access to Parameter Tracking
+- Feature may be advertiser-only (despite official documentation stating "available to media members")
+
+#### Next Actions
+
+**Priority 1: A8.net Support Inquiry** 🔥 **CRITICAL - Immediate Action Required**
+
+**Purpose**: Obtain official confirmation whether Parameter Tracking is available for Media Member contracts
+
+**Inquiry Document**: [`docs/dev/a8-support-inquiry-final.md`](./dev/a8-support-inquiry-final.md)
+
+**Key Questions**:
+1. Is Parameter Tracking Report available for Media Member contracts?
+2. If yes, what are the correct steps to display data in the report?
+3. How long does data reflection typically take?
+4. If no, what alternative methods exist for member-specific conversion tracking?
+
+**Expected Timeline**: 1-3 business days for support response
+
+---
+
+**Priority 2: Alternative ASP Investigation** ⏸️ **Parallel Action**
+
+To prepare for the possibility that Parameter Tracking is unavailable, investigate alternative ASPs:
+
+**Option A: もしもアフィリエイト (Moshimo Affiliate)** - Priority 1 Alternative
+- Member-specific tracking capability: ❓ Unknown (requires investigation)
+- Parameter-based link support: ❓ Unknown
+- CSV export functionality: ❓ Unknown
+- **Action**: Contact support, review management console
+
+**Option B: バリューコマース (ValueCommerce)** - Priority 2 Alternative
+- LinkSwitch feature: ❓ Member-specific tracking capability unknown
+- API integration: ❓ Requires investigation
+- **Action**: Login to dashboard, check for parameter tracking features
+
+**Option C: AFB Re-implementation** - Technical Fallback (Highest Certainty)
+- **Status**: Previously implemented and tested, removed due to Vercel Cron limitations
+- **Commit**: Code preserved in commit `b8e9b98`
+- **Re-implementation Approach**: GitHub Actions Scheduler instead of Vercel Cron
+- **Webhook Endpoint**: Already implemented and tested (`/api/webhooks/afb-postback`)
+- **Estimated Time**: 1 day (GitHub Actions configuration + code restoration)
+- **Certainty**: ✅ **High** (technical implementation already proven)
+
+---
+
+#### Implementation Decision Matrix
+
+**Scenario A: A8.net Support Confirms Feature Available** ✅
+
+**Actions**:
+1. Follow support instructions to enable/configure Parameter Tracking
+2. Verify data appears in report
+3. Confirm CSV export includes id1 column
+4. Create operations manual for daily CSV download workflow
+5. Begin production use
+
+**Timeline**: 1-2 days
+
+---
+
+**Scenario B: A8.net Support Confirms Media Member Limitation** ❌
+
+**Actions**:
+1. Document final conclusion in `docs/dev/a8-parameter-tracking-verification.md`
+2. Close GitHub Issue #22 with negative result
+3. Change A8.net operation policy to "aggregate reporting only (no member-specific cashback)"
+4. Prioritize alternative ASP implementation:
+   - **First**: もしもアフィリエイト investigation (1-2 weeks)
+   - **Second**: バリューコマース investigation (1-2 weeks)
+   - **Fallback**: AFB re-implementation with GitHub Actions (1 day)
+
+**Timeline**: 1 day (documentation) + 1-2 weeks (alternative ASP) OR 1 day (AFB re-implementation)
+
+---
+
+#### Related Documentation
+
+- **Verification Log**: [`docs/dev/a8-parameter-tracking-verification.md`](./dev/a8-parameter-tracking-verification.md) - Detailed daily verification records
+- **Support Inquiry**: [`docs/dev/a8-support-inquiry-final.md`](./dev/a8-support-inquiry-final.md) - Final support inquiry text
+- **Issue Update**: [`docs/dev/github-issue-22-update.md`](./dev/github-issue-22-update.md) - GitHub Issue #22 update template
+- **GitHub Issue**: #22 - A8.net Parameter Tracking Report CSV検証と運用フロー確立
+
+---
+
+#### Official A8.net Documentation References
+
+The following official documentation was referenced during verification:
+
+1. **Parameter Tracking Guide**
+   - URL: https://support.a8.net/a8/as/faq/manual/a8-parameter-guide.php
+   - Content: Parameter measurement feature overview, id1-id5 parameter usage, report screen explanation
+
+2. **New Report Help**
+   - URL: https://support.a8.net/as/newreport/help/
+   - Content: New Report B version usage, report interpretation, data update frequency
+
+3. **Report Renewal Notice**
+   - URL: https://support.a8.net/as/campaign/report_renewal/
+   - Content: Migration from old report to New Report B, new feature announcements
+
+---
+
 **Priority 2: Contact A8.net Support (If Verification Successful)**
 
 **Questions to Ask:**

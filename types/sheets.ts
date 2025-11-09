@@ -5,22 +5,18 @@
  *
  * シート名: 案件マスタ
  * 列構成:
- * A: アフィリエイトURL
+ * A: 整形済みアフィリエイトURL
  * B: 案件ID
  * C: 案件名
- * D: ASP名
- * E: 報酬額
- * F: キャッシュバック率
- * G: 有効/無効
+ * D: 会社名
+ * E: ROW URL
  */
 export interface Deal {
   dealId: string;                // 案件ID（一意、例: "a8-rakuten-card"）
   dealName: string;              // 案件名（例: "楽天カード"）
-  aspName: string;               // ASP名（例: "A8.net", "AFB", "もしも", "バリューコマース"）
-  affiliateUrl: string;          // アフィリエイトURL（?id1={trackingId}&eventId={eventId}が後で付与される）
-  rewardAmount: number;          // 報酬額（参考値）
-  cashbackRate: number;          // キャッシュバック率（0.20 = 20%）
-  isActive: boolean;             // 有効/無効（TRUE/FALSE）
+  affiliateUrl: string;          // 整形済みURL（?id1={trackingId}&eventId={eventId}付与前）
+  companyName?: string;          // 表示用
+  rawAffiliateUrl?: string;      // ROW URL
 }
 
 /**
@@ -35,7 +31,7 @@ export interface Deal {
  * E: 生年月日 (YYYY-MM-DD)
  * F: 郵便番号
  * G: 電話番号
- * H: 登録日時 (ISO8601)
+ * H: 登録日時 (YYYY年MM月DD日 HH時MM分SS秒 JST)
  */
 export interface Member {
   memberId: string;
@@ -45,7 +41,7 @@ export interface Member {
   birthDate: string;             // YYYY-MM-DD
   postalCode: string;
   phoneNumber: string;
-  registeredAt: string;          // ISO8601
+  registeredAt: string;          // JSTフォーマット済み文字列
   emailVerified?: boolean;       // メール認証済みフラグ（オプション）
 }
 
@@ -54,14 +50,14 @@ export interface Member {
  *
  * シート名: クリックログ
  * 列構成:
- * A: 日時 (ISO8601)
+ * A: 日時 (YYYY年MM月DD日 HH時MM分SS秒 JST)
  * B: 会員ID (memberId or guest:UUID)
  * C: 案件名 (dealName)
  * D: 案件ID (dealId)
  * E: イベントID (eventId) - UUID v4
  */
 export interface ClickLog {
-  timestamp: string;             // ISO8601
+  timestamp: string;             // JSTフォーマット済み文字列
   memberId: string;              // memberId or guest:UUID
   dealName: string;
   dealId: string;

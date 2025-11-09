@@ -183,7 +183,7 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
       </div>
 
       {/* タイトル */}
-      <h1 className="text-4xl font-bold mb-4 text-gray-900">{blog.title}</h1>
+      <h1 className="text-[2rem] font-bold mb-4 text-gray-900">{blog.title}</h1>
 
       {/* 公開日時 */}
       <div className="flex items-center gap-4 mb-8 text-sm text-gray-600">
