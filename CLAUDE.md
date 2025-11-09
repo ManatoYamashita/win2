@@ -364,6 +364,86 @@ The existing GAS script:
    - **Documentation**: Client guide (docs/guides/cta-shortcode-guide.md) and technical spec (docs/guides/cta-technical-guide.md)
    - **Click tracking**: Full integration with /api/track-click (id1 + eventId parameters)
 
+### Phase 2-4: A8.net Parameter Tracking検証 ⚠️ Verification Complete - Likely Unavailable (2025-01-09)
+
+**Status**: 🔴 Verification Complete - Feature appears unavailable for Media Member contracts
+**GitHub Issue**: #22 - A8.net Parameter Tracking Report CSV検証と運用フロー確立
+**Period**: 2025-10-13 to 2025-01-09 (4 weeks of testing)
+
+#### ✅ Technical Implementation (100% Complete)
+
+1. ✅ **id1 Parameter Tracking System**
+   - `/api/track-click` generates tracking URLs with `?id1={memberId}` parameter
+   - eventId parameter (UUID v4) appended for unique click identification
+   - Google Sheets "クリックログ" integration for click logging
+   - DealCTAButton component updates (new tab opening, debug logging, success toast)
+
+2. ✅ **System Verification**
+   - 9 clicks recorded over 30 days (2025-10-13 to 2025-01-09)
+   - A8.net daily reports confirm all 9 clicks were received
+   - WIN×Ⅱ system operating correctly as designed
+
+#### ❌ Parameter Tracking Report Results
+
+**Problem**: After 3+ weeks of testing, **Parameter Tracking Report shows zero data** despite:
+- WIN×Ⅱ system correctly generating id1-parameterized links
+- A8.net daily reports confirming 9 clicks received
+- Multiple search patterns tested (period, memberId, program name, all blank)
+- Sufficient time elapsed (data lag ruled out)
+
+**Conclusion**: Parameter Tracking feature is **highly likely to be unavailable for Media Member contracts**.
+
+#### 📝 Documentation Created
+
+1. ✅ **Verification Log**: `docs/dev/a8-parameter-tracking-verification.md`
+   - Daily testing records from 2025-10-13 to 2025-01-09
+   - Search patterns tested and results
+   - Tentative conclusion and evidence
+
+2. ✅ **Support Inquiry**: `docs/dev/a8-support-inquiry-final.md`
+   - Final inquiry text incorporating official A8.net documentation URLs
+   - 4 key questions for A8.net support
+   - Expected response patterns and corresponding actions
+
+3. ✅ **Issue Update Template**: `docs/dev/github-issue-22-update.md`
+   - Comprehensive verification results summary
+   - Next actions (support inquiry, alternative ASPs)
+   - Timeline expectations
+
+4. ✅ **ASP Integration Update**: `docs/asp-api-integration.md`
+   - "Verification Results (2025-01-09)" section added
+   - Detailed test results, tentative conclusion, next actions
+   - Implementation decision matrix (Scenario A/B)
+
+#### 🔄 Next Actions (Pending User)
+
+**Priority 1: A8.net Support Inquiry** 🔥 **CRITICAL**
+- **Action**: User to send inquiry using `docs/dev/a8-support-inquiry-final.md`
+- **Purpose**: Confirm if Parameter Tracking is available for Media Members
+- **Expected Response**: 1-3 business days
+- **Outcome Options**:
+  - ✅ Available → Follow setup instructions, create operations manual
+  - ❌ Unavailable → Proceed to alternative ASP investigation
+
+**Priority 2: Alternative ASP Investigation** ⏸️ **Parallel**
+- **Option A**: もしもアフィリエイト (Moshimo Affiliate) - Priority 1 alternative
+- **Option B**: バリューコマース (ValueCommerce) - Priority 2 alternative
+- **Option C**: AFB Re-implementation with GitHub Actions Scheduler - Technical fallback (highest certainty)
+
+**Priority 3: GitHub Issue #22 Update**
+- **Action**: Post verification completion comment using `docs/dev/github-issue-22-update.md`
+- **Timing**: After A8.net support response OR when proceeding to alternative ASPs
+
+#### 📊 Implementation Status Summary
+
+- **Technical Implementation**: ✅ 100% Complete (system working as designed)
+- **Feature Availability**: ❌ Unconfirmed (likely unavailable for Media Members)
+- **Documentation**: ✅ 100% Complete (all verification documents created)
+- **Support Inquiry**: ⏸️ Pending user action
+- **Alternative Solutions**: ⏸️ Ready for investigation if needed
+
+**Key Takeaway**: WIN×Ⅱ's technical implementation is solid and working correctly. The blocker is A8.net's Parameter Tracking feature availability policy for Media Member contracts, which requires official confirmation from A8.net support.
+
 ## Environment Variables Setup
 
 All environment variables should be stored in `.env.local` (never commit this file).
