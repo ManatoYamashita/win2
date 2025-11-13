@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { cn } from "@/lib/utils";
+import type { CategoryResponse } from "@/types/microcms";
 
 const heroStats = [
   {
@@ -26,33 +27,6 @@ const heroStats = [
 ];
 
 const serviceCategories = ["各種保険", "不動産", "エンタメ", "転職"];
-
-const serviceShowcaseItems = [
-  {
-    tag: "ライフプラン",
-    title: "保険の無料相談",
-    description: "家計を守るための最適な保険選びを、専門家と無料で比較できます。",
-    image: "/assets/images/lifeplan.webp",
-  },
-  {
-    tag: "住まいの価値",
-    title: "不動産査定サービス",
-    description: "オンラインで相場をチェック。複数査定をまとめて依頼して時間を節約。",
-    image: "/assets/images/realestate.webp",
-  },
-  {
-    tag: "暮らしと娯楽",
-    title: "エンタメサブスク特集",
-    description: "動画・音楽・学びまで、生活を彩るサブスクを分かりやすく比較。",
-    image: "/assets/images/entertainment.webp",
-  },
-  {
-    tag: "キャリア支援",
-    title: "転職サポート",
-    description: "非公開求人やキャリア相談など、次の一歩を後押しする支援情報を厳選。",
-    image: "/assets/images/changejob.webp",
-  },
-];
 
 const meritItems = [
   {
@@ -140,7 +114,11 @@ const faqItems = [
   },
 ];
 
-export function LandingPage() {
+interface LandingPageProps {
+  categories: CategoryResponse[];
+}
+
+export function LandingPage({ categories }: LandingPageProps) {
   const { data: session } = useSession();
   const isAuthenticated = Boolean(session);
 
@@ -156,7 +134,7 @@ export function LandingPage() {
       <IntroductionBoxSection resolveCta={resolveCta} />
       <ServiceSection />
       <MeritSection />
-      <HighlightSection resolveCta={resolveCta} />
+      <HighlightSection resolveCta={resolveCta} categories={categories} />
       <AchievementSection />
       <TestimonialsSection />
       <FaqSection />
@@ -213,7 +191,7 @@ function HeroSection({ resolveCta }: { resolveCta: CtaResolver }) {
       </div>
       <div
         ref={ref}
-        className="relative z-10 mx-auto flex max-w-[1100px] flex-col gap-12 px-6 pt-24 md:flex-row md:items-center lg:px-8"
+        className="relative z-10 mx-auto flex max-w-[1100px] flex-col gap-12 px-6 pt-12 md:pt-24 md:flex-row md:items-center lg:px-8"
       >
         <div className="relative z-40 max-w-xl space-y-8">
           <div className="space-y-3">
@@ -233,9 +211,9 @@ function HeroSection({ resolveCta }: { resolveCta: CtaResolver }) {
               )}
             >
               暮らしを
-              <span className="text-win2-primary-orage">もっとお得に</span>
+              <span className="text-win2-primary-orage whitespace-nowrap">もっとお得に</span>
               <br />
-              もっとスマートに。
+              <span className="text-win2-primary-orage whitespace-nowrap">もっとスマートに。</span>
             </h1>
             <p
               className={cn(
@@ -387,7 +365,7 @@ function ProblemSection() {
           </div>
 
           {/* 右：女性画像 */}
-          <div className="flex justify-center">
+          <div className="flex justify-center hidden md:block">
             <div className="relative h-56 w-40 md:h-64 md:w-44 lg:h-80 lg:w-52">
               <Image
                 src="/assets/images/woman.webp"
@@ -654,7 +632,7 @@ function MeritSection() {
   );
 }
 
-function HighlightSection({ resolveCta }: { resolveCta: CtaResolver }) {
+function HighlightSection({ resolveCta, categories }: { resolveCta: CtaResolver; categories: CategoryResponse[] }) {
   const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
 
   return (
@@ -703,11 +681,11 @@ function HighlightSection({ resolveCta }: { resolveCta: CtaResolver }) {
             className="hide-scrollbar relative flex snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-6 pt-1 md:gap-8 md:px-8 lg:px-12"
             aria-roledescription="horizontal carousel"
           >
-            {serviceShowcaseItems.map((item, index) => (
+            {categories.map((category, index) => (
               <Link
-                key={item.title}
-                href="/blog"
-                aria-label={`${item.title}の特集を見る`}
+                key={category.id}
+                href={`/category/${category.id}`}
+                aria-label={`${category.name}の特集を見る`}
                 className={cn(
                   "group relative isolate flex w-[85vw] min-h-[420px] min-w-[280px] max-w-[360px] flex-col justify-between overflow-hidden rounded-2xl bg-slate-900 text-left text-white shadow-md transition-all duration-300 ease-out",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-accent-amber/50",
@@ -716,8 +694,8 @@ function HighlightSection({ resolveCta }: { resolveCta: CtaResolver }) {
                 )}
               >
                 <Image
-                  src={item.image}
-                  alt={item.title}
+                  src={category.image?.url || "/assets/images/city.webp"}
+                  alt={category.image?.alt || category.name}
                   fill
                   sizes="(min-width: 1024px) 30vw, 85vw"
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
@@ -728,11 +706,11 @@ function HighlightSection({ resolveCta }: { resolveCta: CtaResolver }) {
                 <div className="relative flex flex-col gap-4 p-6 sm:p-8">
                   <div className="space-y-3">
                     <span className="inline-flex items-center rounded-md bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
-                      {item.tag}
+                      {category.name}
                     </span>
-                    <h3 className="text-2xl font-bold leading-tight sm:text-3xl">{item.title}</h3>
+                    <h3 className="text-2xl font-bold leading-tight sm:text-3xl">{category.name}</h3>
                     <p className="text-sm leading-relaxed text-white/80 sm:text-base">
-                      {item.description}
+                      {category.description || "カテゴリの詳細をご覧ください"}
                     </p>
                   </div>
                 </div>
