@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { LandingPage } from "@/components/home/landing-page";
+import { getCategories } from "@/lib/microcms";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
@@ -84,7 +85,13 @@ const websiteSchema = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
+  // microCMSから最新4件のカテゴリを取得（更新日降順）
+  const categoriesData = await getCategories({
+    orders: '-updatedAt',
+    limit: 4,
+  });
+
   return (
     <>
       <script
@@ -95,7 +102,7 @@ export default function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
       />
-      <LandingPage />
+      <LandingPage categories={categoriesData.contents} />
     </>
   );
 }

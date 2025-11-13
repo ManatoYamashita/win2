@@ -8,6 +8,7 @@ export interface Category {
   id: string;                    // microCMSコンテンツID（スラッグとして使用）
   name: string;
   description?: string;
+  image?: MicroCMSImage;         // カテゴリ画像（オプション）
 }
 
 export type CategoryResponse = Category & MicroCMSDate;
