@@ -1,5 +1,44 @@
 import { MetadataRoute } from "next";
 import { getBlogs, getCategories } from "@/lib/microcms";
+import type { Blog, Category } from "@/types/microcms";
+
+/**
+ * Fetch all blogs with pagination to handle more than 100 items
+ */
+async function getAllBlogs() {
+  let allBlogs: Blog[] = [];
+  let offset = 0;
+  const limit = 100;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { contents, totalCount } = await getBlogs({ limit, offset });
+    allBlogs = [...allBlogs, ...contents];
+    offset += limit;
+    hasMore = allBlogs.length < totalCount;
+  }
+
+  return allBlogs;
+}
+
+/**
+ * Fetch all categories with pagination to handle more than 100 items
+ */
+async function getAllCategories() {
+  let allCategories: Category[] = [];
+  let offset = 0;
+  const limit = 100;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { contents, totalCount } = await getCategories({ limit, offset });
+    allCategories = [...allCategories, ...contents];
+    offset += limit;
+    hasMore = allCategories.length < totalCount;
+  }
+
+  return allCategories;
+}
 
 /**
  * Sitemap generation for WIN×Ⅱ
@@ -25,6 +64,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.9,
     },
     {
+      url: `${baseUrl}/faq`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${baseUrl}/login`,
       lastModified: new Date(),
       changeFrequency: "monthly",
@@ -45,13 +90,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   try {
-    // Fetch all blog posts from microCMS
-    // Note: microCMS API limit is max 100 per request
-    const { contents: blogs, totalCount: blogCount } = await getBlogs({
-      limit: 100,
-    });
+    // Fetch all blog posts from microCMS with pagination
+    const blogs = await getAllBlogs();
 
-    console.log(`[Sitemap] Fetched ${blogs.length} blog posts (total: ${blogCount})`);
+    console.log(`[Sitemap] Fetched ${blogs.length} blog posts (all)`);
 
     // Generate sitemap entries for blog posts
     const blogPages: MetadataRoute.Sitemap = blogs.map((blog) => ({
@@ -61,12 +103,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     }));
 
-    // Fetch all categories from microCMS
-    const { contents: categories, totalCount: categoryCount } = await getCategories({
-      limit: 100,
-    });
+    // Fetch all categories from microCMS with pagination
+    const categories = await getAllCategories();
 
-    console.log(`[Sitemap] Fetched ${categories.length} categories (total: ${categoryCount})`);
+    console.log(`[Sitemap] Fetched ${categories.length} categories (all)`);
 
     // Generate sitemap entries for category pages
     const categoryPages: MetadataRoute.Sitemap = categories.map((category) => ({

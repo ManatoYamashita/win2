@@ -27,10 +27,10 @@
 ## ブランド & アクセントパレット
 | Token 名 | カラーコード | 主な使用箇所 | 備考 |
 |---|---|---|---|
-| `win2-primary-orage` | `#f26f36` | ヒーロー見出し、CTA ボタン、リンクアクセント | ブランド基調色。テキスト上では 90% 不透明が視認しやすい。 |
-| `win2-accent-rose` | `#f05972` | グラデーション左端、アウトラインボタン、バッジ | `win2-primary-orage` と組み合わせてグラデーションを形成。 |
-| `win2-accent-rose-dark` | `#d9475e` | ホバー時の濃色、影色 | `win2-accent-rose` の濃色シェード。 |
-| `win2-accent-amber` | `#f48a3c` | グラデーション右端、見出しサブカラー | オレンジ系の柔らかい補色。 |
+| `win2-primary-orage` | `#c84812` | ヒーロー見出し、CTA ボタン、リンクアクセント | コントラスト 4.7:1 を満たす改訂版。 |
+| `win2-accent-rose` | `#c53a52` | グラデーション左端、アウトラインボタン、バッジ | `win2-primary-orage` と組み合わせてグラデーションを形成。 |
+| `win2-accent-rose-dark` | `#b33249` | ホバー時の濃色、影色 | `win2-accent-rose` の濃色シェード。 |
+| `win2-accent-amber` | `#bd5607` | グラデーション右端、見出しサブカラー | 白文字と 4.6:1 を確保。 |
 | `win2-accent-gold` | `#f5a623` | キャッチコピーの強調テキスト | 使用頻度低。彩度が高いため小面積のみで利用。 |
 | `win2-accent-sun` | `#fff44f` | ヒーローバナー内のハイライト | 暖色ハイライト。読みやすさ確保のため影と併用。 |
 | `win2-communication-orange` | `#ea580c` | メールテンプレートの見出し・ボタン | HTML メールでのブランド認知用。 |
@@ -63,11 +63,11 @@
 | Token 名 | カラーコード | 用途 |
 |---|---|---|
 | `win2-feedback-danger` | `#dc2626` | エラー通知、メール警告帯 |
-| `win2-feedback-warning` | `#f26f36` (派生) | 警戒を促す軽度アラート。ブランド色と兼用する場合はトーンダウンを検討。 |
+| `win2-feedback-warning` | `#c84812` (派生) | 警戒を促す軽度アラート。ブランド色と兼用する場合はトーンダウンを検討。 |
 
 ## グラデーション定義
-- `win2-gradient-primary`: `linear-gradient(90deg, #f05972 0%, #f26f36 50%, #f48a3c 100%)`
-- `win2-gradient-cta`: `linear-gradient(90deg, #f05972 0%, #f48a3c 100%)`
+- `win2-gradient-primary`: `linear-gradient(90deg, #c53a52 0%, #c84812 50%, #bd5607 100%)`
+- `win2-gradient-cta`: `linear-gradient(90deg, #c53a52 0%, #bd5607 100%)`
 
 グラデーションを Tailwind クラスで再現する場合は `bg-[linear-gradient(...)]` 形式を利用し、再利用のためユーティリティクラス化を検討してください。
 
