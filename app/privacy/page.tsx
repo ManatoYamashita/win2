@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
-  const lastUpdated = "2025年1月9日";
+  const lastUpdated = "2025年11月13日";
 
   return (
     <div className="container mx-auto px-4 py-16 max-w-4xl">
@@ -200,12 +200,12 @@ export default function PrivacyPage() {
           </p>
           <div className="bg-gray-50 p-6 rounded-lg mb-4">
             <p className="font-semibold mb-2">WIN×Ⅱ 運営事務局</p>
-            <p>メールアドレス: <a href="mailto:support@win2.jp" className="text-orange-600 hover:text-orange-700">support@win2.jp</a></p>
+            <p>メールアドレス: <a href="mailto:support@win2.jp" className="text-orange-600 hover:text-orange-700">info@oshiro-group.com</a></p>
           </div>
         </section>
 
         <div className="text-right text-sm text-gray-600 mt-12">
-          <p>制定日：2025年1月9日</p>
+          <p>制定日：2025年10月1日</p>
           <p>最終更新日：{lastUpdated}</p>
         </div>
       </div>
