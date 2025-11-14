@@ -244,45 +244,58 @@ function LatestBlogsSection() {
               まだ公開中のブログ記事がありません。
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-3">
-              {blogs.map((blog) => (
-                <Link
-                  key={blog.id}
-                  href={`/blog/${blog.id}`}
-                  className="group flex h-full flex-col justify-between rounded-3xl border border-white/60 bg-gradient-to-br from-white via-win2-surface-cream-120 to-win2-surface-cream-320 p-6 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-accent-amber/50"
-                >
-                  <div className="space-y-4">
-                    <div className="flex flex-wrap gap-2 text-xs font-semibold text-win2-primary-orage">
-                      <span>{blog.category?.name ?? "コラム"}</span>
-                      <span className="text-slate-400">• {formatDate(blog.publishedAt || blog.createdAt)}</span>
-                    </div>
-                    <h3 className="text-lg font-bold leading-snug text-slate-900 line-clamp-2 transition group-hover:text-win2-primary-orage">
-                      {blog.title}
-                    </h3>
-                    <p className="text-sm leading-relaxed text-slate-600 line-clamp-3">
-                      {extractExcerpt(blog.content ?? "", 110)}
-                    </p>
-                  </div>
-                  <span className="mt-6 inline-flex items-center text-sm font-semibold text-win2-primary-orage transition group-hover:gap-2">
-                    記事を読む
-                    <svg
-                      className="ml-1 h-4 w-4 transition group-hover:translate-x-1"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                      aria-hidden="true"
-                    >
-                      <path
-                        d="M5 12h14M13 6l6 6-6 6"
-                        stroke="currentColor"
-                        strokeWidth="1.6"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
+            <div className="flex flex-col gap-6">
+              {blogs.map((blog) => {
+                const thumbnailUrl = blog.thumbnail?.url ?? "/assets/images/blog-placeholder.webp";
+                return (
+                  <Link
+                    key={blog.id}
+                    href={`/blog/${blog.id}`}
+                    className="group flex flex-col gap-5 rounded-3xl border border-white/70 bg-white/95 p-5 shadow-md shadow-slate-200/40 transition hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-primary-orage/40 md:flex-row md:p-6"
+                  >
+                    <div className="relative h-48 w-full overflow-hidden rounded-2xl bg-slate-100 md:h-40 md:w-64">
+                      <Image
+                        src={thumbnailUrl}
+                        alt={blog.title}
+                        fill
+                        sizes="(min-width: 1024px) 320px, 100vw"
+                        className="object-cover transition duration-500 group-hover:scale-105"
                       />
-                    </svg>
-                  </span>
-                </Link>
-              ))}
+                    </div>
+
+                    <div className="flex flex-1 flex-col gap-4">
+                      <div className="flex flex-wrap gap-2 text-xs font-semibold text-win2-primary-orage">
+                        <span>{blog.category?.name ?? "コラム"}</span>
+                        <span className="text-slate-400">• {formatDate(blog.publishedAt || blog.createdAt)}</span>
+                      </div>
+                      <h3 className="text-xl font-bold leading-snug text-slate-900 transition group-hover:text-win2-primary-orage">
+                        {blog.title}
+                      </h3>
+                      <p className="text-sm leading-relaxed text-slate-600 line-clamp-3">
+                        {extractExcerpt(blog.content ?? "", 140)}
+                      </p>
+                      <span className="inline-flex items-center text-sm font-semibold text-win2-primary-orage transition group-hover:gap-2">
+                        記事を読む
+                        <svg
+                          className="ml-1 h-4 w-4 transition group-hover:translate-x-1"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M5 12h14M13 6l6 6-6 6"
+                            stroke="currentColor"
+                            strokeWidth="1.6"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </span>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </div>
