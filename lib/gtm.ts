@@ -1,3 +1,5 @@
+import type { GTMEventType } from "@/types/gtm";
+
 /**
  * Google Tag Manager (GTM) Helper Functions
  *
