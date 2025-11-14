@@ -28,6 +28,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { registerSchema, RegisterInput } from "@/lib/validations/auth";
 import { cn } from "@/lib/utils";
+import { trackSignUp } from "@/lib/gtm";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -95,6 +96,13 @@ export default function RegisterPage() {
         setIsLoading(false);
         return;
       }
+
+      // 登録成功 → GTMイベント送信
+      trackSignUp({
+        memberId: result.memberId,
+        method: "email",
+        timestamp: result.timestamp,
+      });
 
       // 登録成功 → 自動ログイン
       toast({
