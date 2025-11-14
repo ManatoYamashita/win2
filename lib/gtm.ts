@@ -11,7 +11,7 @@
  * Generic function to push any data to GTM dataLayer
  * @param data - Object to push to dataLayer (must include 'event' property for GTM tags)
  */
-export function pushToDataLayer(data: Record<string, unknown>): void {
+export function pushToDataLayer(data: GTMEventType): void {
   if (typeof window === "undefined") {
     console.warn("[GTM] Cannot push to dataLayer: window is undefined (SSR context)");
     return;
