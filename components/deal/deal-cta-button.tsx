@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { trackDealClick } from "@/lib/gtm";
 
 interface DealCTAButtonProps {
   dealId: string;
@@ -45,6 +46,17 @@ export function DealCTAButton({
       if (data.trackingUrl) {
         // デバッグ用: 生成されたトラッキングURLをコンソールに出力
         console.log('[DEBUG] Generated tracking URL:', data.trackingUrl);
+
+        // GTM イベント送信
+        trackDealClick({
+          dealId: data.dealId,
+          dealName: data.dealName,
+          aspName: data.aspName,
+          trackingId: data.trackingId,
+          eventId: data.eventId,
+          isMember: data.isMember,
+          timestamp: data.timestamp,
+        });
 
         // 別タブでアフィリエイトページを開く
         window.open(data.trackingUrl, '_blank');

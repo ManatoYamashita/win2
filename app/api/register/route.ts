@@ -94,6 +94,7 @@ export async function POST(request: NextRequest) {
           memberId,
           email,
           emailSent: emailResult.success,
+          timestamp: new Date().toISOString(), // GTM tracking用
         },
         { status: 201 }
       );
@@ -121,6 +122,7 @@ export async function POST(request: NextRequest) {
           memberId,
           email,
           emailSent: false,
+          timestamp: new Date().toISOString(), // GTM tracking用
         },
         { status: 201 }
       );

@@ -117,8 +117,19 @@ export async function POST(request: NextRequest) {
     console.log("[track-click] Tracking URL generated:", trackingUrl.toString());
 
     // 7. レスポンス返却（非会員の場合はCookie設定）
+    // GTM tracking用に追加情報を含める
     const response = NextResponse.json(
-      { trackingUrl: trackingUrl.toString() },
+      {
+        trackingUrl: trackingUrl.toString(),
+        // GTM event tracking data
+        dealId: dealId,
+        dealName: deal.dealName,
+        aspName: deal.aspName,
+        trackingId: trackingId,
+        eventId: eventId,
+        isMember: !!session?.user?.memberId,
+        timestamp: new Date().toISOString(),
+      },
       { status: 200 }
     );
 

@@ -25,6 +25,12 @@ WIN×Ⅱ is a membership-based affiliate blog platform that provides cashback to
 - Primary: A8.net
 - Future: AFB, もしもアフィリエイト, バリューコマース
 
+**Analytics & Tracking:**
+- Google Tag Manager (GTM): Tag management and event tracking
+- Google Analytics 4 (GA4): User behavior analytics
+- Google Search Console (GSC): Search performance and sitemap management
+- Custom event tracking: `sign_up` (member registration), `deal_click` (affiliate click)
+
 **Key Dependencies:**
 - bcryptjs v3.0.2 (password hashing, salt rounds: 10)
 - zod v4.1.12 (validation)
@@ -74,6 +80,12 @@ WIN×Ⅱ is a membership-based affiliate blog platform that provides cashback to
 **UI Components:**
 - `components/ui/*`: shadcn/ui components (Button, Card, Form, Input, etc.)
 - `components/providers/session-provider.tsx`: Next-Auth SessionProvider wrapper
+
+**Analytics & Tracking:**
+- `components/analytics/google-tag-manager.tsx`: GTM script injection components
+- `lib/gtm.ts`: Type-safe GTM helper functions (trackSignUp, trackDealClick)
+- `types/gtm.d.ts`: GTM event type definitions and window.dataLayer extension
+- `docs/analytics/gtm-setup.md`: Complete GTM × GA4 × GSC setup guide
 
 ### Directory Patterns
 
@@ -471,6 +483,9 @@ RESEND_FROM_EMAIL=onboarding@resend.dev  # Development: onboarding@resend.dev, P
 
 # Application URLs
 NEXT_PUBLIC_APP_URL=http://localhost:3000  # Used for email verification links
+
+# Google Tag Manager (Analytics)
+NEXT_PUBLIC_GTM_ID=GTM-XXXXXXX  # GTM container ID (optional, analytics will not work without it)
 ```
 
 ### Environment Variable Notes
@@ -479,6 +494,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000  # Used for email verification links
 - **NEXTAUTH_SECRET**: Generate unique secret for each environment (dev/staging/prod)
 - **RESEND_VALID**: Controls email functionality (default: `false` due to Wix DNS restrictions). Set to `true` only after DNS migration.
 - **RESEND_FROM_EMAIL**: Development uses `onboarding@resend.dev`, production requires verified domain
+- **NEXT_PUBLIC_GTM_ID**: GTM container ID for analytics tracking. If not set, GTM components will warn but not break the app. See `docs/analytics/gtm-setup.md` for setup guide.
 - **NEXT_PUBLIC_* variables**: Exposed to browser, use for non-sensitive config only
 
 ### Template File

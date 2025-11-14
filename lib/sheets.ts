@@ -51,6 +51,7 @@ export interface DealRow {
   dealId: string;
   dealName: string;
   affiliateUrl: string;
+  aspName?: string;
   companyName?: string;
   rawAffiliateUrl?: string;
 }
@@ -419,6 +420,7 @@ export async function getDealById(dealId: string): Promise<DealRow | null> {
       dealId: dealRow[1] || "",           // B列: 案件ID
       dealName: dealRow[2] || "",         // C列: 案件名
       affiliateUrl,
+      aspName: dealRow[3] || "",
       companyName: dealRow[3] || "",
       rawAffiliateUrl: dealRow[4] || "",
     };
@@ -446,6 +448,7 @@ export async function getAllActiveDeals(): Promise<DealRow[]> {
           dealId: row[1] || "",
           dealName: row[2] || "",
           affiliateUrl,
+          aspName: row[3] || "",
           companyName: row[3] || "",
           rawAffiliateUrl: row[4] || "",
         } satisfies DealRow;
