@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - 'feature/**'
+      - 'fix/**'
+      - 'update/**'
+      - 'refactor/**'
+      - 'doc/**'
+      - 'test/**'
 
 jobs:
   test-and-pr:
@@ -22,28 +27,61 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: npm
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
+        run: pnpm install --frozen-lockfile
 
       - name: Lint
-        run: npm run lint
+        run: pnpm lint
 
-      - name: Typecheck
-        run: npx tsc --noEmit
+      - name: Type check
+        run: pnpm type-check
 
-      - name: Prepare change summary
+      - name: Build
+        run: pnpm build
+
+      - name: Prepare PR body from template
         id: summary
         env:
           TARGET_BRANCH: dev
         run: |
           git fetch origin "${TARGET_BRANCH}"
-          echo "# featureブランチ差分概要" > pr-body.md
+
+          # PRテンプレートファイルを読み込み
+          if [ -f ".github/pull_request_template.md" ]; then
+            cat .github/pull_request_template.md > pr-body.md
+          else
+            echo "# Pull Request" > pr-body.md
+            echo "" >> pr-body.md
+            echo "## 変更内容の概要" >> pr-body.md
+            echo "" >> pr-body.md
+          fi
+
+          # コミット履歴を追加セクションとして挿入
           echo "" >> pr-body.md
+          echo "---" >> pr-body.md
+          echo "" >> pr-body.md
+          echo "## 📋 コミット履歴（自動生成）" >> pr-body.md
+          echo "" >> pr-body.md
+
           if git rev-parse --verify "origin/${TARGET_BRANCH}" >/dev/null 2>&1; then
             LOG=$(git log "origin/${TARGET_BRANCH}..HEAD" --pretty=format:'- %s (%h)')
             if [ -z "$LOG" ]; then
@@ -54,6 +92,7 @@ jobs:
           else
             echo "- origin/${TARGET_BRANCH} ブランチが取得できませんでした。" >> pr-body.md
           fi
+
           {
             echo "body<<EOF"
             cat pr-body.md
@@ -71,11 +110,17 @@ jobs:
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const headBranch = context.ref.replace('refs/heads/', '');
-            if (!headBranch.startsWith('feature/')) {
-              core.info(`Head branch ${headBranch} is not feature/*, skipping PR creation.`);
+
+            // 開発ブランチのプレフィックス一覧
+            const allowedPrefixes = ['feature/', 'fix/', 'update/', 'refactor/', 'doc/', 'test/'];
+            const isAllowedBranch = allowedPrefixes.some(prefix => headBranch.startsWith(prefix));
+
+            if (!isAllowedBranch) {
+              core.info(`Head branch ${headBranch} is not a development branch, skipping PR creation.`);
               return;
             }
-            const body = process.env.PR_BODY || '# featureブランチ差分概要\n\n- 変更点情報を生成できませんでした。';
+
+            const body = process.env.PR_BODY || '# Pull Request\n\n## 変更内容の概要\n\n- 変更点情報を生成できませんでした。';
             const title = `[CI] ${headBranch} -> dev 自動PR`;
 
             const handleForbiddenError = (error) => {
