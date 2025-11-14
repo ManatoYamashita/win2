@@ -1,12 +1,12 @@
 import { MetadataRoute } from "next";
 import { getBlogs, getCategories } from "@/lib/microcms";
-import type { Blog, Category } from "@/types/microcms";
+import type { BlogResponse, CategoryResponse } from "@/types/microcms";
 
 /**
  * Fetch all blogs with pagination to handle more than 100 items
  */
 async function getAllBlogs() {
-  let allBlogs: Blog[] = [];
+  let allBlogs: BlogResponse[] = [];
   let offset = 0;
   const limit = 100;
   let hasMore = true;
@@ -25,7 +25,7 @@ async function getAllBlogs() {
  * Fetch all categories with pagination to handle more than 100 items
  */
 async function getAllCategories() {
-  let allCategories: Category[] = [];
+  let allCategories: CategoryResponse[] = [];
   let offset = 0;
   const limit = 100;
   let hasMore = true;
