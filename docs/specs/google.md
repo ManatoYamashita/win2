@@ -123,7 +123,7 @@ L: 確認日時（ISO8601形式（例: 2025-01-03T12:00:00Z）
 
 ### Google Apps Script
 
-- `google-spread-sheet/cashback-processor.gs`
+- `google-spread-sheet/gode.gs`
   - 内容: 成果CSVの取り込み〜キャッシュバック集計、設定ダイアログ、日次トリガーを制御するメインGASファイル。
 
 ### Google Apps Script（案件マスタ用）

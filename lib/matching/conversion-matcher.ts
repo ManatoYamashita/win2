@@ -157,7 +157,7 @@ async function calculateMatchScore(
   );
 
   // 3. 報酬額の妥当性（完全:30点, 許容範囲:15点）
-  if (dealInfo) {
+  if (dealInfo?.rewardAmount !== undefined && dealInfo.rewardAmount !== null) {
     scoreBreakdown.rewardMatch = calculateRewardValidityScore(
       dealInfo.rewardAmount,
       conversionReward
