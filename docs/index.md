@@ -35,6 +35,11 @@ docs/
 │   ├── microcms-setup.md         ← microCMS設定ガイド（API作成、フィールド定義、環境変数設定）
 │   └── resend-setup.md           ← Resend.com 詳細セットアップ手順書（DNS設定・ドメイン検証・APIキー）
 │
+├── operations/               ← 運用マニュアル・メンテナンスガイド
+│   ├── afb-a8-hybrid-workflow.md         ← AFB自動ポーリング + A8.net手動CSVハイブリッド運用マニュアル
+│   ├── gas-a8net-update-guide.md         ← Google Apps Script修正ガイド（A8.net対応）
+│   └── environment-variables-setup.md    ← 環境変数設定ガイド（GitHub Secrets + Vercel）
+│
 ├── architecture/             ← アーキテクチャ決定記録・インフラ構成
 │   └── dns-infrastructure.md ← DNS/メールインフラ構成、Wix DNS制限、RESEND_VALIDフィーチャーフラグ
 │
@@ -239,6 +244,100 @@ docs/
 ## 更新履歴
 
 このセクションは、ドキュメントの主要な更新を記録します。
+
+### 2025-11-15
+
+#### AFB自動ポーリング + A8.net手動CSVハイブリッド実装完了（Issue #22完了）
+- **operations/afb-a8-hybrid-workflow.md**: 新規作成（AFB自動ポーリング + A8.net手動CSVハイブリッド運用マニュアル v1.0.0）
+  - AFB案件の完全自動化フロー（GitHub Actions Scheduler、10分毎ポーリング）
+  - A8.net案件の手動CSVワークフロー（週1回、所要5分）
+  - システム構成図とデータフロー図
+  - モニタリング方法（GitHub Actions実行ログ確認、Google Sheets確認）
+  - トラブルシューティング（AFB/A8.net別対策）
+  - 定期作業スケジュール（毎日自動、週次手動）
+  - 緊急時のFallback Plan
+- **operations/gas-a8net-update-guide.md**: 新規作成（Google Apps Script修正ガイド v1.0.0）
+  - A8.net Parameter Tracking Report CSV対応のためのGAS修正手順
+  - HEADER_CANDIDATES拡張（A8.net固有カラム名追加：パラメータ(ID1)、ステータス名、発生報酬額、プログラム名）
+  - APPROVED_VALUES拡張（A8.net固有ステータス値：成果確定、報酬確定、支払済）
+  - ステータス判定ロジック拡張（PENDING_VALUES、REJECTED_VALUES）
+  - A8.net CSVカラム構成とGAS変数マッピング表
+  - 実装手順（Apps Script編集、テスト実行、確認項目）
+  - トラブルシューティング
+- **operations/environment-variables-setup.md**: 新規作成（環境変数設定ガイド v1.0.0）
+  - GitHub Secrets設定（CRON_SECRET、APP_URL）
+  - Vercel環境変数設定（CRON_SECRET、AFB_PARTNER_ID、AFB_API_KEY）
+  - CRON_SECRET生成方法（OpenSSL、Node.js、オンラインツール）
+  - 設定値のバックアップとセキュア保管方法
+  - 既存環境変数との統合
+  - 動作確認手順（GitHub Actions手動実行、ログ確認、Google Sheets確認）
+  - トラブルシューティング（401 Unauthorized、500 Server Error、AFB APIエラー）
+  - セキュリティベストプラクティス（環境変数ローテーション、アクセス制限）
+- **.env.example**: 更新（AFB + GitHub Actions環境変数追加 v2.0.0）
+  - AFB_PARTNER_ID、AFB_API_KEY（コメント解除、実装完了マーク付き）
+  - CRON_SECRET追加（GitHub Actions認証用）
+  - A8.net注記更新（Manual CSV workflow、Media Member制限）
+- **.github/workflows/afb-sync.yml**: 新規作成（GitHub Actions Scheduler設定）
+  - 10分毎実行（cron: '*/10 * * * *'）
+  - AFB Sync API呼び出し（/api/cron/sync-afb-conversions）
+  - CRON_SECRET認証
+  - HTTPステータスコード検証
+  - エラー時の通知（失敗ログ出力）
+  - 手動実行サポート（workflow_dispatch）
+- **app/api/cron/sync-afb-conversions/route.ts**: 復元 + 認証強化（v2.0.0）
+  - コミット b8e9b98~1 からコード復元
+  - GETメソッドからPOSTメソッドに変更
+  - CRON_SECRET検証ロジック追加（Bearer token認証）
+  - 認証失敗時は401 Unauthorizedを返却
+  - CRON_SECRET未設定時は500 Server Errorを返却
+  - AFB APIポーリング処理（過去7日間の成果データ取得）
+  - 重複チェック（commit_idベース）
+  - Google Sheets「成果CSV_RAW」への自動書き込み
+- **lib/asp/afb-client.ts**: 復元（コミット b8e9b98~1 から）
+  - AFB API呼び出しロジック
+  - fetchAfbConversionsLastNDays関数
+- **lib/matching/conversion-matcher.ts**: 復元（コミット b8e9b98~1 から）
+  - 成果マッチングアルゴリズム
+- **types/afb-api.ts**: 復元（コミット b8e9b98~1 から）
+  - AFB API型定義
+  - AfbConversionData、ConversionStatus型
+- **index.md**: 更新（operations/セクション追加、更新履歴追加 v2.2.0）
+  - ツリー構造にoperations/ディレクトリ追加（3ドキュメント）
+  - 更新履歴に2025-11-15エントリ追加
+- **実装結果**:
+  - ✅ AFB自動ポーリング: GitHub Actions Schedulerで10分毎実行、完全自動化
+  - ✅ A8.net手動CSV: 週1回手動ダウンロード→Google Sheets貼り付け（所要5分）
+  - ✅ 両ASP成果統合: 「成果データ」シートで一元管理
+  - ✅ セキュリティ: CRON_SECRET認証によるAPI保護
+  - ✅ 運用マニュアル: 完全な運用フロー文書化
+  - ✅ 環境変数ガイド: GitHub Secrets + Vercel設定手順完備
+- **A8.net Parameter Tracking検証完了（Issue #22）**:
+  - ✅ Parameter Tracking Report機能確認済み（CSV出力成功）
+  - ✅ id1カラム存在確認（memberID正常記録）
+  - ✅ ステータス名カラム確認（未確定/確定/否認対応）
+  - ✅ 成果データ完全性確認（報酬額、成果ID、日時情報）
+  - ✅ GitHub Issue #22完了報告投稿
+  - ✅ Phase 2-4完了（A8.net Parameter Tracking検証成功）
+- **specs/google.md**: 更新（GASコードA8.net対応版に全面書き換え v2.0.0）
+  - HEADER_CANDIDATES拡張（A8.net Parameter Tracking Report固有カラム名対応）
+    - memberId: パラメータ(id1)、パラメータid1、パラメータ（id1）、パラメータ（ID1）、パラメータID1 追加
+    - reward: 発生報酬額、確定報酬額 追加
+    - status: ステータス名 追加
+    - dealName: プログラム名 追加
+  - APPROVED_VALUES拡張（A8.net固有ステータス値対応）
+    - 成果確定、報酬確定、支払済、支払い済み 追加
+  - PENDING_VALUES新規追加（未確定ステータス判定）
+    - 未確定、成果発生、未承認、審査中、確認中
+  - REJECTED_VALUES新規追加（否認ステータス判定）
+    - 否認、却下、非承認、キャンセル、取消、無効
+  - isApprovedStatus_関数拡張（ステータス判定ロジック強化）
+    - 未確定・否認の明示的判定追加
+    - PENDING_VALUES、REJECTED_VALUESによる厳密なステータス判定
+    - より正確なキャッシュバック計算を実現
+  - ✅ A8.net Parameter Tracking Report CSV完全対応
+  - ✅ AFB APIポーリングとのデータ統合対応
+  - ✅ 複数ASPの柔軟なCSVフォーマット対応
+- **ステータス**: AFB自動ポーリング実装完了、A8.net手動CSVワークフロー確立、GASコードA8.net対応完了、運用ドキュメント完備、Phase 2-4完了、Issue #22完了
 
 ### 2025-01-09
 

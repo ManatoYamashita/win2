@@ -353,7 +353,7 @@ function HeroSection({ resolveCta }: { resolveCta: CtaResolver }) {
       </div>
       <div
         ref={ref}
-        className="relative z-10 mx-auto flex max-w-[1100px] flex-col gap-12 px-6 pt-12 md:pt-24 md:flex-row md:items-center lg:px-8"
+        className="relative z-10 mx-auto flex max-w-[1100px] flex-col gap-12 px-6 pt-12 md:flex-row md:items-center lg:px-8"
       >
         <div className="relative z-40 max-w-xl space-y-8">
           <div className="space-y-3">
