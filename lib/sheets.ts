@@ -39,13 +39,11 @@ export interface MemberRow {
 /**
  * 案件マスタ型定義
  * シート構成:
- * A: アフィリエイトURL
+ * A: 整形済みアフィリエイトURL
  * B: 案件ID (一意)
  * C: 案件名
- * D: ASP名
- * E: 報酬額
- * F: キャッシュバック率 (例: 0.20 = 20%)
- * G: 有効/無効 (TRUE/FALSE)
+ * D: 会社名（手書き）
+ * E: ROW URL（ASP発行の元URL）
  */
 export interface DealRow {
   dealId: string;
@@ -54,6 +52,9 @@ export interface DealRow {
   aspName?: string;
   companyName?: string;
   rawAffiliateUrl?: string;
+  rewardAmount?: number;
+  cashbackRate?: number;
+  isActive?: boolean;
 }
 
 /**
