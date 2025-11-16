@@ -238,7 +238,6 @@ export async function findMatchingCandidates(
 
     // 2. 時間範囲で事前フィルタリング（±24時間）
     const hoursIn24 = 24 * 60 * 60 * 1000;
-    const commitDate = new Date(commitTime);
     const filteredLogs = clickLogs.filter(log => {
       const timeDiff = calculateTimeDifference(log.timestamp, commitTime);
       return timeDiff <= hoursIn24;

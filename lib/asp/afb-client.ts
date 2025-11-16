@@ -2,7 +2,6 @@ import type {
   AfbApiRequest,
   AfbApiResponse,
   AfbConversionData,
-  ConversionDateType,
 } from "@/types/afb-api";
 
 /**
