@@ -184,12 +184,14 @@ CMS/データ管理:
      // Cookieに保存（同一ユーザーの追跡用）
    }
    
-   // クリックログをGoogle Sheetsに記録
+   // イベントIDを生成し、クリックログをGoogle Sheetsに記録
+   const eventId = crypto.randomUUID();
    await appendToSheet("クリックログ", [
-     new Date().toISOString(),
+     formatJapaneseDateTime(new Date()),
      memberId,
      dealName,
      dealId,
+     eventId,
    ]);
    
    // microCMSから案件情報を取得
@@ -198,8 +200,8 @@ CMS/データ管理:
      contentId: dealId,
    });
    
-   // アフィリエイトURLにid1パラメータを付与
-   const trackingUrl = `${deal.affiliateUrl}?id1=${memberId}`;
+   // アフィリエイトURLにid1/id2/eventIdパラメータを付与
+   const trackingUrl = `${deal.affiliateUrl}?id1=${memberId}&id2=${eventId}&eventId=${eventId}`;
    
    // リダイレクトURLを返す
    return { url: trackingUrl };

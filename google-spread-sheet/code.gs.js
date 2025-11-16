@@ -1,293 +1,172 @@
 /**
- * WIN×Ⅱ 成果CSV 取込～キャッシュバック集計（2025/10/05）
+ * WIN×Ⅱ A8.net成果マッチング処理（2025/11/15 v4.0.0）
  * -------------------------------------------------------------------
  * シート:
- *  - `成果CSV_RAW`：ASP のCSV貼付（ヘッダ1行＋データ）
- *  - `成果データ` ：本スクリプトの出力先
- *  - `会員リスト` ：memberId -> 氏名 のマスタ（任意）
- *  - `クリックログ`：A:C = (日時(JST), memberId, dealName) フォールバック用
+ *  - `成果CSV_RAW`：A8.net Parameter Tracking Report CSV貼付（ヘッダ1行＋データ）
+ *  - `クリックログ`：成果情報を記録する対象シート
  *
- * 設定（スクリプトプロパティに保存）:
- *  - CASHBACK_RATE (Number)          既定 0.20
- *  - ONLY_PAY_ON_APPROVED (Boolean)  既定 true
- *  - ROUNDING_MODE (String)          "FLOOR" | "ROUND" | "CEIL" （既定 "FLOOR"）
+ * 処理内容:
+ *  - 成果CSV_RAWから id1（会員ID） + id2（イベントID）、案件名、ステータスを取得
+ *  - クリックログの該当行（B列=id1, E列=id2）を検索
+ *  - 該当行のF列に「申し込み案件名」、G列に「ステータス」を記録
  *
- * 動作:
- *  - 「承認のみ支払い」時、未承認はキャッシュバック 0
- *  - 丸めは ROUNDING_MODE に従い reward * rate を処理
- *  - バッチ出力でタイムアウト回避
- *  - メニュー「成果処理」から実行、または `setupTrigger()` で 03:10 自動実行
+ * 実行方法:
+ *  - 手動実行: メニュー「成果処理」→「成果をクリックログに記録」
+ *
+ * A8.net Parameter Tracking Report 対応:
+ *  - HEADER_CANDIDATES: パラメータ(id1)、パラメータ(id2)、プログラム名、ステータス名
  */
 
 const SHEET_RAW = '成果CSV_RAW';
-const SHEET_OUT = '成果データ';
-const SHEET_MEMBERS = '会員リスト';
 const SHEET_CLICKLOG = 'クリックログ';
-
-const APPROVED_VALUES = [
-  '承認', '確定', '承認済', '確定済',
-  'approved', 'Approved', 'APPROVED',
-  // A8.net固有のステータス値
-  '成果確定', '報酬確定', '支払済', '支払い済み'
-];
-
-// 未確定ステータス値（キャッシュバック0円）
-const PENDING_VALUES = ['未確定', '成果発生', '未承認', '審査中', '確認中'];
-
-// 否認ステータス値（キャッシュバック0円）
-const REJECTED_VALUES = ['否認', '却下', '非承認', 'キャンセル', '取消', '無効'];
-
-const BATCH_SIZE = 300; // 数百～数千行を想定
 
 const HEADER_CANDIDATES = {
   memberId: [
-    'id1', 'memberid', 'member_id', '会員id', '会員ＩＤ', '会員ｉｄ', '会員id（id1）', '会員', 'id', 'ID',
-    // A8.net Parameter Tracking Report固有カラム名
-    'パラメータ(id1)', 'パラメータid1', 'パラメータ（id1）', 'パラメータ（ID1）', 'パラメータID1'
+    'パラメータ(id1)', 'パラメータid1', 'パラメータ（id1）', 'パラメータ（ID1）', 'パラメータID1',
+    'id1', 'memberid', 'member_id', '会員id', '会員ＩＤ', '会員ｉｄ'
   ],
-  reward: [
-    'reward', '成果報酬', '報酬額', '報酬', 'commission', '金額', '確定報酬', '承認報酬',
-    // A8.net固有カラム名
-    '発生報酬額', '確定報酬額'
-  ],
-  status: [
-    'status', '承認状況', 'ステータス', '状態',
-    // A8.net固有カラム名
-    'ステータス名'
+  eventId: [
+    'パラメータ(id2)', 'パラメータid2', 'パラメータ（id2）', 'パラメータ（ID2）', 'パラメータID2',
+    'id2', 'eventid', 'event_id', 'イベントid', 'イベントＩＤ'
   ],
   dealName: [
-    'dealname', '案件名', '商品名', '広告名', 'offer', 'program', 'サービス名', '広告主名', 'キャンペーン名',
-    // A8.net固有カラム名
-    'プログラム名'
+    'プログラム名', '案件名', '商品名', '広告名', 'program', 'dealname', 'offer', 'サービス名', '広告主名'
   ],
-};
-
-const MEMBER_SHEET_HEADERS = {
-  memberId: ['memberid', 'member_id', '会員id', '会員ＩＤ', 'id', 'ID'],
-  name:     ['氏名', '名前', 'name', 'お名前', '会員名', 'ニックネーム', 'displayname', '表示名']
-};
-const CLICKLOG_HEADERS = {
-  memberId: ['memberid', 'member_id', '会員id', 'id', 'ID'],
-  dealName: ['dealname', '案件名', '商品名', '広告名', 'サービス名']
+  status: [
+    'ステータス名', '承認状況', 'ステータス', '状態', 'status'
+  ]
 };
 
 // =============== メニュー ===============
 function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('成果処理')
-    .addItem('CSV取込→集計', 'runImportAndAggregate')
-    .addSeparator()
-    .addItem('設定...', 'openSettingsDialog')
-    .addSeparator()
-    .addItem('毎日 03:10 自動実行を設定', 'setupTrigger')
+    .addItem('成果をクリックログに記録', 'recordConversionsToClickLog')
     .addToUi();
 }
 
-// =============== 設定関連（スクリプトプロパティ） ===============
-function getScriptProps_() { return PropertiesService.getScriptProperties(); }
-function getConfig_() {
-  const p = getScriptProps_().getProperties();
-  return {
-    CASHBACK_RATE: Number(p.CASHBACK_RATE ?? 0.20),
-    ONLY_PAY_ON_APPROVED: String(p.ONLY_PAY_ON_APPROVED ?? 'true') === 'true',
-    ROUNDING_MODE: (p.ROUNDING_MODE || 'FLOOR').toUpperCase(), // FLOOR | ROUND | CEIL
-  };
-}
-function saveConfig_(cfg) {
-  const p = getScriptProps_();
-  const toSave = {
-    CASHBACK_RATE: String(cfg.CASHBACK_RATE ?? 0.20),
-    ONLY_PAY_ON_APPROVED: String(Boolean(cfg.ONLY_PAY_ON_APPROVED)),
-    ROUNDING_MODE: (cfg.ROUNDING_MODE || 'FLOOR').toUpperCase()
-  };
-  p.setProperties(toSave, true);
-}
-
-// 簡易 UI ダイアログ
-function openSettingsDialog() {
-  const ui = SpreadsheetApp.getUi();
-  const cfg = getConfig_();
-  const html = HtmlService.createHtmlOutput(`
-    <html>
-      <body style="font-family:system-ui, -apple-system, Segoe UI, Roboto, 'ヒラギノ角ゴ ProN', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif; padding:16px;">
-        <h3>成果処理 設定</h3>
-        <label>還元率 (例: 0.2 = 20%)<br>
-          <input id="rate" type="number" min="0" max="1" step="0.001" value="${cfg.CASHBACK_RATE}" style="width:120px"/>
-        </label><br><br>
-        <label>
-          <input id="only" type="checkbox" ${cfg.ONLY_PAY_ON_APPROVED ? 'checked' : ''}/> 承認のみ支払いに含める
-        </label><br><br>
-        <label>丸め方式
-          <select id="rounding">
-            <option ${cfg.ROUNDING_MODE==='FLOOR'?'selected':''}>FLOOR</option>
-            <option ${cfg.ROUNDING_MODE==='ROUND'?'selected':''}>ROUND</option>
-            <option ${cfg.ROUNDING_MODE==='CEIL'?'selected':''}>CEIL</option>
-          </select>
-        </label>
-        <br><br>
-        <button onclick="google.script.run
-            .withSuccessHandler(() => google.script.host.close())
-            .saveSettings({
-              CASHBACK_RATE: Number(document.getElementById('rate').value),
-              ONLY_PAY_ON_APPROVED: document.getElementById('only').checked,
-              ROUNDING_MODE: document.getElementById('rounding').value
-            })">保存</button>
-        <button onclick="google.script.host.close()">閉じる</button>
-      </body>
-    </html>
-  `).setWidth(420).setHeight(300);
-  ui.showModalDialog(html, '成果処理 設定');
-}
-function saveSettings(cfg) { saveConfig_(cfg); }
-
-// =============== トリガー ===============
-/** 毎日深夜の自動実行（例：03:10）をセットアップ */
-function setupTrigger() {
-  ScriptApp.getProjectTriggers()
-    .filter(t => t.getHandlerFunction() === 'runImportAndAggregate')
-    .forEach(t => ScriptApp.deleteTrigger(t));
-
-  ScriptApp.newTrigger('runImportAndAggregate')
-    .timeBased()
-    .atHour(3)
-    .nearMinute(10)
-    .everyDays(1)
-    .create();
-
-  console.log('[trigger] setup completed');
-}
-
-// =============== メイン集計 ===============
-function runImportAndAggregate() {
-  const cfg = getConfig_(); // ← パラメタ読み込み
+// =============== メイン処理 ===============
+/**
+ * 成果CSV_RAWをクリックログにマッチングして記録する
+ *
+ * 処理フロー:
+ * 1. 成果CSV_RAWからデータ読み込み
+ * 2. id1, id2, 案件名, ステータスを抽出
+ * 3. クリックログから該当行を検索（B列=id1, E列=id2）
+ * 4. 該当行のF列・G列を更新
+ */
+function recordConversionsToClickLog() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
-  const raw = ss.getSheetByName(SHEET_RAW);
-  if (!raw) throw new Error(`シート "${SHEET_RAW}" が見つかりません。`);
+  const rawSheet = ss.getSheetByName(SHEET_RAW);
+  const clickLogSheet = ss.getSheetByName(SHEET_CLICKLOG);
 
-  const out = getOrCreateSheet_(ss, SHEET_OUT);
-  const membersSheet = ss.getSheetByName(SHEET_MEMBERS);
-  const clicklogSheet = ss.getSheetByName(SHEET_CLICKLOG);
-
-  const memberMap = buildMemberMap_(membersSheet);                  // memberId -> 氏名
-  const latestDealByMember = buildLatestDealNameMap_(clicklogSheet);// memberId -> 最新 dealName
-
-  const rawValues = raw.getDataRange().getValues(); // [ [header...], [row...] ... ]
-  if (rawValues.length <= 1) { writeHeader_(out); return; }
-  const header = normalizeHeader_(rawValues[0]);
-
-  const col = {
-    memberId: findColIdx_(header, HEADER_CANDIDATES.memberId),
-    reward:   findColIdx_(header, HEADER_CANDIDATES.reward),
-    status:   findColIdx_(header, HEADER_CANDIDATES.status),   // 任意
-    dealName: findColIdx_(header, HEADER_CANDIDATES.dealName), // 任意（無ければクリックログ補完）
-  };
-  if (col.memberId < 0 || col.reward < 0) {
-    throw new Error('CSVの列特定に失敗（memberId / reward は必須）。ヘッダ候補配列を見直してください。');
+  // シート存在チェック
+  if (!rawSheet) {
+    SpreadsheetApp.getUi().alert(`エラー: シート「${SHEET_RAW}」が見つかりません`);
+    throw new Error(`シート「${SHEET_RAW}」が見つかりません`);
+  }
+  if (!clickLogSheet) {
+    SpreadsheetApp.getUi().alert(`エラー: シート「${SHEET_CLICKLOG}」が見つかりません`);
+    throw new Error(`シート「${SHEET_CLICKLOG}」が見つかりません`);
   }
 
-  out.clear();
-  writeHeader_(out);
+  // 成果CSV_RAW読み込み
+  const rawValues = rawSheet.getDataRange().getValues();
+  if (rawValues.length <= 1) {
+    SpreadsheetApp.getUi().alert('警告: 成果CSV_RAWにデータがありません');
+    console.log('[warn] 成果CSV_RAWにデータがありません');
+    return;
+  }
 
-  const rows = rawValues.slice(1);
-  const outputChunk = [];
-  let total = 0, wrote = 0, skipped = 0, approvedCount = 0;
+  const header = normalizeHeader_(rawValues[0]);
+  const col = {
+    memberId: findColIdx_(header, HEADER_CANDIDATES.memberId),
+    eventId: findColIdx_(header, HEADER_CANDIDATES.eventId),
+    dealName: findColIdx_(header, HEADER_CANDIDATES.dealName),
+    status: findColIdx_(header, HEADER_CANDIDATES.status)
+  };
 
-  for (let i = 0; i < rows.length; i++) {
-    const r = rows[i];
-    if (isRowEmpty_(r)) continue;
+  // 必須カラムチェック
+  if (col.memberId < 0) {
+    SpreadsheetApp.getUi().alert('エラー: id1（会員ID）カラムが見つかりません\n\nヘッダー候補: パラメータ(id1), id1, memberid');
+    throw new Error('id1カラムが見つかりません');
+  }
+  if (col.eventId < 0) {
+    SpreadsheetApp.getUi().alert('エラー: id2（イベントID）カラムが見つかりません\n\nヘッダー候補: パラメータ(id2), id2, eventid');
+    throw new Error('id2カラムが見つかりません');
+  }
 
-    const memberIdRaw = safeCell_(r[col.memberId]);
-    const rewardRaw   = safeCell_(r[col.reward]);
-    const statusRaw   = col.status >= 0 ? safeCell_(r[col.status]) : '';
-    const csvDealRaw  = col.dealName >= 0 ? safeCell_(r[col.dealName]) : '';
+  console.log('[info] カラム検出:', col);
 
-    if (!memberIdRaw || !rewardRaw) { skipped++; continue; }
+  // クリックログ読み込み
+  const clickLogValues = clickLogSheet.getDataRange().getValues();
+  if (clickLogValues.length <= 1) {
+    SpreadsheetApp.getUi().alert('警告: クリックログにデータがありません');
+    console.log('[warn] クリックログにデータがありません');
+    return;
+  }
 
-    const isApproved = isApprovedStatus_(statusRaw);
-    const reward = parseMoney_(rewardRaw);
+  let matched = 0, notMatched = 0;
+  const notMatchedList = [];
 
-    // ゲスト判定（guest: で始まるIDはゲストとして扱う）
-    const isGuest = /^guest:/i.test(memberIdRaw);
+  // 成果CSV_RAWの各行について処理
+  for (let i = 1; i < rawValues.length; i++) {
+    const row = rawValues[i];
+    if (isRowEmpty_(row)) continue;
 
-    const basePay = (cfg.ONLY_PAY_ON_APPROVED && !isApproved) ? 0 : reward;
-    const rawCashback = basePay * cfg.CASHBACK_RATE;
-    // ゲストの場合は還元額0、会員の場合は計算結果を適用
-    const cashback = isGuest ? 0 : applyRounding_(rawCashback, cfg.ROUNDING_MODE);
+    const memberId = safeCell_(row[col.memberId]);
+    const eventId = safeCell_(row[col.eventId]);
+    const dealName = col.dealName >= 0 ? safeCell_(row[col.dealName]) : '';
+    const status = col.status >= 0 ? safeCell_(row[col.status]) : '';
 
-    if (isApproved) approvedCount++;
+    if (!memberId || !eventId) {
+      console.log(`[warn] 行${i+1}: id1またはid2が空です`);
+      continue;
+    }
 
-    // ゲストの場合は「非会員」表記、会員の場合は会員リストから取得または memberIdRaw
-    const displayName = isGuest
-      ? '非会員'
-      : (memberMap.get(memberIdRaw) || memberIdRaw);
-    const dealName = csvDealRaw || latestDealByMember.get(memberIdRaw) || '不明';
+    // クリックログから該当行を検索（B列=memberId, E列=eventId）
+    let matchedRowIndex = -1;
+    for (let j = 1; j < clickLogValues.length; j++) {
+      const clickRow = clickLogValues[j];
+      const clickMemberId = safeCell_(clickRow[1]); // B列（0-indexed なので1）
+      const clickEventId = safeCell_(clickRow[4]);  // E列（0-indexed なので4）
 
-    outputChunk.push([
-      displayName,       // 氏名
-      dealName,          // 案件名
-      statusRaw || '',   // 承認状況
-      cashback,          // キャッシュバック金額（整数円）
-      memberIdRaw,       // 参考: memberId
-      reward,            // 参考: 原始報酬額
-      ''                 // 予備メモ
-    ]);
-    total++;
+      if (clickMemberId === memberId && clickEventId === eventId) {
+        matchedRowIndex = j;
+        break;
+      }
+    }
 
-    if (outputChunk.length >= BATCH_SIZE) {
-      appendToOutput_(out, outputChunk);
-      wrote += outputChunk.length;
-      outputChunk.length = 0;
-      Utilities.sleep(50);
+    if (matchedRowIndex >= 0) {
+      // F列（案件名）、G列（ステータス）を更新
+      clickLogSheet.getRange(matchedRowIndex + 1, 6).setValue(dealName);  // F列（1-indexed）
+      clickLogSheet.getRange(matchedRowIndex + 1, 7).setValue(status);    // G列（1-indexed）
+      matched++;
+      console.log(`[info] マッチング成功: id1=${memberId}, id2=${eventId} → 案件名=${dealName}, ステータス=${status}`);
+    } else {
+      console.log(`[warn] マッチング失敗: id1=${memberId}, id2=${eventId} に一致するクリックログが見つかりませんでした`);
+      notMatchedList.push(`id1=${memberId}, id2=${eventId}`);
+      notMatched++;
     }
   }
 
-  if (outputChunk.length) {
-    appendToOutput_(out, outputChunk);
-    wrote += outputChunk.length;
-  }
+  // 処理完了メッセージ
+  const summaryMessage = `成果マッチング処理完了\n\n成功: ${matched}件\n失敗: ${notMatched}件`;
+  console.log(`[info] 処理完了: マッチング成功=${matched}, マッチング失敗=${notMatched}`);
 
-  console.log(JSON.stringify({
-    total_rows_processed: total,
-    written: wrote,
-    skipped,
-    approvedCount,
-    cashback_rate: cfg.CASHBACK_RATE,
-    only_pay_on_approved: cfg.ONLY_PAY_ON_APPROVED,
-    rounding_mode: cfg.ROUNDING_MODE
-  }));
+  if (notMatched > 0 && notMatched <= 10) {
+    // 失敗が10件以下なら詳細表示
+    SpreadsheetApp.getUi().alert(summaryMessage + '\n\n【失敗した成果】\n' + notMatchedList.join('\n'));
+  } else if (notMatched > 10) {
+    // 失敗が多い場合は件数のみ
+    SpreadsheetApp.getUi().alert(summaryMessage + '\n\n失敗詳細はログを確認してください');
+  } else {
+    // 全件成功
+    SpreadsheetApp.getUi().alert(summaryMessage);
+  }
 }
 
 // =============== Utils ===============
-function applyRounding_(n, mode) {
-  const x = Number(n || 0);
-  if (!Number.isFinite(x)) return 0;
-  switch ((mode || 'FLOOR').toUpperCase()) {
-    case 'CEIL':  return Math.ceil(x);
-    case 'ROUND': return Math.round(x);
-    case 'FLOOR':
-    default:      return Math.floor(x);
-  }
-}
-function getOrCreateSheet_(ss, name) {
-  let sh = ss.getSheetByName(name);
-  if (!sh) sh = ss.insertSheet(name);
-  return sh;
-}
-function writeHeader_(out) {
-  const header = ['氏名', '案件名', '承認状況', 'キャッシュバック金額', 'memberId(参考)', '原始報酬額(参考)', 'メモ'];
-  out.getRange(1, 1, 1, header.length).setValues([header]);
-}
-function appendToOutput_(out, rows) {
-  if (!rows.length) return;
-  const startRow = out.getLastRow() + 1;
-  out.getRange(startRow, 1, rows.length, rows[0].length).setValues(rows);
-}
-function isRowEmpty_(arr) { return arr.every(v => !safeCell_(v)); }
-function safeCell_(v) {
-  if (v === null || v === undefined) return '';
-  const s = (typeof v === 'string') ? v : String(v);
-  return s.trim();
-}
 function normalizeHeader_(headerArr) {
   return headerArr.map(h => safeCell_(h).toLowerCase()
     .replace(/[＿－—–‐―ー]/g, '_')
@@ -296,6 +175,7 @@ function normalizeHeader_(headerArr) {
     .replace(/　/g, '')
   );
 }
+
 function findColIdx_(normalizedHeaderArr, candidates) {
   if (!Array.isArray(candidates)) return -1;
   const cands = candidates.map(c => c.toLowerCase()
@@ -303,77 +183,28 @@ function findColIdx_(normalizedHeaderArr, candidates) {
     .replace(/\s+/g, '')
     .replace(/[（）\(\)]/g, '')
   );
+
+  // 完全一致検索
   for (let i = 0; i < normalizedHeaderArr.length; i++) {
     const h = normalizedHeaderArr[i];
     if (cands.includes(h)) return i;
   }
+
+  // 部分一致検索
   for (let i = 0; i < normalizedHeaderArr.length; i++) {
     const h = normalizedHeaderArr[i];
     if (cands.some(c => h.includes(c))) return i;
   }
+
   return -1;
 }
-function parseMoney_(s) {
-  if (typeof s !== 'string') s = String(s);
-  const cleaned = s.replace(/[^\d.]/g, '');
-  const n = Number(cleaned);
-  return Number.isFinite(n) ? n : 0;
+
+function safeCell_(v) {
+  if (v === null || v === undefined) return '';
+  const s = (typeof v === 'string') ? v : String(v);
+  return s.trim();
 }
-function isApprovedStatus_(status) {
-  if (!status) return false;
-  const s = status.toString().trim().toLowerCase();
 
-  // 未確定または否認の場合は明示的にfalseを返す
-  if (PENDING_VALUES.some(v => s.includes(v.toLowerCase()))) {
-    return false;
-  }
-  if (REJECTED_VALUES.some(v => s.includes(v.toLowerCase()))) {
-    return false;
-  }
-
-  // 承認済みの場合のみtrueを返す
-  return APPROVED_VALUES.some(v => s.includes(v.toLowerCase()));
-}
-function buildMemberMap_(sheet) {
-  const map = new Map();
-  if (!sheet) return map;
-  const vals = sheet.getDataRange().getValues();
-  if (vals.length <= 1) return map;
-  const header = normalizeHeader_(vals[0]);
-
-  const colId = findColIdx_(header, MEMBER_SHEET_HEADERS.memberId);
-  const colName = findColIdx_(header, MEMBER_SHEET_HEADERS.name);
-  if (colId < 0) { return map; }
-
-  for (let i = 1; i < vals.length; i++) {
-    const row = vals[i];
-    const id = safeCell_(row[colId]);
-    if (!id) continue;
-    const name = (colName >= 0) ? safeCell_(row[colName]) : '';
-    if (name) map.set(id, name);
-  }
-  return map;
-}
-/** クリックログ: 同一 memberId の最終行を採用（A:C 既定。ヘッダ名ゆれも許容） */
-function buildLatestDealNameMap_(sheet) {
-  const map = new Map();
-  if (!sheet) return map;
-  const vals = sheet.getDataRange().getValues();
-  if (vals.length <= 1) return map;
-
-  const header = normalizeHeader_(vals[0]);
-  const colId = findColIdx_(header, CLICKLOG_HEADERS.memberId);
-  const colDeal = findColIdx_(header, CLICKLOG_HEADERS.dealName);
-
-  const idxId = colId >= 0 ? colId : 1;       // 既定: B列
-  const idxDeal = colDeal >= 0 ? colDeal : 2; // 既定: C列
-
-  for (let i = 1; i < vals.length; i++) {
-    const row = vals[i];
-    const id = safeCell_(row[idxId]);
-    const deal = safeCell_(row[idxDeal]);
-    if (!id || !deal) continue;
-    map.set(id, deal); // 後勝ち＝最後が最新
-  }
-  return map;
+function isRowEmpty_(arr) {
+  return arr.every(v => !safeCell_(v));
 }
