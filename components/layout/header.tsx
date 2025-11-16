@@ -88,21 +88,23 @@ export function Header() {
   // Mobile menu portal content
   const mobileMenuPortal = isMounted ? createPortal(
     <>
+      {/* eslint-disable-next-line jsx-a11y/aria-props */}
       <div
         className={cn(
           "fixed inset-0 z-[9998] bg-slate-900/50 backdrop-blur-sm transition-opacity duration-300 md:hidden",
           isMobileMenuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         )}
-        aria-hidden={!isMobileMenuOpen ? "true" : "false"}
+        aria-hidden={isMobileMenuOpen ? "false" : "true"}
         onClick={() => setIsMobileMenuOpen(false)}
       />
 
+      {/* eslint-disable-next-line jsx-a11y/aria-props */}
       <aside
         className={cn(
           "fixed inset-y-0 right-0 z-[9999] w-[80%] translate-x-full bg-white shadow-[-12px_0_36px_rgba(24,25,28,0.16)] transition-transform duration-300 md:hidden",
           isMobileMenuOpen && "translate-x-0"
         )}
-        aria-hidden={!isMobileMenuOpen ? "true" : "false"}
+        aria-hidden={isMobileMenuOpen ? "false" : "true"}
       >
         <div className="flex items-center justify-between border-b border-win2-surface-cream-200 px-5 py-4">
           <span className="text-sm font-semibold text-win2-neutral-900">メニュー</span>
@@ -111,6 +113,7 @@ export function Header() {
             onClick={toggleMobileMenu}
             className="rounded-md p-2"
             aria-label="メニューを閉じる"
+            tabIndex={isMobileMenuOpen ? 0 : -1}
           >
             <svg className="h-6 w-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -128,6 +131,7 @@ export function Header() {
                   "block py-2 text-base font-medium text-slate-600 transition-colors",
                   item.isActive ? "text-win2-primary-orage" : "hover:text-win2-primary-orage"
                 )}
+                tabIndex={isMobileMenuOpen ? 0 : -1}
               >
                 {item.label}
               </Link>
@@ -143,6 +147,7 @@ export function Header() {
                   href="/blog"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-6 py-3 text-sm font-semibold text-white shadow-md shadow-win2-accent-rose/25 transition hover:opacity-90"
+                  tabIndex={isMobileMenuOpen ? 0 : -1}
                 >
                   ブログ
                 </Link>
@@ -153,6 +158,7 @@ export function Header() {
                     setIsMobileMenuOpen(false);
                   }}
                   className="w-full rounded-full border border-win2-surface-cream-200 px-6 py-3 text-sm font-medium text-slate-600 transition hover:text-win2-primary-orage"
+                  tabIndex={isMobileMenuOpen ? 0 : -1}
                 >
                   ログアウト
                 </button>
@@ -163,6 +169,7 @@ export function Header() {
                   href="/login"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="inline-flex w-full items-center justify-center rounded-full border border-win2-surface-cream-200 px-6 py-3 text-sm font-medium text-slate-600 transition hover:text-win2-primary-orage"
+                  tabIndex={isMobileMenuOpen ? 0 : -1}
                 >
                   ログイン
                 </Link>
@@ -170,6 +177,7 @@ export function Header() {
                   href="/register"
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage px-6 py-3 text-sm font-semibold text-white shadow-md shadow-win2-accent-rose/25 transition hover:opacity-90"
+                  tabIndex={isMobileMenuOpen ? 0 : -1}
                 >
                   無料メルマガ会員登録
                 </Link>
@@ -212,6 +220,7 @@ export function Header() {
           <div className="hidden items-center gap-4 md:flex">
             {isAuthenticated ? (
               <div className="relative" ref={profileMenuRef}>
+                {/* eslint-disable-next-line jsx-a11y/aria-props */}
                 <button
                   type="button"
                   onClick={() => setIsProfileMenuOpen((prev) => !prev)}

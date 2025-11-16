@@ -16,10 +16,7 @@ export function HeroSection({ resolveCta }: HeroSectionProps) {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsMounted(true);
-    }, 80);
-    return () => clearTimeout(timer);
+    setIsMounted(true);
   }, []);
 
   const heroReady = isMounted;
@@ -103,25 +100,28 @@ export function HeroSection({ resolveCta }: HeroSectionProps) {
   return (
     <section className="relative -mb-32 min-h-[540px] overflow-visible bg-gradient-to-b from-win2-surface-cream-320 via-white to-win2-surface-cream-150 pb-32 md:-mb-40 md:min-h-[640px] md:pb-44">
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          className="relative h-full w-full min-h-full"
-          initial={{ scale: 1.08, opacity: 0 }}
-          animate={heroReady ? { scale: 1, opacity: 1 } : { scale: 1.08, opacity: 0 }}
-          transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
-        >
-          <Image
+        {/* LCP要素: 背景画像を即座に表示（アニメーションなし） */}
+        <div className="relative h-full w-full min-h-full">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/assets/images/office-super-blur.webp"
             alt="オフィス背景"
-            fill
-            sizes="100vw"
             className="origin-top object-cover"
-            style={{ objectFit: "cover", objectPosition: "center top" }}
-            quality={75}
-            priority
+            style={{
+              position: "absolute",
+              height: "100%",
+              width: "100%",
+              inset: 0,
+              objectFit: "cover",
+              objectPosition: "center top",
+            }}
             loading="eager"
+            decoding="sync"
+            fetchPriority="high"
             draggable={false}
           />
-        </motion.div>
+        </div>
+        {/* オーバーレイはアニメーションを維持 */}
         <motion.div
           className="absolute inset-0 bg-gradient-to-b from-white/0 via-white/40 to-white/85"
           initial={{ opacity: 0 }}
