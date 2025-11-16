@@ -1,56 +1,43 @@
-name: AFB成果データ同期
+name: AFB成果データ同期 (disabled)
 
-# 定期的にAFB APIをポーリングして、成果データをGoogle Sheetsに同期
-# Vercel Free PlanのCron制限を回避するため、GitHub Actions Schedulerを使用
+# NOTE:
+# AFB連携は当面優先度を下げる方針のため、GitHub Actionsを停止しています。
+# 再開する際は、以下のコメントアウトされた`on:`と`jobs:`を復元してください。
 
-on:
-  schedule:
-    # 10分毎に実行（UTC時間: 毎時0分、10分、20分、30分、40分、50分）
-    - cron: '*/10 * * * *'
+# on:
+#   schedule:
+#     - cron: '*/10 * * * *'
+#   workflow_dispatch:
+#     inputs:
+#       days:
+#         description: '取得する過去の日数（デフォルト: 7日間）'
+#         required: false
+#         default: '7'
 
-  # 手動実行も可能
-  workflow_dispatch:
-    inputs:
-      days:
-        description: '取得する過去の日数（デフォルト: 7日間）'
-        required: false
-        default: '7'
-
-jobs:
-  sync-afb-conversions:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Trigger AFB Sync API
-        run: |
-          echo "🚀 Starting AFB成果データ同期..."
-
-          # POSTリクエストを送信してAFB APIポーリングを実行
-          response=$(curl -X POST \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            -H "Content-Type: application/json" \
-            -w "\n%{http_code}" \
-            -s \
-            "${{ secrets.APP_URL }}/api/cron/sync-afb-conversions")
-
-          # HTTPステータスコードを抽出
-          http_code=$(echo "$response" | tail -n1)
-          body=$(echo "$response" | sed '$d')
-
-          echo "📊 HTTP Status: $http_code"
-          echo "📄 Response: $body"
-
-          # ステータスコードが200系以外ならエラー
-          if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
-            echo "❌ AFB同期に失敗しました (HTTP $http_code)"
-            exit 1
-          fi
-
-          echo "✅ AFB同期が正常に完了しました"
-
-      - name: Notify on failure
-        if: failure()
-        run: |
-          echo "⚠️ AFB成果データ同期に失敗しました"
-          echo "詳細はGitHub Actionsのログを確認してください"
-          # 将来的にSlack/Discord通知を追加可能
+# jobs:
+#   sync-afb-conversions:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Trigger AFB Sync API
+#         run: |
+#           echo "🚀 Starting AFB成果データ同期..."
+#           response=$(curl -X POST \
+#             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+#             -H "Content-Type: application/json" \
+#             -w "\n%{http_code}" \
+#             -s \
+#             "${{ secrets.APP_URL }}/api/cron/sync-afb-conversions")
+#           http_code=$(echo "$response" | tail -n1)
+#           body=$(echo "$response" | sed '$d')
+#           echo "📊 HTTP Status: $http_code"
+#           echo "📄 Response: $body"
+#           if [ "$http_code" -lt 200 ] || [ "$http_code" -ge 300 ]; then
+#             echo "❌ AFB同期に失敗しました (HTTP $http_code)"
+#             exit 1
+#           fi
+#           echo "✅ AFB同期が正常に完了しました"
+#       - name: Notify on failure
+#         if: failure()
+#         run: |
+#           echo "⚠️ AFB成果データ同期に失敗しました"
+#           echo "詳細はGitHub Actionsのログを確認してください"
