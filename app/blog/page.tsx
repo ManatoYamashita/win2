@@ -1,8 +1,7 @@
 import { Metadata } from "next";
 import { getBlogs, getCategories } from "@/lib/microcms";
-import { BlogCard } from "@/components/blog/blog-card";
-import { Pagination } from "@/components/ui/pagination";
 import { CategoryNav } from "@/components/blog/category-nav";
+import { BlogInfiniteList } from "@/components/blog/blog-infinite-list";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
@@ -44,12 +43,6 @@ export const metadata: Metadata = {
   },
 };
 
-interface BlogListPageProps {
-  searchParams: Promise<{
-    page?: string;
-  }>;
-}
-
 const BLOGS_PER_PAGE = 10;
 
 /**
@@ -57,21 +50,14 @@ const BLOGS_PER_PAGE = 10;
  * ページネーション対応（1ページ10件表示）
  * カテゴリナビゲーション追加
  */
-export default async function BlogListPage({ searchParams }: BlogListPageProps) {
-  const params = await searchParams;
-  const currentPage = Number(params.page) || 1;
-  const offset = (currentPage - 1) * BLOGS_PER_PAGE;
-
-  // microCMSからブログ一覧とカテゴリ一覧を取得
-  const [{ contents: blogs, totalCount }, { contents: categories }] = await Promise.all([
+export default async function BlogListPage() {
+  const [{ contents: initialBlogs, totalCount }, { contents: categories }] = await Promise.all([
     getBlogs({
       limit: BLOGS_PER_PAGE,
-      offset,
+      offset: 0,
     }),
     getCategories({ limit: 100 }),
   ]);
-
-  const totalPages = Math.ceil(totalCount / BLOGS_PER_PAGE);
 
   const collectionPageSchema = {
     "@context": "https://schema.org",
@@ -86,15 +72,15 @@ export default async function BlogListPage({ searchParams }: BlogListPageProps) 
     },
   };
 
-  const itemListSchema = blogs.length
+  const itemListSchema = initialBlogs.length
     ? {
         "@context": "https://schema.org",
         "@type": "ItemList",
         name: "WIN×Ⅱ ブログ記事一覧",
         description: "キャッシュバックやアフィリエイトに役立つブログ記事をまとめたリスト",
-        itemListElement: blogs.map((blog, index) => ({
+        itemListElement: initialBlogs.map((blog, index) => ({
           "@type": "ListItem",
-          position: offset + index + 1,
+          position: index + 1,
           url: `${appUrl}/blog/${blog.id}`,
           name: blog.title,
           image: blog.thumbnail?.url,
@@ -123,33 +109,14 @@ export default async function BlogListPage({ searchParams }: BlogListPageProps) 
       <div className="container max-w-6xl mx-auto px-4 py-8">
         {/* ページヘッダー */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-gray-900">All Posts</h1>
+          <h1 className="text-4xl font-bold mb-2 text-gray-900">全ての投稿</h1>
         </div>
 
-        {/* ブログ記事がない場合 */}
-        {blogs.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600 text-lg">
-              まだブログ記事がありません
-            </p>
-          </div>
-        ) : (
-          <>
-            {/* ブログカードの縦並び表示 */}
-            <div className="flex flex-col gap-6 mb-8">
-              {blogs.map((blog) => (
-                <BlogCard key={blog.id} blog={blog} />
-              ))}
-            </div>
-
-            {/* ページネーション */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              basePath="/blog"
-            />
-          </>
-        )}
+        <BlogInfiniteList
+          initialBlogs={initialBlogs}
+          totalCount={totalCount}
+          pageSize={BLOGS_PER_PAGE}
+        />
       </div>
     </div>
   );

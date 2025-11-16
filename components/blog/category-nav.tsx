@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { CategoryResponse } from "@/types/microcms";
@@ -14,7 +15,7 @@ interface CategoryNavProps {
  *
  * 機能:
  * - オレンジ色の水平ナビゲーションバー
- * - All Posts + カテゴリ一覧を表示
+ * - 全ての投稿 + カテゴリ一覧を表示
  * - 現在選択中のカテゴリをハイライト
  * - 水平スクロール対応（モバイル）
  *
@@ -24,6 +25,22 @@ interface CategoryNavProps {
 export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps) {
   const pathname = usePathname();
   const isAllPostsActive = pathname === "/blog" && !currentCategoryId;
+  const latestCategories = useMemo(() => {
+    if (!Array.isArray(categories)) {
+      return [];
+    }
+    const getTimestamp = (category: CategoryResponse) => {
+      const fallbackDate =
+        category.publishedAt ||
+        category.createdAt ||
+        category.updatedAt ||
+        category.revisedAt;
+      return fallbackDate ? new Date(fallbackDate).getTime() : 0;
+    };
+    return [...categories]
+      .sort((a, b) => getTimestamp(b) - getTimestamp(a))
+      .slice(0, 5);
+  }, [categories]);
 
   return (
     <nav className="bg-orange-500 shadow-md">
@@ -31,7 +48,7 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
         {/* 水平スクロール対応 */}
         <div className="overflow-x-auto scrollbar-hide">
           <div className="flex items-center space-x-1 py-3 px-4 min-w-max">
-            {/* All Posts */}
+            {/* 全ての投稿 */}
             <Link
               href="/blog"
               className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
@@ -40,11 +57,11 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
                   : "text-white hover:bg-orange-600"
               }`}
             >
-              All Posts
+              全ての投稿
             </Link>
 
             {/* カテゴリリスト */}
-            {categories.map((category) => {
+            {latestCategories.map((category) => {
               const isActive = currentCategoryId === category.id;
               return (
                 <Link
@@ -61,10 +78,13 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
               );
             })}
 
-            {/* 続きを読む（ダミーリンク、必要に応じて削除） */}
-            <span className="px-4 py-2 text-white font-medium whitespace-nowrap opacity-60 cursor-not-allowed">
-              続きを読む
-            </span>
+            {/* 全カテゴリリンク */}
+            <Link
+              href="/categories"
+              className="px-4 py-2 rounded-lg font-medium whitespace-nowrap text-white/90 transition hover:bg-orange-600 hover:text-white"
+            >
+              全てのカテゴリへ
+            </Link>
           </div>
         </div>
       </div>
