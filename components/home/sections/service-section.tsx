@@ -10,9 +10,17 @@ export function ServiceSection() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [isVideoError, setIsVideoError] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
+  const [shouldPlay, setShouldPlay] = useState(false);
 
   useEffect(() => {
-    if (isVideoError || hasPlayed || !isVisible) return;
+    if (isVisible) {
+      setShouldPlay(true);
+    }
+  }, [isVisible]);
+
+  useEffect(() => {
+    if (isVideoError || hasPlayed || !shouldPlay) return;
 
     const videoNode = videoRef.current;
     if (!videoNode) return;
@@ -25,7 +33,7 @@ export function ServiceSection() {
         videoNode.currentTime = fallbackTime;
         setHasPlayed(true);
       });
-  }, [hasPlayed, isVideoError, isVisible]);
+  }, [hasPlayed, isVideoError, shouldPlay]);
 
   useEffect(() => {
     if (isVideoError) return;
@@ -48,65 +56,83 @@ export function ServiceSection() {
   return (
     <section className="bg-win2-surface-cream-50 py-24">
       <div className="mx-auto max-w-[1080px] px-6 lg:px-8">
-        <div className="mb-12 flex flex-col items-center justify-center gap-6 md:flex-row md:gap-4">
-          <Image
-            src="/assets/images/win2-is-bubble.webp"
-            alt="WIN×Ⅱは"
-            width={180}
-            height={180}
-            className="h-28 w-28 shrink-0 object-contain md:h-32 md:w-32 lg:h-36 lg:w-36"
-            priority
-          />
-          <h2 className="text-3xl font-bold md:text-4xl lg:text-5xl">
-            どんな<span className="text-win2-primary-orage">サービス</span>？
-          </h2>
-        </div>
-
-        <div className="mb-10 flex flex-wrap justify-center gap-4">
-          {serviceCategories.map((category) => (
-            <div
-              key={category}
-              className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-win2-primary-orage shadow-[0_12px_30px_rgba(242,111,54,0.18)]"
-            >
-              {category}
+        <div className="grid gap-12 lg:gap-16 md:grid-cols-2 md:items-start">
+          <div className="space-y-8">
+            <div className="flex flex-col items-center justify-center gap-6 text-center md:items-start md:text-left">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.25em] text-win2-primary-orage">
+                  ONE STOP PLATFORM
+                </p>
+                <h2 className="mt-2 text-3xl font-bold md:text-4xl lg:text-5xl">
+                  WIN×Ⅱってどんな<span className="text-win2-primary-orage">サービス</span>？
+                </h2>
+                <p className="mt-4 text-base text-slate-600">
+                  暮らしに必要な情報をワンストップでキャッチアップ。サービス比較、キャッシュバック情報、特典を一つのダッシュボードで管理できます。
+                </p>
+              </div>
             </div>
-          ))}
-        </div>
-        <div className="relative mx-auto w-full max-w-[900px] pt-16 sm:pt-20 lg:pt-24">
-          <div
-            ref={videoContainerRef}
-            className="overflow-hidden rounded-[32px] bg-win2-surface-cream-50"
-          >
-            {isVideoError ? (
-              <Image
-                src="/assets/images/onestop-figure.webp"
-                alt="暮らしを支える4つのカテゴリ"
-                width={720}
-                height={540}
-                className="w-full object-contain"
-              />
-            ) : (
-              <video
-                ref={videoRef}
-                className="block w-full object-cover min-h-[220px] sm:min-h-[320px] md:min-h-[520px]"
-                playsInline
-                preload="metadata"
-                muted
-                loop={false}
-                controls={false}
-                aria-label="WIN×Ⅱのサービス紹介"
-                poster="/assets/images/onestop-figure.webp"
-                onError={() => setIsVideoError(true)}
-                suppressHydrationWarning
-              >
-                <source src="/assets/images/what-is-win2.webm" type="video/webm" />
-                <img
+            <div className="flex flex-wrap justify-center gap-3 md:justify-start">
+              {serviceCategories.map((category) => (
+                <div
+                  key={category}
+                  className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-win2-primary-orage shadow-[0_12px_30px_rgba(242,111,54,0.18)]"
+                >
+                  {category}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="relative max-w-xl md:ml-auto">
+            <div
+              ref={videoContainerRef}
+              className="overflow-hidden rounded-[32px] bg-win2-surface-cream-50"
+            >
+              {isVideoError ? (
+                <Image
                   src="/assets/images/onestop-figure.webp"
                   alt="暮らしを支える4つのカテゴリ"
-                  className="block w-full object-contain"
+                  width={720}
+                  height={540}
+                  className="w-full object-contain"
                 />
-              </video>
-            )}
+              ) : (
+                <div className="relative">
+                  {!isVideoReady && (
+                    <Image
+                      src="/assets/images/onestop-figure.webp"
+                      alt="暮らしを支える4つのカテゴリ"
+                      width={720}
+                      height={540}
+                      className="absolute inset-0 z-10 h-full w-full object-cover"
+                    />
+                  )}
+                  <video
+                    ref={videoRef}
+                    className="block w-full object-cover min-h-[220px] sm:min-h-[300px] md:min-h-[420px]"
+                    playsInline
+                    preload="metadata"
+                    muted
+                    loop={false}
+                    controls={false}
+                    aria-label="WIN×Ⅱのサービス紹介"
+                    poster="/assets/images/onestop-figure.webp"
+                    onLoadedData={() => setIsVideoReady(true)}
+                    onCanPlay={() => setIsVideoReady(true)}
+                    onError={() => setIsVideoError(true)}
+                    suppressHydrationWarning
+                    style={{ opacity: isVideoReady ? 1 : 0, transition: "opacity 300ms ease" }}
+                  >
+                    <source src="/assets/images/what-is-win2.webm" type="video/webm" />
+                    <img
+                      src="/assets/images/onestop-figure.webp"
+                      alt="暮らしを支える4つのカテゴリ"
+                      className="block w-full object-contain"
+                    />
+                  </video>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
