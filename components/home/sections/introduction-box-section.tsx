@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useScrollReveal } from "@/hooks/use-scroll-reveal";
-import { cn } from "@/lib/utils";
 import { CtaResolver } from "../types";
 
 interface IntroductionBoxSectionProps {
@@ -10,18 +8,9 @@ interface IntroductionBoxSectionProps {
 }
 
 export function IntroductionBoxSection({ resolveCta }: IntroductionBoxSectionProps) {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
-
   return (
     <section className="bg-white py-16">
-      <div
-        ref={ref}
-        className={cn(
-          "mx-auto max-w-[900px] px-6",
-          "transition-transform-opacity",
-          isVisible ? "reveal-visible" : "reveal"
-        )}
-      >
+      <div className="mx-auto max-w-[900px] px-6">
         <div className="relative rounded-[40px] border-4 border-win2-primary-orage bg-white p-8 shadow-[0_20px_50px_rgba(242,111,54,0.2)] md:p-10">
           <div className="absolute -top-6 left-1/2 h-12 w-12 -translate-x-1/2 rotate-45 border-l-4 border-t-4 border-win2-primary-orage bg-white" />
 

@@ -85,12 +85,27 @@ const websiteSchema = {
   },
 };
 
+/**
+ * Fisher-Yatesアルゴリズムで配列をランダムにシャッフル
+ */
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export default async function Home() {
-  // microCMSから最新4件のカテゴリを取得（更新日降順）
-  const categoriesData = await getCategories({
-    orders: '-updatedAt',
-    limit: 4,
+  // microCMSからすべてのカテゴリを取得してランダムにシャッフル
+  const allCategoriesData = await getCategories({
+    limit: 100, // 十分な数を取得（通常のカテゴリ数より多めに設定）
   });
+
+  // ランダムにシャッフルして4件取得
+  const shuffledCategories = shuffleArray(allCategoriesData.contents);
+  const randomCategories = shuffledCategories.slice(0, 4);
 
   return (
     <>
@@ -102,7 +117,7 @@ export default async function Home() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
       />
-      <LandingPage categories={categoriesData.contents} />
+      <LandingPage categories={randomCategories} />
     </>
   );
 }

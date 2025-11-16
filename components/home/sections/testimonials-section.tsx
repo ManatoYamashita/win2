@@ -1,23 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useScrollReveal } from "@/hooks/use-scroll-reveal";
-import { cn } from "@/lib/utils";
 import { testimonials } from "../landing-data";
 
 export function TestimonialsSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
-
   return (
     <section className="bg-white py-24">
-      <div
-        ref={ref}
-        className={cn(
-          "mx-auto max-w-[1080px] space-y-10 px-6 text-center lg:px-8",
-          "transition-transform-opacity",
-          isVisible ? "reveal-visible" : "reveal"
-        )}
-      >
+      <div className="mx-auto max-w-[1080px] space-y-10 px-6 text-center lg:px-8">
         <div className="space-y-2">
           <h2 className="text-3xl font-bold md:text-4xl">ご利用者様の声</h2>
           <p className="text-sm text-slate-600 md:text-base">
