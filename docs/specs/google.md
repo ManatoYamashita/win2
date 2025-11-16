@@ -69,15 +69,20 @@ B: 会員ID (memberId or guest:UUID)
 C: 案件名 (dealName)
 D: 案件ID (dealId)
 E: イベントID (eventId) ← 新規追加（UUID v4）
+F: 申し込み案件名 ← GASで自動記録（成果マッチング時）
+G: ステータス ← GASで自動記録（成果マッチング時）
 ```
 
 **重要:**
 - E列「イベントID」は各クリック毎にユニークなUUID v4を生成
-- ASPへのトラッキングURLに `?id1={memberId}&eventId={eventId}` として付与
+- ASPへのトラッキングURLに `?id1={memberId}&id2={eventId}&eventId={eventId}` として付与（A8.net向けにid2へも同値をセット）
 - 成果CSV取込時に `eventId` で完全に紐付け可能（同じ会員の複数クリックを区別できる）
+- F列・G列はGAS `recordConversionsToClickLog()` 関数が成果CSV_RAWとマッチング時に自動記録
+  - F列：A8.net Parameter Tracking Reportの「プログラム名」を記録
+  - G列：A8.net Parameter Tracking Reportの「ステータス名」を記録
 
-| 日時 | 会員ID | 案件名 | 案件ID | イベントID |
-| --- | --- | --- | --- | --- |
+| 日時 | 会員ID | 案件名 | 案件ID | イベントID | 申し込み案件名 | ステータス |
+| --- | --- | --- | --- | --- | --- | --- |
 
 ### 成果データ
 
@@ -123,10 +128,26 @@ L: 確認日時（ISO8601形式（例: 2025-01-03T12:00:00Z）
 
 ### Google Apps Script
 
-- `google-spread-sheet/gode.gs`
-  - 内容: 成果CSVの取り込み〜キャッシュバック集計、設定ダイアログ、日次トリガーを制御するメインGASファイル。
+- `google-spread-sheet/code.gs.js` (v4.0.0 - 2025/11/15更新)
+  - **内容**: A8.net Parameter Tracking Report CSVと「クリックログ」をマッチングして成果情報を記録するGASファイル。
+  - **主な機能**:
+    - `recordConversionsToClickLog()`: 成果CSV_RAWから id1+id2 でクリックログをマッチング、F列・G列を更新
+    - A8.net Parameter Tracking Report CSV対応（パラメータ(id1)、パラメータ(id2)、プログラム名、ステータス名）
+    - 柔軟なヘッダー検出（HEADER_CANDIDATES）
+    - 手動実行トリガー: メニュー「成果処理」→「成果をクリックログに記録」
+    - 詳細なエラーハンドリングとマッチング結果レポート
+  - **処理フロー**:
+    1. 成果CSV_RAWから id1（会員ID）、id2（イベントID）、プログラム名、ステータス名を取得
+    2. クリックログの該当行（B列=id1, E列=id2）を検索
+    3. 該当行のF列に「申し込み案件名」、G列に「ステータス」を記録
+    4. マッチング結果をアラートで表示（成功件数、失敗件数、失敗詳細）
+  - **更新履歴**:
+    - v1.0.0: 初版（AFB対応、時間ベーストリガー、キャッシュバック計算）
+    - v2.0.0: A8.net対応（HEADER_CANDIDATES拡張、ステータス値追加）
+    - v3.0.0: onEdit()トリガー実装、時間ベーストリガー削除
+    - v4.0.0: 完全書き換え（クリックログマッチング処理に変更、キャッシュバック計算削除、手動実行のみ）
 
 ### Google Apps Script（案件マスタ用）
 
-- `google-spread-sheet/deal-auto-fill.gs`
-  - 内容: 案件マスタでROW URL入力時に案件名・ASP名補完とデフォルト設定を行うGAS。
+- `google-spread-sheet/deal-auto-fill.gs.js`
+  - **内容**: 案件マスタでROW URL入力時に案件名・ASP名補完とデフォルト設定を行うGAS。

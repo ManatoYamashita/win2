@@ -14,7 +14,7 @@
 export interface Deal {
   dealId: string;                // 案件ID（一意、例: "a8-rakuten-card"）
   dealName: string;              // 案件名（例: "楽天カード"）
-  affiliateUrl: string;          // 整形済みURL（?id1={trackingId}&eventId={eventId}付与前）
+  affiliateUrl: string;          // 整形済みURL（?id1={trackingId}&id2={eventId}&eventId={eventId} 付与前）
   aspName?: string;              // ASP名（A8.net, AFB等）
   companyName?: string;          // 表示用
   rawAffiliateUrl?: string;      // ROW URL

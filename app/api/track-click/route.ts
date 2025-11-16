@@ -31,9 +31,9 @@ import { formatJapaneseDateTime } from "@/lib/utils";
  *    - 各クリック毎にユニークなIDを生成
  * 5. Google Sheets「クリックログ」に記録
  *    - 列構成: 日時, 会員ID, 案件名, 案件ID, イベントID
- * 6. affiliateUrlに ?id1={trackingId}&eventId={eventId} を付与
+ * 6. affiliateUrlに ?id1={trackingId}&id2={eventId}&eventId={eventId} を付与
  *    - trackingId = memberId or guest:UUID
- *    - eventId = UUID v4（クリック毎にユニーク）
+ *    - eventId = UUID v4（クリック毎にユニーク、id2パラメータにもセット）
  * 7. レスポンス返却（非会員の場合はguest UUID Cookieを設定）
  *
  * @param request - NextRequest オブジェクト
@@ -109,9 +109,10 @@ export async function POST(request: NextRequest) {
       eventId,
     });
 
-    // 6. affiliateUrlに ?id1={trackingId}&eventId={eventId} を付与
+    // 6. affiliateUrlに ?id1={trackingId}&id2={eventId}&eventId={eventId} を付与
     const trackingUrl = new URL(deal.affiliateUrl);
     trackingUrl.searchParams.set("id1", trackingId);
+    trackingUrl.searchParams.set("id2", eventId);
     trackingUrl.searchParams.set("eventId", eventId);
 
     console.log("[track-click] Tracking URL generated:", trackingUrl.toString());

@@ -148,7 +148,7 @@ microCMSのリッチエディタで記事を書く際、CTAボタンを設置し
 3. Google Sheetsの「クリックログ」に自動保存
 4. トラッキングパラメータ付きのURLへ自動リダイレクト：
    ```
-   https://px.a8.net/svt/ejp?a8mat=XXXXX&id1={会員ID}&eventId={イベントID}
+   https://px.a8.net/svt/ejp?a8mat=XXXXX&id1={会員ID}&id2={イベントID}&eventId={イベントID}
    ```
 
 ### 成果発生時の処理
