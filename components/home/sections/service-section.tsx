@@ -124,6 +124,7 @@ export function ServiceSection() {
                     style={{ opacity: isVideoReady ? 1 : 0, transition: "opacity 300ms ease" }}
                   >
                     <source src="/assets/images/what-is-win2.webm" type="video/webm" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/assets/images/onestop-figure.webp"
                       alt="暮らしを支える4つのカテゴリ"

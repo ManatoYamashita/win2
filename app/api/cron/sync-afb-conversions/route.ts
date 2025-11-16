@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { fetchAfbConversionsLastNDays } from "@/lib/asp/afb-client";
-import type { AfbConversionData, ConversionStatus } from "@/types/afb-api";
+import type { ConversionStatus } from "@/types/afb-api";
 import { writeConversionData, readSheet, SHEET_NAMES } from "@/lib/sheets";
 import type { ConversionWebhookData } from "@/lib/sheets";
 
