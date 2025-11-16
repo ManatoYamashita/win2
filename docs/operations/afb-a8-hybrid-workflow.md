@@ -4,6 +4,9 @@
 
 WIN×ⅡではAFBとA8.netの2つのASPを運用しています。それぞれ異なる方法で成果データを取得・管理します。
 
+> [!IMPORTANT]
+> 2025-01-09 時点では **AFB成果データ同期 GitHub Actions** を一時停止しています（`.github/workflows/afb-sync.yml` を無効化済み）。AFB側の調査が再開されるまでは自動ポーリングは走りません。必要に応じて当該Workflowの`on`設定を復元して再稼働させてください。
+
 | ASP | 取得方法 | 頻度 | 手動作業 |
 |-----|---------|------|---------|
 | **AFB** | GitHub Actions自動ポーリング（AFB API） | 10分毎 | なし |
@@ -56,7 +59,10 @@ WIN×ⅡではAFBとA8.netの2つのASPを運用しています。それぞれ�
 
 ## AFB案件の運用（完全自動）
 
-### 自動処理フロー
+### 自動処理フロー（現在は停止中）
+
+> [!NOTE]
+> 以下はAFB同期Workflowを再度有効化した場合の動作です。現状はStep1が起動しないため、以降の処理も実行されません。
 
 1. **GitHub Actions Scheduler** が10分毎に起動（`*/10 * * * *`）
 2. **AFB Sync API** (`/api/cron/sync-afb-conversions`) にPOSTリクエスト送信

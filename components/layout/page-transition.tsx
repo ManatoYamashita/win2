@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
 
 type PageTransitionProps = {
@@ -10,18 +10,23 @@ type PageTransitionProps = {
 export function PageTransition({ children }: PageTransitionProps) {
   const pathname = usePathname();
   const [displayState, setDisplayState] = useState<'loading' | 'visible'>('loading');
+  const isFirstLoadRef = useRef(true);
 
   useEffect(() => {
-    // 初回ロード時のフェードイン
-    const timer = window.setTimeout(() => setDisplayState('visible'), 500);
-    return () => window.clearTimeout(timer);
+    // 初回ロード時は即座に表示（LCP改善のため）
+    if (isFirstLoadRef.current) {
+      setDisplayState('visible');
+      isFirstLoadRef.current = false;
+    }
   }, []);
 
   useEffect(() => {
-    // pathname 変更時のトランジション
-    setDisplayState('loading');
-    const timer = window.setTimeout(() => setDisplayState('visible'), 450);
-    return () => window.clearTimeout(timer);
+    // pathname 変更時のトランジション（初回ロード時はスキップ）
+    if (!isFirstLoadRef.current) {
+      setDisplayState('loading');
+      const timer = window.setTimeout(() => setDisplayState('visible'), 450);
+      return () => window.clearTimeout(timer);
+    }
   }, [pathname]);
 
   const isLoading = displayState === 'loading';

@@ -83,7 +83,7 @@ export function ServiceSection() {
             </div>
           </div>
 
-          <div className="relative max-w-xl md:ml-auto">
+          <div className="relative mx-auto w-full max-w-[520px] md:ml-auto md:max-w-[540px]">
             <div
               ref={videoContainerRef}
               className="overflow-hidden rounded-[32px] bg-win2-surface-cream-50"
@@ -109,7 +109,7 @@ export function ServiceSection() {
                   )}
                   <video
                     ref={videoRef}
-                    className="block w-full object-cover min-h-[220px] sm:min-h-[300px] md:min-h-[420px]"
+                    className="block w-full rounded-[28px] object-cover"
                     playsInline
                     preload="metadata"
                     muted
@@ -124,6 +124,7 @@ export function ServiceSection() {
                     style={{ opacity: isVideoReady ? 1 : 0, transition: "opacity 300ms ease" }}
                   >
                     <source src="/assets/images/what-is-win2.webm" type="video/webm" />
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src="/assets/images/onestop-figure.webp"
                       alt="暮らしを支える4つのカテゴリ"
