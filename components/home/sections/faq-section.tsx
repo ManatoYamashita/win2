@@ -1,12 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { cn } from "@/lib/utils";
 import { faqItems } from "../landing-data";
 
 export function FaqSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const toggleFaq = (index: number) => {
@@ -15,14 +13,7 @@ export function FaqSection() {
 
   return (
     <section className="bg-win2-surface-cream-300 py-24">
-      <div
-        ref={ref}
-        className={cn(
-          "mx-auto max-w-[960px] space-y-10 px-6 text-center lg:px-8",
-          "transition-transform-opacity",
-          isVisible ? "reveal-visible" : "reveal"
-        )}
-      >
+      <div className="mx-auto max-w-[960px] space-y-10 px-6 text-center lg:px-8">
         <div className="space-y-2">
           <h2 className="text-3xl font-bold md:text-4xl">よくあるご質問</h2>
           <p className="text-sm text-slate-600 md:text-base">

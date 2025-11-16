@@ -101,9 +101,10 @@ export default function FAQPage() {
                 >
                   {/* Question (clickable) */}
                   <button
+                    type="button"
                     onClick={() => toggleFaq(index)}
                     className="flex w-full items-start gap-3 p-6 text-left transition-colors hover:bg-win2-surface-cream-50"
-                    aria-expanded={isOpen}
+                    aria-expanded={isOpen ? "true" : "false"}
                     aria-controls={`faq-answer-${index}`}
                   >
                     {/* Q Badge */}

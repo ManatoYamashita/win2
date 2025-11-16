@@ -1,9 +1,3 @@
-export const heroStats = [
-  { title: "無料掲載サービス数", value: "300", unit: "件以上" },
-  { title: "掲載ジャンル数", value: "30", unit: "カテゴリ以上" },
-  { title: "口コミ評価", value: "5", unit: "/5 点" },
-];
-
 export const serviceCategories = ["各種保険", "不動産", "エンタメ", "転職"];
 
 export const meritItems = [

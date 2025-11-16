@@ -136,7 +136,7 @@ export function Header() {
               <span className="text-xs text-slate-400">読み込み中...</span>
             )}
           </div>
-          <div className="space-y-3 border-t border-win2-surface-cream-200 pt-4">
+          <div className="space-y-5 border-t border-win2-surface-cream-200 pt-4">
             {isAuthenticated ? (
               <>
                 <Link
@@ -162,7 +162,7 @@ export function Header() {
                 <Link
                   href="/login"
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full rounded-full border border-win2-surface-cream-200 px-6 py-3 text-sm font-medium text-slate-600 transition hover:text-win2-primary-orage"
+                  className="inline-flex w-full items-center justify-center rounded-full border border-win2-surface-cream-200 px-6 py-3 text-sm font-medium text-slate-600 transition hover:text-win2-primary-orage"
                 >
                   ログイン
                 </Link>

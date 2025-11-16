@@ -1,23 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useScrollReveal } from "@/hooks/use-scroll-reveal";
-import { cn } from "@/lib/utils";
 import { meritItems } from "../landing-data";
 
 export function MeritSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
-
   return (
     <section className="bg-white py-24">
-      <div
-        ref={ref}
-        className={cn(
-          "mx-auto max-w-[1100px] space-y-12 px-6 text-center lg:px-8",
-          "transition-transform-opacity",
-          isVisible ? "reveal-visible" : "reveal"
-        )}
-      >
+      <div className="mx-auto max-w-[1100px] space-y-12 px-6 text-center lg:px-8">
         <div className="space-y-3">
           <h2 className="text-3xl font-bold text-win2-accent-amber md:text-4xl">WIN×Ⅱでのメリット</h2>
           <p className="text-sm text-slate-600 md:text-base">

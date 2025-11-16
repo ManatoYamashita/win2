@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useScrollReveal } from "@/hooks/use-scroll-reveal";
 import { cn } from "@/lib/utils";
 import type { CategoryResponse } from "@/types/microcms";
 import { CtaResolver } from "../types";
@@ -14,7 +13,6 @@ interface HighlightSectionProps {
 }
 
 export function HighlightSection({ resolveCta, categories }: HighlightSectionProps) {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -58,14 +56,7 @@ export function HighlightSection({ resolveCta, categories }: HighlightSectionPro
       </div>
       <div className="absolute inset-0 bg-gradient-to-b from-win2-surface-sky-50/80 to-win2-surface-sky-50/90" />
 
-      <div
-        ref={ref}
-        className={cn(
-          "relative space-y-12",
-          "transition-transform-opacity",
-          isVisible ? "reveal-visible" : "reveal"
-        )}
-      >
+      <div className="relative space-y-12">
         <div className="mx-auto max-w-[1100px] space-y-3 px-6 text-center lg:px-8">
           <p className="text-sm font-semibold uppercase tracking-[0.35em] text-win2-primary-orage">
             掲載サービス・活用シーン
@@ -82,7 +73,7 @@ export function HighlightSection({ resolveCta, categories }: HighlightSectionPro
 
           <div
             ref={carouselRef}
-            className="hide-scrollbar relative flex snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-6 pt-1 md:gap-8 md:px-8 lg:px-12"
+            className="hide-scrollbar relative flex snap-x snap-mandatory gap-6 overflow-x-auto pl-12 pr-6 pb-6 pt-1 md:gap-8 md:pl-20 md:pr-8 lg:pl-24 lg:pr-12"
             aria-roledescription="horizontal carousel"
           >
             {categories.map((category, index) => (
@@ -91,9 +82,9 @@ export function HighlightSection({ resolveCta, categories }: HighlightSectionPro
                 href={`/category/${category.id}`}
                 aria-label={`${category.name}の特集を見る`}
                 className={cn(
-                  "group relative isolate flex w-[85vw] min-h-[420px] min-w-[280px] max-w-[360px] flex-col justify-between overflow-hidden rounded-2xl bg-slate-900 text-left text-white shadow-md transition-all duration-300 ease-out",
+                  "group relative isolate flex w-[85vw] min-h-[300px] min-w-[280px] max-w-[360px] flex-col justify-between overflow-hidden rounded-2xl bg-slate-900 text-left text-white shadow-md transition-all duration-300 ease-out",
                   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-accent-amber/50",
-                  "sm:w-[420px] sm:min-w-[380px] md:w-[460px] lg:w-[500px] lg:min-h-[560px]",
+                  "sm:w-[420px] sm:min-w-[380px] sm:min-h-[320px] md:w-[460px] lg:w-[500px] lg:min-h-[380px]",
                   "snap-start hover:shadow-lg focus-visible:shadow-lg"
                 )}
               >
@@ -107,13 +98,13 @@ export function HighlightSection({ resolveCta, categories }: HighlightSectionPro
                 />
                 <span className="absolute inset-0 bg-gradient-to-b from-black/40 to-black/60" />
 
-                <div className="relative flex flex-col gap-4 p-6 sm:p-8">
-                  <div className="space-y-3">
+                <div className="relative flex flex-col gap-3 p-5 sm:p-6">
+                  <div className="space-y-2">
                     <span className="inline-flex items-center rounded-md bg-white/10 px-3 py-1 text-xs font-medium text-white/90">
                       {category.name}
                     </span>
-                    <h3 className="text-2xl font-bold leading-tight sm:text-3xl">{category.name}</h3>
-                    <p className="text-sm leading-relaxed text-white/80 sm:text-base">
+                    <h3 className="text-xl font-bold leading-tight sm:text-2xl">{category.name}</h3>
+                    <p className="text-xs leading-relaxed text-white/80 sm:text-sm overflow-hidden line-clamp-2">
                       {category.description || "カテゴリの詳細をご覧ください"}
                     </p>
                   </div>
@@ -122,34 +113,34 @@ export function HighlightSection({ resolveCta, categories }: HighlightSectionPro
             ))}
           </div>
 
-          <div className="pointer-events-none absolute inset-y-0 left-2 flex items-center md:left-6">
+          <div className="pointer-events-none absolute inset-y-0 left-2 z-20 flex items-center md:left-6">
             <button
               type="button"
               onClick={() => scrollByDirection("left")}
               disabled={!canScrollLeft}
               className={cn(
-                "pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage text-white shadow-lg transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-accent-rose/50",
+                "pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-white border-2 border-win2-primary-orage text-win2-primary-orage shadow-lg transition-all duration-200 hover:bg-win2-primary-orage hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-primary-orage/50",
                 !canScrollLeft && "opacity-40"
               )}
               aria-label="前のカテゴリを見る"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="transition-colors duration-200">
                 <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           </div>
-          <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center md:right-6">
+          <div className="pointer-events-none absolute inset-y-0 right-2 z-20 flex items-center md:right-6">
             <button
               type="button"
               onClick={() => scrollByDirection("right")}
               disabled={!canScrollRight}
               className={cn(
-                "pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-r from-win2-accent-rose to-win2-primary-orage text-white shadow-lg transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-accent-rose/50",
+                "pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-white border-2 border-win2-primary-orage text-win2-primary-orage shadow-lg transition-all duration-200 hover:bg-win2-primary-orage hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-primary-orage/50",
                 !canScrollRight && "opacity-40"
               )}
               aria-label="次のカテゴリを見る"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="transition-colors duration-200">
                 <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
