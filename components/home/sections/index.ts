@@ -1,0 +1,11 @@
+export { LatestBlogsSection } from "./latest-blogs-section";
+export { HeroSection } from "./hero-section";
+export { ProblemSection } from "./problem-section";
+export { IntroductionBoxSection } from "./introduction-box-section";
+export { ServiceSection } from "./service-section";
+export { MeritSection } from "./merit-section";
+export { HighlightSection } from "./highlight-section";
+export { AchievementSection } from "./achievement-section";
+export { TestimonialsSection } from "./testimonials-section";
+export { FaqSection } from "./faq-section";
+export { BottomCtaSection } from "./bottom-cta-section";
