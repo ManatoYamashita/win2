@@ -180,7 +180,8 @@ After 4 weeks of testing (2025-10-13 to 2025-01-09) with the WIN×Ⅱ system cor
 #### Detailed Test Results
 
 **1. WIN×Ⅱ System Implementation** ✅ **100% Complete**
-- id1 parameter appending: ✅ Working (`/api/track-click` generates `?id1={memberId}`)
+- id1 parameter appending: ✅ Working (`/api/track-click` generates `?id1={memberId}&id2={eventId}&eventId={eventId}`)
+- id2 parameter appending: ✅ Working (eventId mirrored for A8.net Parameter Tracking)
 - eventId parameter appending: ✅ Working (UUID v4 generated per click)
 - Google Sheets logging: ✅ Working (all clicks recorded in "クリックログ")
 - Debug logging: ✅ Working (console.log shows full tracking URL)

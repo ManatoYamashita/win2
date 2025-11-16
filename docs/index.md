@@ -38,7 +38,8 @@ docs/
 ├── operations/               ← 運用マニュアル・メンテナンスガイド
 │   ├── afb-a8-hybrid-workflow.md         ← AFB自動ポーリング + A8.net手動CSVハイブリッド運用マニュアル
 │   ├── gas-a8net-update-guide.md         ← Google Apps Script修正ガイド（A8.net対応）
-│   └── environment-variables-setup.md    ← 環境変数設定ガイド（GitHub Secrets + Vercel）
+│   ├── environment-variables-setup.md    ← 環境変数設定ガイド（GitHub Secrets + Vercel）
+│   └── a8-conversion-matching.md         ← A8.net成果マッチング運用マニュアル（クリックログF/G列自動更新）
 │
 ├── architecture/             ← アーキテクチャ決定記録・インフラ構成
 │   └── dns-infrastructure.md ← DNS/メールインフラ構成、Wix DNS制限、RESEND_VALIDフィーチャーフラグ
@@ -273,6 +274,23 @@ docs/
   - 動作確認手順（GitHub Actions手動実行、ログ確認、Google Sheets確認）
   - トラブルシューティング（401 Unauthorized、500 Server Error、AFB APIエラー）
   - セキュリティベストプラクティス（環境変数ローテーション、アクセス制限）
+- **operations/a8-conversion-matching.md**: 新規作成（A8.net成果マッチング運用マニュアル v1.0.0）
+  - システム概要（クリックログF/G列自動更新処理）
+  - Phase 1初回動作確認テスト（10分、詳細手順）
+  - 日常運用フロー（週1回、5分）
+  - A8.net Parameter Tracking Report CSV ダウンロード手順
+  - Google Sheets「成果CSV_RAW」貼り付け手順
+  - GASメニュー「成果処理」→「成果をクリックログに記録」実行手順
+  - トラブルシューティング（5つの主要問題と解決策）
+    - 問題1: 「成果処理」メニューが表示されない
+    - 問題2: ヘッダーが検出できないエラー
+    - 問題3: マッチングが失敗する（成功: 0件）
+    - 問題4: F列・G列が更新されない
+    - 問題5: 権限エラー
+  - 技術仕様（マッチングアルゴリズム、ヘッダー検出ロジック、データフォーマット）
+  - GAS実装詳細（code.gs.js v4.0.0、recordConversionsToClickLog関数）
+  - パフォーマンス最適化案（将来検討）
+  - FAQ（6つの質問と回答）
 - **.env.example**: 更新（AFB + GitHub Actions環境変数追加 v2.0.0）
   - AFB_PARTNER_ID、AFB_API_KEY（コメント解除、実装完了マーク付き）
   - CRON_SECRET追加（GitHub Actions認証用）
@@ -337,7 +355,27 @@ docs/
   - ✅ A8.net Parameter Tracking Report CSV完全対応
   - ✅ AFB APIポーリングとのデータ統合対応
   - ✅ 複数ASPの柔軟なCSVフォーマット対応
-- **ステータス**: AFB自動ポーリング実装完了、A8.net手動CSVワークフロー確立、GASコードA8.net対応完了、運用ドキュメント完備、Phase 2-4完了、Issue #22完了
+- **google-spread-sheet/code.gs.js**: 更新（onEditトリガー実装、時間ベーストリガー削除 v3.0.0）
+  - onEdit()トリガー関数追加（141-189行目）
+    - 「成果CSV_RAW」シートへのCSV貼り付けを検知
+    - 複数行・複数列の編集のみ処理（単一セル編集は無視）
+    - 即座にrunImportAndAggregate()を実行
+    - エラーハンドリング追加（例外を投げずログ出力のみ）
+  - setupTrigger()関数削除（旧141-156行目）
+    - 毎日3:10の時間ベーストリガー不要（A8.net手動CSV即時処理）
+  - onOpen()メニュー更新（75-82行目）
+    - 「毎日 03:10 自動実行を設定」メニュー項目削除
+    - 「CSV取込→集計」と「設定...」のみ表示
+  - ファイルヘッダーコメント更新（1-27行目）
+    - 更新日を2025/11/15に変更
+    - トリガー説明を「onEdit()自動実行 + 手動実行」に更新
+    - A8.net対応内容を明記
+  - 動作仕様変更
+    - 旧: 毎日3:10自動実行 + メニューから手動実行
+    - 新: CSV貼り付け時に即座に自動実行 + メニューから手動実行
+  - ⚠️ 注意: API経由の書き込み（AFB自動ポーリング）は検知不可
+  - 📝 TODO: AFB成果の処理方法は別途検討（Web App化 or 時間トリガー）
+- **ステータス**: AFB自動ポーリング実装完了、A8.net手動CSV即時処理実装完了、GASコードA8.net対応完了、運用ドキュメント完備、Phase 2-4完了、Issue #22完了
 
 ### 2025-01-09
 

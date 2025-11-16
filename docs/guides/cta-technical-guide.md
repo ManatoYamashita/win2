@@ -33,7 +33,7 @@ WIN×ⅡのCTA（Call To Action）機能は、ブログ記事内のショート�
 │  ├─ Google Sheets「案件マスタ」から案件情報取得              │
 │  ├─ Google Sheets「クリックログ」に記録                      │
 │  └─ トラッキングURL生成・返却                                │
-│     ?id1={memberId}&eventId={eventId}                        │
+│     ?id1={memberId}&id2={eventId}&eventId={eventId}          │
 └─────────────────────────────────────────────────────────────┘
                               ↓
 ┌─────────────────────────────────────────────────────────────┐
@@ -284,7 +284,7 @@ export async function POST(request: NextRequest) {
     eventId: eventId,
   });
 
-  // 6. affiliateUrlに ?id1={trackingId}&eventId={eventId} を付与
+  // 6. affiliateUrlに ?id1={trackingId}&id2={eventId}&eventId={eventId} を付与
   const trackingUrl = new URL(deal.affiliateUrl);
   trackingUrl.searchParams.set("id1", trackingId);
   trackingUrl.searchParams.set("eventId", eventId);
@@ -312,7 +312,7 @@ export async function POST(request: NextRequest) {
 
 ```json
 {
-  "trackingUrl": "https://px.a8.net/svt/ejp?a8mat=XXXXX&id1=member-uuid&eventId=event-uuid-v4"
+  "trackingUrl": "https://px.a8.net/svt/ejp?a8mat=XXXXX&id1=member-uuid&id2=event-uuid-v4&eventId=event-uuid-v4"
 }
 ```
 
@@ -488,7 +488,7 @@ test('CTA button click flow', async ({ page }) => {
   await button.click();
 
   // 4. トラッキングURLへリダイレクトされることを確認
-  await page.waitForURL(/id1=.+&eventId=.+/);
+  await page.waitForURL(/id1=.+&id2=.+&eventId=.+/);
 });
 ```
 
