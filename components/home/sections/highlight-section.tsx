@@ -73,7 +73,7 @@ export function HighlightSection({ resolveCta, categories }: HighlightSectionPro
 
           <div
             ref={carouselRef}
-            className="hide-scrollbar relative flex snap-x snap-mandatory gap-6 overflow-x-auto px-6 pb-6 pt-1 md:gap-8 md:px-8 lg:px-12"
+            className="hide-scrollbar relative flex snap-x snap-mandatory gap-6 overflow-x-auto pl-12 pr-6 pb-6 pt-1 md:gap-8 md:pl-20 md:pr-8 lg:pl-24 lg:pr-12"
             aria-roledescription="horizontal carousel"
           >
             {categories.map((category, index) => (
@@ -119,12 +119,12 @@ export function HighlightSection({ resolveCta, categories }: HighlightSectionPro
               onClick={() => scrollByDirection("left")}
               disabled={!canScrollLeft}
               className={cn(
-                "pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-white border-2 border-win2-primary-orage text-win2-primary-orage shadow-lg transition hover:bg-win2-surface-cream-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-primary-orage/50",
+                "pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-white border-2 border-win2-primary-orage text-win2-primary-orage shadow-lg transition-all duration-200 hover:bg-win2-primary-orage hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-primary-orage/50",
                 !canScrollLeft && "opacity-40"
               )}
               aria-label="前のカテゴリを見る"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="transition-colors duration-200">
                 <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
@@ -135,12 +135,12 @@ export function HighlightSection({ resolveCta, categories }: HighlightSectionPro
               onClick={() => scrollByDirection("right")}
               disabled={!canScrollRight}
               className={cn(
-                "pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-white border-2 border-win2-primary-orage text-win2-primary-orage shadow-lg transition hover:bg-win2-surface-cream-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-primary-orage/50",
+                "pointer-events-auto inline-flex h-12 w-12 items-center justify-center rounded-full bg-white border-2 border-win2-primary-orage text-win2-primary-orage shadow-lg transition-all duration-200 hover:bg-win2-primary-orage hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-win2-primary-orage/50",
                 !canScrollRight && "opacity-40"
               )}
               aria-label="次のカテゴリを見る"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="transition-colors duration-200">
                 <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>

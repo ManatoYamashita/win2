@@ -148,7 +148,7 @@ export function HeroSection({ resolveCta }: HeroSectionProps) {
             </motion.p>
             <motion.h1
               variants={headlineVariants}
-              className="text-4xl font-bold leading-tight text-win2-neutral-950 md:text-5xl"
+              className="text-4xl font-bold leading-tight text-win2-neutral-950 max-[420px]:text-[26px] max-[420px]:leading-[1.2] md:text-5xl"
             >
               <motion.span
                 variants={wordVariants}
@@ -205,13 +205,14 @@ export function HeroSection({ resolveCta }: HeroSectionProps) {
             />
             <Link
               href={heroCta.href}
-              className="rounded-full bg-win2-primary-orage px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-primary-orage/25 transition hover:bg-win2-accent-amber"
+              className="rounded-full bg-win2-primary-orage px-10 py-3 text-sm font-semibold text-white shadow-lg shadow-win2-primary-orage/25 transition hover:bg-win2-accent-amber max-[420px]:px-8 max-[420px]:py-2.5 max-[420px]:text-xs"
             >
-              {heroCta.label}
+              <span className="hidden sm:inline">無料メルマガ会員登録はこちら</span>
+              <span className="sm:hidden">無料メルマガ会員登録</span>
             </Link>
             <Link
               href="/login"
-              className="rounded-full border border-win2-accent-rose bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-win2-surface-rose-100"
+              className="rounded-full border border-win2-accent-rose bg-white px-10 py-3 text-sm font-semibold text-win2-accent-rose transition hover:bg-win2-surface-rose-100 max-[420px]:px-8 max-[420px]:py-2.5 max-[420px]:text-xs"
             >
               ログイン
             </Link>
