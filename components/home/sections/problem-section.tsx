@@ -1,22 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useScrollReveal } from "@/hooks/use-scroll-reveal";
-import { cn } from "@/lib/utils";
 
 export function ProblemSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
-
   return (
     <section className="relative z-20 bg-win2-surface-stone-100 pb-16 pt-40 md:pt-48">
-      <div
-        ref={ref}
-        className={cn(
-          "mx-auto max-w-[1200px] px-6",
-          "transition-transform-opacity",
-          isVisible ? "reveal-visible" : "reveal"
-        )}
-      >
+      <div className="mx-auto max-w-[1200px] px-6">
         <div className="mb-12 text-center">
           <h2 className="flex flex-wrap items-center justify-center gap-2 text-2xl font-bold md:text-3xl lg:text-4xl">
             <span className="inline-block rounded-full border-2 border-win2-primary-orage bg-white px-4 py-1 text-win2-primary-orage">

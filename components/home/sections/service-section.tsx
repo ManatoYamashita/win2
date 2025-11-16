@@ -3,32 +3,29 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useScrollReveal } from "@/hooks/use-scroll-reveal";
-import { cn } from "@/lib/utils";
 import { serviceCategories } from "../landing-data";
 
 export function ServiceSection() {
-  const { ref, isVisible } = useScrollReveal<HTMLDivElement>();
+  const { ref: videoContainerRef, isVisible } = useScrollReveal<HTMLDivElement>({ threshold: 0.3 });
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [isVideoError, setIsVideoError] = useState(false);
 
   useEffect(() => {
-    if (isVideoError) return;
+    if (isVideoError || hasPlayed || !isVisible) return;
 
     const videoNode = videoRef.current;
     if (!videoNode) return;
 
-    if (isVisible && !hasPlayed) {
-      void videoNode
-        .play()
-        .then(() => setHasPlayed(true))
-        .catch(() => {
-          const fallbackTime = Number.isFinite(videoNode.duration) ? videoNode.duration : 0;
-          videoNode.currentTime = fallbackTime;
-          setHasPlayed(true);
-        });
-    }
-  }, [isVisible, hasPlayed, isVideoError]);
+    void videoNode
+      .play()
+      .then(() => setHasPlayed(true))
+      .catch(() => {
+        const fallbackTime = Number.isFinite(videoNode.duration) ? videoNode.duration : 0;
+        videoNode.currentTime = fallbackTime;
+        setHasPlayed(true);
+      });
+  }, [hasPlayed, isVideoError, isVisible]);
 
   useEffect(() => {
     if (isVideoError) return;
@@ -50,14 +47,7 @@ export function ServiceSection() {
 
   return (
     <section className="bg-win2-surface-cream-50 py-24">
-      <div
-        ref={ref}
-        className={cn(
-          "mx-auto max-w-[1080px] px-6 lg:px-8",
-          "transition-transform-opacity",
-          isVisible ? "reveal-visible" : "reveal"
-        )}
-      >
+      <div className="mx-auto max-w-[1080px] px-6 lg:px-8">
         <div className="mb-12 flex flex-col items-center justify-center gap-6 md:flex-row md:gap-4">
           <Image
             src="/assets/images/win2-is-bubble.webp"
@@ -82,8 +72,11 @@ export function ServiceSection() {
             </div>
           ))}
         </div>
-        <div className="relative mx-auto w-full max-w-[900px] pt-24 lg:max-w-[1080px]">
-          <div className="overflow-hidden rounded-[32px] bg-win2-surface-cream-50">
+        <div className="relative mx-auto w-full max-w-[900px] pt-16 sm:pt-20 lg:pt-24">
+          <div
+            ref={videoContainerRef}
+            className="overflow-hidden rounded-[32px] bg-win2-surface-cream-50"
+          >
             {isVideoError ? (
               <Image
                 src="/assets/images/onestop-figure.webp"
@@ -95,7 +88,7 @@ export function ServiceSection() {
             ) : (
               <video
                 ref={videoRef}
-                className="block w-full object-cover"
+                className="block w-full object-cover min-h-[220px] sm:min-h-[320px] md:min-h-[520px]"
                 playsInline
                 preload="metadata"
                 muted

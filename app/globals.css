@@ -158,17 +158,6 @@
   }
 }
 
-@keyframes heroStatsReveal {
-  0% {
-    opacity: 0;
-    transform: translateY(18px) scale(0.98);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 @keyframes heroCtaRise {
   0% {
     opacity: 0;
@@ -229,10 +218,6 @@
   animation: heroSubtextFade 0.9s ease forwards 0.35s;
 }
 
-.animate-hero-stats {
-  animation: heroStatsReveal 0.9s ease forwards 0.45s;
-}
-
 .animate-hero-cta {
   animation: heroCtaRise 0.9s cubic-bezier(0.16, 0.77, 0.38, 0.98) forwards 0.6s;
 }
@@ -251,4 +236,13 @@
 
 .hide-scrollbar::-webkit-scrollbar {
   display: none; /* Chrome, Safari, Opera */
+}
+
+/* テキストを2行に制限 */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-clamp: 2; /* 標準プロパティ（互換性のため） */
 }
