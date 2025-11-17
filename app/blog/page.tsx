@@ -5,6 +5,9 @@ import { BlogInfiniteList } from "@/components/blog/blog-infinite-list";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+// ISR: 60秒ごとに再検証
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "ブログ一覧 | WIN×Ⅱ",
   description: "会員制アフィリエイトブログWIN×Ⅱのブログ記事一覧ページです。お得な案件情報や攻略法を発信しています。",
