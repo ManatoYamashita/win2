@@ -18,6 +18,9 @@ const BLOGS_PER_PAGE = 10;
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+// ISR: 60秒ごとに再検証
+export const revalidate = 60;
+
 /**
  * generateMetadata: SEO/OGP対応
  */

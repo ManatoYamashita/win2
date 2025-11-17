@@ -52,6 +52,9 @@ export const getBlogs = async (queries?: BlogQueries) => {
       // categoryの詳細情報を取得
       fields: queries?.fields || "id,title,content,thumbnail,category.id,category.name,category.description,publishedAt,createdAt,updatedAt,revisedAt",
     },
+    customRequestInit: {
+      next: { revalidate: 60 }, // 60秒ごとに再検証
+    },
   });
   return listData;
 };
@@ -75,6 +78,9 @@ export const getBlogById = async (contentId: string, queries?: BlogQueries) => {
       ...queries,
       // categoryの詳細情報を取得
       fields: queries?.fields || "id,title,content,thumbnail,category.id,category.name,category.description,publishedAt,createdAt,updatedAt,revisedAt",
+    },
+    customRequestInit: {
+      next: { revalidate: 60 }, // 60秒ごとに再検証
     },
   });
   return detailData;
@@ -162,6 +168,9 @@ export const getCategories = async (queries?: CategoryQueries) => {
   const listData = await client.getList<CategoryResponse>({
     endpoint: "categories",
     queries,
+    customRequestInit: {
+      next: { revalidate: 60 }, // 60秒ごとに再検証
+    },
   });
   return listData;
 };
@@ -179,6 +188,9 @@ export const getCategoryById = async (contentId: string, queries?: CategoryQueri
     endpoint: "categories",
     contentId,
     queries,
+    customRequestInit: {
+      next: { revalidate: 60 }, // 60秒ごとに再検証
+    },
   });
   return detailData;
 };
