@@ -28,37 +28,73 @@ I: emailVerified (ISO8601)
 
 **列構成（2025/11 更新）:**
 ```
-A: 整形済みアフィリエイトURL（システム利用値）
-B: 案件ID (例: "a8-rakuten-card")
+A: 整形済みアフィリエイトURL（システム利用値、優先）
+B: 案件ID (例: "a8-rakuten-card") - 主キー
 C: 案件名 (例: "楽天カード")
-D: 会社名（クライアント様が入力）
-E: ROW URL（ASPから取得した元のURL）
+D: ASP名 (例: "A8.net", "AFB", "もしも", "バリューコマース") ※GASで自動判定
+E: ROW URL（ASPから取得した元URL、Aが空の場合のフォールバック用）
+F: 報酬額（GASで使用、Next.jsアプリでは未使用、デフォルト0）
+G: キャッシュバック率（GASで使用、Next.jsアプリでは未使用、デフォルト20%）
+H: 有効/無効（GASで使用、Next.jsアプリでは未使用、デフォルトTRUE）
 ```
 
 **運用ルール:**
 - B列「案件ID」は一意である必要があります（主キー）
-- A列は `/api/track-click` が参照する整形済みURLです。ここが空だと案件が配信されません。
-- D列「会社名」はユーザーに見せたい名称を入力してください。
-- E列にROW URLを貼り付け、A列に整形済みURLを自動出力させる運用に切り替えてください。
+- A列は `/api/track-click` が参照する整形済みURLです。**ここが空だと案件が配信されません**。
+- D列「ASP名」は `deal-auto-fill.gs.js` で自動判定されます（A列URLから A8.net, AFB, もしも, バリューコマース を検出）
+- E列にROW URLを貼り付けると、GASがC列（案件名）とD列（ASP名）を自動入力します
+- F/G/H列はGAS処理で使用されますが、Next.jsアプリ側では読み込んでいません（範囲: A2:E）
 
 **入力手順（推奨）:**
-1. B列とC列に案件ID／案件名を入力
-2. D列にユーザー向けの会社名を入力
+1. **A列にアフィリエイトURLを入力**（手動 or E列から自動生成）
+2. **B列に案件ID**を入力（例: `a8-rakuten-card`）
 3. E列にASPから発行されたROW URLを貼り付け
-4. A列には次のような `ARRAYFORMULA` を設定し、E列をトリガーに整形済みURLを自動生成
+4. GAS（`deal-auto-fill.gs.js`）が自動実行:
+   - C列: URLからページタイトルを取得して案件名を自動入力
+   - D列: URLからASP名を自動判定（A8.net / AFB / もしも / バリューコマース）
+   - F列: 報酬額のデフォルト値（0）を自動入力
+   - G列: キャッシュバック率のデフォルト値（20%）を自動入力
+   - H列: 有効/無効のデフォルト値（TRUE）を自動入力
+5. （オプション）A列に `ARRAYFORMULA` を設定して、E列から整形済みURLを自動生成
    ```gs
    =ARRAYFORMULA(IF(LEN(E2:E)=0,"",TRIM(E2:E)))
    ```
-   ※必要に応じて `REGEXREPLACE` やGASで余計なクエリを除去してください。
+   ※必要に応じて `REGEXREPLACE` で余計なクエリを除去
 
 **使用イメージ:**
 ```
 A列: https://px.a8.net/svt/ejp?a8mat=XXXXX
 B列: a8-rakuten-card
-C列: 楽天カード
-D列: 楽天カード株式会社
+C列: 楽天カード（GASで自動取得）
+D列: A8.net（GASで自動判定）
 E列: https://px.a8.net/svt/ejp?a8mat=XXXXX（ROW URL）
+F列: 0（GASでデフォルト設定）
+G列: 0.20（GASでデフォルト設定）
+H列: TRUE（GASでデフォルト設定）
 ```
+
+**ASP対応状況:**
+- ✅ **A8.net** (`a8.net`) - 対応済み（手動CSV週次）
+- ✅ **AFB** (`afi-b.com`, `afb.com`) - 対応済み（自動ポーリング10分毎）
+- ✅ **もしもアフィリエイト** (`moshimo.com`) - 準備済み（運用開始待ち）
+- ✅ **バリューコマース** (`valuecommerce.com`) - 準備済み（運用開始待ち）
+
+**CTAボタンリンク生成ルール:**
+microCMSの `[CTA:dealId]` ショートコードがクリックされると、以下の処理が実行されます：
+
+1. `/api/track-click` にPOSTリクエスト（body: `{ dealId: "..." }`）
+2. Google Sheets「案件マスタ」からA列（整形済みURL）を取得（A列が空の場合はE列をフォールバック）
+3. URLに以下のパラメータを付与:
+   ```
+   ?id1={trackingId}&id2={eventId}&eventId={eventId}
+   ```
+   - `id1`: 会員ID または `guest:UUID`（非会員の場合）
+   - `id2`: クリック毎に生成されるUUID v4
+   - `eventId`: id2と同じ値（A8.net Parameter Tracking Report対応）
+4. クリックログに記録（日時, 会員ID, 案件名, 案件ID, イベントID）
+5. 生成されたtracking URLへリダイレクト
+
+**重要**: このルールは**すべてのASPで共通**です。ASPによる処理の分岐はありません。
 
 ### クリックログ
 
