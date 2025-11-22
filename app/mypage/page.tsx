@@ -162,10 +162,19 @@ export default function MypagePage() {
           </p>
           <div className="mt-6 flex flex-wrap gap-4">
             <Link
-              href="/blog"
+              href="/mypage/history"
               className={cn(
                 buttonVariants({ size: "lg" }),
                 "rounded-full bg-white px-8 text-win2-primary-orage shadow-lg shadow-white/30 hover:bg-white/90"
+              )}
+            >
+              申込履歴を見る
+            </Link>
+            <Link
+              href="/blog"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "rounded-full border-2 border-white bg-transparent px-8 text-white shadow-lg hover:bg-white/10"
               )}
             >
               ブログで最新情報を見る

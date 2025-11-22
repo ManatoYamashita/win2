@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { usePathname } from "next/navigation";
+import { Spinner } from "@/components/ui/spinner";
 
 type PageTransitionProps = {
   children: React.ReactNode;
@@ -32,13 +33,23 @@ export function PageTransition({ children }: PageTransitionProps) {
   const isLoading = displayState === 'loading';
 
   return (
-    <div className="relative min-h-screen">
-      {/* 白いオーバーレイ - ページ遷移時に表示 */}
+    <div className="relative min-h-screen" aria-busy={isLoading}>
+      {/* 白いオーバーレイ - ページ遷移時の視覚的フィードバック */}
       <div
-        className={`pointer-events-none fixed inset-0 z-[70] bg-white transition-opacity duration-500 ${
-          isLoading ? "opacity-100" : "opacity-0"
+        className={`fixed inset-0 z-[70] bg-white transition-opacity duration-500 ${
+          isLoading ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
-      />
+      >
+        <div className="flex h-full items-center justify-center">
+          <div
+            className={`transition-all duration-300 ${
+              isLoading ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+            }`}
+          >
+            <Spinner size="md" label="ページを読み込んでいます…" />
+          </div>
+        </div>
+      </div>
       {/* ページコンテンツ - ローディング中は非表示 */}
       <div
         className={`relative flex min-h-screen flex-col transition-opacity duration-500 ${

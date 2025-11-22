@@ -39,7 +39,7 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
     };
     return [...categories]
       .sort((a, b) => getTimestamp(b) - getTimestamp(a))
-      .slice(0, 5);
+      .filter((category) => Boolean(category.name));
   }, [categories]);
 
   return (
@@ -47,44 +47,50 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
       <div className="container mx-auto">
         {/* 水平スクロール対応 */}
         <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex items-center space-x-1 py-3 px-4 min-w-max">
-            {/* 全ての投稿 */}
-            <Link
-              href="/blog"
-              className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
-                isAllPostsActive
-                  ? "bg-orange-600 text-white shadow-md"
-                  : "text-white hover:bg-orange-600"
-              }`}
-            >
-              全ての投稿
-            </Link>
+          <div className="relative flex items-center gap-2 py-3 px-4 min-w-max">
+            <div className="sticky left-0 z-10 flex items-center gap-2 bg-orange-500 pr-2">
+              {/* 全ての投稿 */}
+              <Link
+                href="/blog"
+                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                  isAllPostsActive
+                    ? "bg-orange-600 text-white shadow-md"
+                    : "text-white hover:bg-orange-600"
+                }`}
+              >
+                全ての投稿へ
+              </Link>
+            </div>
 
             {/* カテゴリリスト */}
-            {latestCategories.map((category) => {
-              const isActive = currentCategoryId === category.id;
-              return (
-                <Link
-                  key={category.id}
-                  href={`/category/${category.id}`}
-                  className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
-                    isActive
-                      ? "bg-orange-600 text-white shadow-md"
-                      : "text-white hover:bg-orange-600"
-                  }`}
-                >
-                  {category.name}
-                </Link>
-              );
-            })}
+            <div className="flex items-center gap-2">
+              {latestCategories.map((category) => {
+                const isActive = currentCategoryId === category.id;
+                return (
+                  <Link
+                    key={category.id}
+                    href={`/category/${category.id}`}
+                    className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                      isActive
+                        ? "bg-orange-600 text-white shadow-md"
+                        : "text-white hover:bg-orange-600"
+                    }`}
+                  >
+                    {category.name}
+                  </Link>
+                );
+              })}
+            </div>
 
-            {/* 全カテゴリリンク */}
-            <Link
-              href="/categories"
-              className="px-4 py-2 rounded-lg font-medium whitespace-nowrap text-white/90 transition hover:bg-orange-600 hover:text-white"
-            >
-              全てのカテゴリへ
-            </Link>
+            {/* 全カテゴリリンク（右寄せ） */}
+            <div className="sticky right-0 z-10 ml-2 bg-orange-500 pl-2">
+              <Link
+                href="/categories"
+                className="px-4 py-2 rounded-lg font-medium whitespace-nowrap text-white/90 transition hover:bg-orange-600 hover:text-white"
+              >
+                カテゴリ一覧へ
+              </Link>
+            </div>
           </div>
         </div>
       </div>
