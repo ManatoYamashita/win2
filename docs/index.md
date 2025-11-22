@@ -41,6 +41,7 @@ docs/
 │   ├── gas-a8net-update-guide.md         ← Google Apps Script修正ガイド（A8.net対応）
 │   ├── environment-variables-setup.md    ← 環境変数設定ガイド（GitHub Secrets + Vercel）
 │   ├── a8-conversion-matching.md         ← A8.net成果マッチング運用マニュアル（クリックログF/G列自動更新）
+│   ├── microcms-cache-revalidation.md    ← microCMSキャッシュ再検証設定ガイド（ISR 60秒、トラブルシューティング）
 │   └── rentracks-investigation-report.md ← レントラックス成果トラッキング実装方法調査報告書（Phase 1: 情報収集待ち）
 │
 ├── architecture/             ← アーキテクチャ決定記録・インフラ構成
@@ -128,6 +129,7 @@ docs/
 | **gas-a8net-update-guide.md** | Google Apps Script修正ガイド（A8.net対応） | ✅ 実装完了 | HEADER_CANDIDATES拡張（A8.net固有カラム名）、APPROVED_VALUES拡張（A8.net固有ステータス値）、ステータス判定ロジック、実装手順、トラブルシューティング |
 | **environment-variables-setup.md** | 環境変数設定ガイド（GitHub Secrets + Vercel） | ✅ 実装完了 | GitHub Secrets設定、Vercel環境変数設定、CRON_SECRET生成方法、セキュリティベストプラクティス |
 | **a8-conversion-matching.md** | A8.net成果マッチング運用マニュアル | ✅ 運用中 | クリックログF/G列自動更新処理、Phase 1初回動作確認テスト、日常運用フロー（週1回、5分）、トラブルシューティング、技術仕様、FAQ |
+| **microcms-cache-revalidation.md** | microCMSキャッシュ再検証設定ガイド | ✅ 実装完了 | ISR 60秒設定、キャッシュ問題の原因、代替案（キャッシュ無効化、Webhook）、トラブルシューティング |
 | **rentracks-investigation-report.md** | レントラックス成果トラッキング実装方法調査報告書 | ⏳ 情報収集待ち | コンバージョンタグ方式（`_rt.cinfo`）、A8.net/AFBとの違い、広告主連携必須、実装前確認事項チェックリスト、実装スケジュール提案、リスクと注意事項 |
 
 #### `guides/` - ユーザー/開発者向けガイド
@@ -159,6 +161,16 @@ docs/
 | **dev/a8-parameter-tracking-verification.md** | A8.netパラメータ計測機能 実地検証ログ | 4週間検証（2025-10-13〜2025-01-09）、9回クリック記録、Parameter Tracking Report表示なし、暫定結論（Media Member利用不可の可能性大）、サポート問い合わせ推奨 |
 | **dev/a8-support-inquiry-final.md** | A8.netサポート問い合わせ最終版 | 公式ドキュメントURL統合、4つの質問項目、期待される回答パターン4種、回答後のアクション（利用可/不可）、問い合わせ記録フォーマット |
 | **dev/github-issue-22-update.md** | GitHub Issue #22 更新用テンプレート | 検証完了報告、技術実装100%完了、検証結果サマリー、次のアクション（サポート問い合わせ、代替ASP調査）、タイムライン |
+
+#### `operations/` - 運用マニュアル・メンテナンスガイド
+
+| ファイル | 内容 | 主要トピック |
+|---------|------|------------|
+| **operations/afb-a8-hybrid-workflow.md** | AFB自動ポーリング + A8.net手動CSVハイブリッド運用マニュアル | AFB自動化（GitHub Actions 10分間隔）、A8.net週次CSV運用、手順書、トラブルシューティング |
+| **operations/gas-a8net-update-guide.md** | Google Apps Script修正ガイド（A8.net対応） | A8.netヘッダー候補追加、ステータス値対応、実装手順、検証方法 |
+| **operations/environment-variables-setup.md** | 環境変数設定ガイド（GitHub Secrets + Vercel） | CRON_SECRET生成、GitHub Secrets設定、Vercel環境変数、セキュリティベストプラクティス |
+| **operations/a8-conversion-matching.md** | A8.net成果マッチング運用マニュアル | クリックログF/G列自動更新、週次CSV運用、初回検証手順、トラブルシューティング |
+| **operations/microcms-cache-revalidation.md** | microCMSキャッシュ再検証設定ガイド | ISR 60秒設定、キャッシュ問題の原因、代替案（キャッシュ無効化、Webhook）、トラブルシューティング |
 
 ### 今後追加が想定されるドキュメントカテゴリ
 
@@ -303,6 +315,21 @@ docs/
   - Priority 1: レントラックス担当者への問い合わせ（成果レポートCSV機能、`_rt.cinfo`埋め込み可否、API提供有無）
   - Priority 2: 広告主との連携可否の確認
   - Priority 3: 実装判断（上記2つが成功した場合のみ、GASコード拡張を実施）
+
+### 2025-11-17
+
+#### microCMSキャッシュ再検証設定（ISR実装）
+- **operations/microcms-cache-revalidation.md**: 新規作成（microCMSキャッシュ再検証設定ガイド v1.0.0）
+  - 問題: microCMSコンテンツ更新がデプロイ済みサイトに反映されない（Next.js 15デフォルトキャッシング）
+  - 解決策: ISR（Incremental Static Regeneration）60秒設定
+  - 実装箇所: lib/microcms.ts、app/page.tsx、app/blog/**、app/category/**、app/api/blogs/route.ts
+  - 代替案: キャッシュ完全無効化、On-Demand Revalidation（Webhook）
+  - トラブルシューティング: ブラウザキャッシュ、CDNキャッシュ、APIレート制限
+- **コード変更**:
+  - `lib/microcms.ts`: すべてのmicroCMS関数に `customRequestInit: { next: { revalidate: 60 } }` 追加
+  - `app/page.tsx`, `app/blog/page.tsx`, `app/blog/[id]/page.tsx`, `app/category/[id]/page.tsx`: `export const revalidate = 60;` 追加
+  - `app/api/blogs/route.ts`: `export const revalidate = 60;` 追加
+- **影響**: microCMS更新後、最大60秒以内にデプロイ済みサイトに反映されるようになる
 
 ### 2025-11-15
 
@@ -696,6 +723,20 @@ docs/
   - 実装中: Next-Auth設定
   - `dev/architecture.md`: 新規作成（ディレクトリ構成とTypeScript設定の詳細を文書化）
   - 本ファイル（`index.md`）: 更新履歴セクション追加
+
+### 2025-11-17
+- **microCMSキャッシュ再検証設定（ISR実装）**
+  - **operations/microcms-cache-revalidation.md**: 新規作成（microCMSキャッシュ再検証設定ガイド v1.0.0）
+    - 問題: microCMSコンテンツ更新がデプロイ済みサイトに反映されない（Next.js 15デフォルトキャッシング）
+    - 解決策: ISR（Incremental Static Regeneration）60秒設定
+    - 実装箇所: lib/microcms.ts、app/page.tsx、app/blog/**、app/category/**、app/api/blogs/route.ts
+    - 代替案: キャッシュ完全無効化、On-Demand Revalidation（Webhook）
+    - トラブルシューティング: ブラウザキャッシュ、CDNキャッシュ、APIレート制限
+  - **コード変更**:
+    - `lib/microcms.ts`: すべてのmicroCMS関数に `customRequestInit: { next: { revalidate: 60 } }` 追加
+    - `app/page.tsx`, `app/blog/page.tsx`, `app/blog/[id]/page.tsx`, `app/category/[id]/page.tsx`: `export const revalidate = 60;` 追加
+    - `app/api/blogs/route.ts`: `export const revalidate = 60;` 追加
+  - **影響**: microCMS更新後、最大60秒以内にデプロイ済みサイトに反映されるようになる
 
 ---
 

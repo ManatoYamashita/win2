@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getBlogs } from "@/lib/microcms";
 
-export const dynamic = "force-dynamic";
+// ISR: 60秒ごとに再検証
+export const revalidate = 60;
 
 export async function GET(request: NextRequest) {
   try {

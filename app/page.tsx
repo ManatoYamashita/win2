@@ -4,6 +4,9 @@ import { getCategories } from "@/lib/microcms";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
+// ISR: 60秒ごとに再検証
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
   description:
