@@ -120,7 +120,7 @@ C: 案件名 (dealName)
 D: 案件ID (dealId)
 E: イベントID (eventId) ← 新規追加（UUID v4）
 F: 申し込み案件名 ← GASで自動記録（成果マッチング時）
-G: ステータス ← GASで自動記録（成果マッチング時）
+G: STATUS ← GASで自動記録（成果マッチング時）
 ```
 
 **重要:**
@@ -131,7 +131,7 @@ G: ステータス ← GASで自動記録（成果マッチング時）
   - F列：A8.net Parameter Tracking Reportの「プログラム名」を記録
   - G列：A8.net Parameter Tracking Reportの「ステータス名」を記録
 
-| 日時 | 会員ID | 案件名 | 案件ID | イベントID | 申し込み案件名 | ステータス |
+| 日時 | 会員ID | 案件名 | 案件ID | イベントID | 申し込み案件名 | STATUS |
 | --- | --- | --- | --- | --- | --- | --- |
 
 ### 成果データ

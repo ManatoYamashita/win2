@@ -17,7 +17,8 @@ docs/
 ├── asp-api-integration.md    ← ASP Webhook/Postback API調査結果（A8.net、AFB、もしも、バリュコマ）
 │
 ├── design/
-│   └── color-guidelines.md   ← ブランド/アクセントカラーの命名規則と運用ルール
+│   ├── color-guidelines.md               ← ブランド/アクセントカラーの命名規則と運用ルール
+│   └── landing-page-refresh-2025-01-09.md ← LP刷新内容・Hero/Service/Highlight更新履歴とメンテ指針
 │
 ├── dev/
 │   ├── architecture.md       ← アーキテクチャ詳細・ディレクトリ構成・設定ファイル解説
@@ -36,14 +37,16 @@ docs/
 │   └── resend-setup.md           ← Resend.com 詳細セットアップ手順書（DNS設定・ドメイン検証・APIキー）
 │
 ├── operations/               ← 運用マニュアル・メンテナンスガイド
-│   ├── afb-a8-hybrid-workflow.md         ← AFB自動ポーリング + A8.net手動CSVハイブリッド運用マニュアル
+│   ├── afb-a8-hybrid-workflow.md         ← AFB自動ポーリング + A8.net手動CSVハイブリッド運用マニュアル（AFB同期一時停止メモあり）
 │   ├── gas-a8net-update-guide.md         ← Google Apps Script修正ガイド（A8.net対応）
 │   ├── environment-variables-setup.md    ← 環境変数設定ガイド（GitHub Secrets + Vercel）
 │   ├── a8-conversion-matching.md         ← A8.net成果マッチング運用マニュアル（クリックログF/G列自動更新）
 │   └── microcms-cache-revalidation.md    ← microCMSキャッシュ再検証設定ガイド（ISR 60秒、トラブルシューティング）
 │
 ├── architecture/             ← アーキテクチャ決定記録・インフラ構成
-│   └── dns-infrastructure.md ← DNS/メールインフラ構成、Wix DNS制限、RESEND_VALIDフィーチャーフラグ
+│   ├── dns-infrastructure.md           ← DNS/メールインフラ構成、Wix DNS制限、RESEND_VALIDフィーチャーフラグ
+│   ├── client-side-data-processing.md  ← クライアントサイドデータ処理アーキテクチャ（useMemo、Set型、ソート/フィルタパターン）
+│   └── webhook-flow.md                 ← Webhook/Postbackフロー設計
 │
 ├── handoff/                  ← セッション引き継ぎ記録（実装中断・変更経緯）
 │   ├── asp-integration-session-handoff.md   ← ASP統合セッション引き継ぎ（AFB実装保留、A8優先）
@@ -132,6 +135,8 @@ docs/
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
 | **dns-infrastructure.md** | DNS/メールインフラ構成 | Wix+Vercel構成、DNS制限（MXレコード/NSレコード）、RESEND_VALIDフィーチャーフラグ、代替メールサービス検討、ドメイン移管の選択肢、トラブルシューティング |
+| **client-side-data-processing.md** | クライアントサイドデータ処理アーキテクチャ | useMemoメモ化パターン、Set型フィルタ管理、型安全なソート実装、レスポンシブUI、パフォーマンス最適化チェックリスト、サーバーサイド移行基準 |
+| **webhook-flow.md** | Webhook/Postbackフロー設計 | ASP連携、成果データ同期アーキテクチャ |
 
 #### `dev/` - 開発規約
 
@@ -439,6 +444,10 @@ docs/
 - **次のステップ**:
   - Priority 1: A8.netサポートへ問い合わせ（`a8-support-inquiry-final.md` 使用）
   - Priority 2: 代替ASP調査（もしも、バリューコマース、AFB再実装）
+
+#### Landing Page Refresh & AFB Workflow Pause（2025-01-09追記）
+- **design/landing-page-refresh-2025-01-09.md**: Heroアニメーション刷新、Latest Blogsリスト再構成、Highlight/Serviceセクションの挙動変更、CTAレスポンシブ仕様などを整理。今後のメンテ指針を明文化。
+- **operations/afb-a8-hybrid-workflow.md**: AFB成果同期GitHub Actionsを一時停止した旨と、再開手順メモを追加。
   - Priority 3: GitHub Issue #22更新（`github-issue-22-update.md` 使用）
 - **ステータス**: 検証完了、ドキュメント作成完了、サポート問い合わせ待ち
 

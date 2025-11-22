@@ -256,6 +256,13 @@ export function Header() {
                     >
                       マイページ
                     </Link>
+                    <Link
+                      href="/mypage/history"
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 font-medium transition hover:bg-win2-surface-cream-100"
+                      onClick={() => setIsProfileMenuOpen(false)}
+                    >
+                      申込履歴
+                    </Link>
                     <button
                       type="button"
                       onClick={() => {
