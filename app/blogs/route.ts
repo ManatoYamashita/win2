@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { getBlogs } from "@/lib/microcms";
 
+export const dynamic = "force-dynamic";
+
 const DEFAULT_LIMIT = 3;
 const MAX_LIMIT = 6;
 
