@@ -24,8 +24,8 @@ interface HistoryItem {
   dealName: string;           // 案件名
   dealId: string;             // 案件ID
   eventId: string;            // イベントID
-  status: string;             // ステータス（申込済み/未確定/成果確定/否認）
-  statusLabel: string;        // ステータス表示ラベル
+  status: string | null;      // ステータス（未確定/成果確定/否認、G列が空の場合はnull）
+  statusLabel: string | null; // ステータス表示ラベル（G列が空の場合はnull）
   cashbackAmount?: number;    // キャッシュバック金額（成果がある場合）
   originalReward?: number;    // 原始報酬額（参考、成果がある場合）
 }
@@ -76,8 +76,8 @@ export async function GET(_request: NextRequest) {
       const result = results.find(r => r.dealName === log.dealName);
 
       // ステータス判定ロジック
-      let status: string;
-      let statusLabel: string;
+      let status: string | null;
+      let statusLabel: string | null;
       let cashbackAmount: number | undefined;
       let originalReward: number | undefined;
 
@@ -85,14 +85,14 @@ export async function GET(_request: NextRequest) {
         // GASが記録したステータスを使用
         const normalizedStatus = log.status.toLowerCase();
 
-        if (normalizedStatus.includes("確定") || normalizedStatus.includes("approved")) {
+        if (normalizedStatus.includes("未確定") || normalizedStatus.includes("pending")) {
+          status = "pending";
+          statusLabel = "未確定";
+          originalReward = result?.originalReward;
+        } else if (normalizedStatus.includes("成果確定") || normalizedStatus.includes("確定") || normalizedStatus.includes("approved")) {
           status = "approved";
           statusLabel = "成果確定";
           cashbackAmount = result?.cashbackAmount;
-          originalReward = result?.originalReward;
-        } else if (normalizedStatus.includes("未確定") || normalizedStatus.includes("pending")) {
-          status = "pending";
-          statusLabel = "未確定";
           originalReward = result?.originalReward;
         } else if (normalizedStatus.includes("否認") || normalizedStatus.includes("cancelled")) {
           status = "cancelled";
@@ -105,14 +105,14 @@ export async function GET(_request: NextRequest) {
         // 成果データがある場合
         const resultStatus = result.status.toLowerCase();
 
-        if (resultStatus.includes("確定") || resultStatus.includes("approved")) {
+        if (resultStatus.includes("未確定") || resultStatus.includes("pending")) {
+          status = "pending";
+          statusLabel = "未確定";
+          originalReward = result.originalReward;
+        } else if (resultStatus.includes("成果確定") || resultStatus.includes("確定") || resultStatus.includes("approved")) {
           status = "approved";
           statusLabel = "成果確定";
           cashbackAmount = result.cashbackAmount;
-          originalReward = result.originalReward;
-        } else if (resultStatus.includes("未確定") || resultStatus.includes("pending")) {
-          status = "pending";
-          statusLabel = "未確定";
           originalReward = result.originalReward;
         } else if (resultStatus.includes("否認") || resultStatus.includes("cancelled")) {
           status = "cancelled";
@@ -122,9 +122,9 @@ export async function GET(_request: NextRequest) {
           statusLabel = "申込済み";
         }
       } else {
-        // クリックログのみ（成果データなし）
-        status = "applied";
-        statusLabel = "申込済み";
+        // クリックログのみ（成果データなし、G列も空）
+        status = null;
+        statusLabel = null;
       }
 
       return {

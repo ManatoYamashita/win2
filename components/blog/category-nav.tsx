@@ -45,11 +45,10 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
   return (
     <nav className="bg-orange-500 shadow-md">
       <div className="container mx-auto">
-        {/* 水平スクロール対応 */}
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="relative flex items-center gap-2 py-3 px-4 min-w-max">
-            <div className="sticky left-0 z-10 flex items-center gap-2 bg-orange-500 pr-2">
-              {/* 全ての投稿 */}
+        <div className="flex flex-col gap-2 py-3 px-4 sm:flex-row sm:items-center sm:gap-3 sm:px-4">
+          {/* 左右の固定リンク */}
+          <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-start sm:gap-2">
+            <div className="sm:sticky sm:left-0 sm:z-10 sm:bg-orange-500 sm:pr-2">
               <Link
                 href="/blog"
                 className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
@@ -61,9 +60,19 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
                 全ての投稿へ
               </Link>
             </div>
+            <div className="sm:sticky sm:right-0 sm:z-10 sm:bg-orange-500 sm:pl-2">
+              <Link
+                href="/categories"
+                className="px-4 py-2 rounded-lg font-medium whitespace-nowrap text-white/90 transition hover:bg-orange-600 hover:text-white"
+              >
+                カテゴリ一覧へ
+              </Link>
+            </div>
+          </div>
 
-            {/* カテゴリリスト */}
-            <div className="flex items-center gap-2">
+          {/* カテゴリリスト（横スクロール領域を確保） */}
+          <div className="-mx-4 overflow-x-auto scrollbar-hide px-4 sm:mx-0 sm:px-0">
+            <div className="flex items-center gap-2 min-w-max">
               {latestCategories.map((category) => {
                 const isActive = currentCategoryId === category.id;
                 return (
@@ -80,16 +89,6 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
                   </Link>
                 );
               })}
-            </div>
-
-            {/* 全カテゴリリンク（右寄せ） */}
-            <div className="sticky right-0 z-10 ml-2 bg-orange-500 pl-2">
-              <Link
-                href="/categories"
-                className="px-4 py-2 rounded-lg font-medium whitespace-nowrap text-white/90 transition hover:bg-orange-600 hover:text-white"
-              >
-                カテゴリ一覧へ
-              </Link>
             </div>
           </div>
         </div>

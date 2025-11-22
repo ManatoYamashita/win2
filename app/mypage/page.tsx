@@ -140,7 +140,7 @@ export default function MypagePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-win2-surface-cream-50 via-white to-win2-surface-cream-100 px-4">
+    <div className="min-h-screen">
       <motion.div
         className="mx-auto flex w-full max-w-5xl flex-col gap-8"
         variants={containerVariants}
