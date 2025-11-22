@@ -43,7 +43,9 @@ docs/
 │   └── a8-conversion-matching.md         ← A8.net成果マッチング運用マニュアル（クリックログF/G列自動更新）
 │
 ├── architecture/             ← アーキテクチャ決定記録・インフラ構成
-│   └── dns-infrastructure.md ← DNS/メールインフラ構成、Wix DNS制限、RESEND_VALIDフィーチャーフラグ
+│   ├── dns-infrastructure.md           ← DNS/メールインフラ構成、Wix DNS制限、RESEND_VALIDフィーチャーフラグ
+│   ├── client-side-data-processing.md  ← クライアントサイドデータ処理アーキテクチャ（useMemo、Set型、ソート/フィルタパターン）
+│   └── webhook-flow.md                 ← Webhook/Postbackフロー設計
 │
 ├── handoff/                  ← セッション引き継ぎ記録（実装中断・変更経緯）
 │   ├── asp-integration-session-handoff.md   ← ASP統合セッション引き継ぎ（AFB実装保留、A8優先）
@@ -132,6 +134,8 @@ docs/
 | ファイル | 内容 | 主要トピック |
 |---------|------|------------|
 | **dns-infrastructure.md** | DNS/メールインフラ構成 | Wix+Vercel構成、DNS制限（MXレコード/NSレコード）、RESEND_VALIDフィーチャーフラグ、代替メールサービス検討、ドメイン移管の選択肢、トラブルシューティング |
+| **client-side-data-processing.md** | クライアントサイドデータ処理アーキテクチャ | useMemoメモ化パターン、Set型フィルタ管理、型安全なソート実装、レスポンシブUI、パフォーマンス最適化チェックリスト、サーバーサイド移行基準 |
+| **webhook-flow.md** | Webhook/Postbackフロー設計 | ASP連携、成果データ同期アーキテクチャ |
 
 #### `dev/` - 開発規約
 

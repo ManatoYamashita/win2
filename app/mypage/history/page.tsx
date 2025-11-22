@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import {
@@ -8,21 +8,78 @@ import {
   CardContent,
 } from "@/components/ui/card";
 import { buttonVariants } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { cn, formatJapaneseDateTime } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { AlertCircle, FileText, ArrowLeft } from "lucide-react";
+import { AlertCircle, FileText, ArrowLeft, Search, X } from "lucide-react";
 
 interface HistoryItem {
   timestamp: string;
   dealName: string;
   dealId: string;
   eventId: string;
-  status: string;
-  statusLabel: string;
+  status: string | null;
+  statusLabel: string | null;
   cashbackAmount?: number;
   originalReward?: number;
 }
+
+/**
+ * ソートキー型定義
+ */
+type SortKey = "timestamp" | "cashbackAmount";
+
+/**
+ * ソート順序型定義
+ */
+type SortOrder = "desc" | "asc";
+
+/**
+ * ソートオプション型定義
+ */
+interface SortOption {
+  value: string;
+  label: string;
+  sortKey: SortKey;
+  sortOrder: SortOrder;
+}
+
+/**
+ * ソートオプション一覧
+ */
+const SORT_OPTIONS: SortOption[] = [
+  { value: "timestamp-desc", label: "新しい順", sortKey: "timestamp", sortOrder: "desc" },
+  { value: "timestamp-asc", label: "古い順", sortKey: "timestamp", sortOrder: "asc" },
+  { value: "cashback-desc", label: "キャッシュバック高い順", sortKey: "cashbackAmount", sortOrder: "desc" },
+  { value: "cashback-asc", label: "キャッシュバック低い順", sortKey: "cashbackAmount", sortOrder: "asc" },
+];
+
+/**
+ * ステータスフィルタ型定義
+ */
+interface StatusFilterOption {
+  value: string;
+  label: string;
+}
+
+/**
+ * ステータスフィルタオプション一覧
+ */
+const STATUS_FILTER_OPTIONS: StatusFilterOption[] = [
+  { value: "pending", label: "未確定" },
+  { value: "approved", label: "成果確定" },
+  { value: "cancelled", label: "否認" },
+  { value: "none", label: "ステータスなし" },
+];
 
 const containerVariants = {
   hidden: {},
@@ -87,10 +144,17 @@ function HistoryCard({ item }: { item: HistoryItem }) {
                 : formatJapaneseDateTime(item.timestamp)}
             </p>
 
+            {/* イベントID */}
+            <p className="text-xs text-win2-neutral-400">
+              イベントID: {item.eventId}
+            </p>
+
             {/* ステータス */}
-            <div className="flex items-center gap-2">
-              <StatusBadge status={item.status} label={item.statusLabel} />
-            </div>
+            {item.status && item.statusLabel && (
+              <div className="flex items-center gap-2">
+                <StatusBadge status={item.status} label={item.statusLabel} />
+              </div>
+            )}
 
             {/* キャッシュバック金額（成果確定の場合のみ） */}
             {item.status === "approved" && item.cashbackAmount !== undefined && (
@@ -124,6 +188,11 @@ export default function HistoryPage() {
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // ソート/フィルタ状態管理
+  const [sortValue, setSortValue] = useState<string>("timestamp-desc");
+  const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set());
+  const [searchQuery, setSearchQuery] = useState<string>("");
+
   useEffect(() => {
     const fetchHistory = async () => {
       try {
@@ -152,10 +221,76 @@ export default function HistoryPage() {
     }
   }, [status, toast]);
 
+  // フィルタリング処理（useMemoでメモ化）
+  const filteredHistory = useMemo(() => {
+    return history.filter((item) => {
+      // 案件名検索フィルタ
+      if (searchQuery && !item.dealName.includes(searchQuery)) {
+        return false;
+      }
+
+      // ステータスフィルタ
+      if (statusFilter.size > 0) {
+        // ステータスがnullの場合は"none"として扱う
+        const itemStatus = item.status || "none";
+        if (!statusFilter.has(itemStatus)) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [history, searchQuery, statusFilter]);
+
+  // ソート処理（useMemoでメモ化）
+  const sortedAndFilteredHistory = useMemo(() => {
+    const sorted = [...filteredHistory];
+    const selectedSort = SORT_OPTIONS.find(opt => opt.value === sortValue);
+
+    if (!selectedSort) {
+      return sorted;
+    }
+
+    sorted.sort((a, b) => {
+      if (selectedSort.sortKey === "timestamp") {
+        const dateA = new Date(a.timestamp).getTime();
+        const dateB = new Date(b.timestamp).getTime();
+        return selectedSort.sortOrder === "desc" ? dateB - dateA : dateA - dateB;
+      } else if (selectedSort.sortKey === "cashbackAmount") {
+        const amountA = a.cashbackAmount ?? 0;
+        const amountB = b.cashbackAmount ?? 0;
+        return selectedSort.sortOrder === "desc" ? amountB - amountA : amountA - amountB;
+      }
+      return 0;
+    });
+
+    return sorted;
+  }, [filteredHistory, sortValue]);
+
+  // フィルタクリア関数
+  const handleClearFilters = () => {
+    setSortValue("timestamp-desc");
+    setStatusFilter(new Set());
+    setSearchQuery("");
+  };
+
+  // ステータスフィルタトグル関数
+  const handleStatusFilterToggle = (value: string) => {
+    setStatusFilter((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(value)) {
+        newSet.delete(value);
+      } else {
+        newSet.add(value);
+      }
+      return newSet;
+    });
+  };
+
   // ローディング状態
   if (status === "loading" || isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-win2-surface-cream-50 via-white to-win2-surface-cream-100 px-4 py-16">
+      <div className="min-h-screen">
         <div className="mx-auto max-w-5xl">
           <Card className="border-0 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
             <CardContent className="p-12 text-center text-muted-foreground">
@@ -168,7 +303,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-win2-surface-cream-50 via-white to-win2-surface-cream-100 px-4 py-8">
+    <div className="min-h-screen">
       <motion.div
         className="mx-auto flex w-full max-w-5xl flex-col gap-8"
         variants={containerVariants}
@@ -237,12 +372,6 @@ export default function HistoryPage() {
                     <div className="space-y-2 text-sm text-blue-900">
                       <p className="font-semibold">ステータスについて</p>
                       <div className="flex flex-wrap gap-2">
-                        <StatusBadge status="applied" label="申込済み" />
-                        <span className="text-xs text-blue-700">
-                          案件に申し込みました。成果が発生するまでお待ちください。
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
                         <StatusBadge status="pending" label="未確定" />
                         <span className="text-xs text-blue-700">
                           成果が発生しました。承認されるとキャッシュバックが確定します。
@@ -266,13 +395,104 @@ export default function HistoryPage() {
               </Card>
             </motion.div>
 
+            {/* ソート・フィルタUI */}
+            <motion.div variants={fadeUpVariants}>
+              <Card className="border-0 bg-gradient-to-br from-white to-win2-neutral-50 shadow-sm">
+                <CardContent className="p-6">
+                  <div className="space-y-4">
+                    {/* ソート・検索 行 */}
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      {/* ソートセレクト */}
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium text-win2-neutral-700">
+                          並べ替え:
+                        </span>
+                        <Select value={sortValue} onValueChange={setSortValue}>
+                          <SelectTrigger className="w-[200px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {SORT_OPTIONS.map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      {/* 検索 */}
+                      <div className="relative flex-1 sm:max-w-xs">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-win2-neutral-400" />
+                        <Input
+                          type="text"
+                          placeholder="案件名で検索..."
+                          value={searchQuery}
+                          onChange={(e) => setSearchQuery(e.target.value)}
+                          className="pl-9 pr-9"
+                        />
+                        {searchQuery && (
+                          <button
+                            onClick={() => setSearchQuery("")}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-win2-neutral-400 hover:text-win2-neutral-600"
+                            aria-label="検索をクリア"
+                          >
+                            <X className="h-4 w-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* ステータスフィルタ行 */}
+                    <div className="space-y-2">
+                      <span className="text-sm font-medium text-win2-neutral-700">
+                        ステータス絞り込み:
+                      </span>
+                      <div className="flex flex-wrap gap-3">
+                        {STATUS_FILTER_OPTIONS.map((option) => (
+                          <label
+                            key={option.value}
+                            className="flex cursor-pointer items-center gap-2 rounded-md border border-win2-neutral-200 bg-white px-3 py-2 text-sm transition hover:border-win2-primary-orage hover:bg-win2-primary-orage/5"
+                          >
+                            <Checkbox
+                              checked={statusFilter.has(option.value)}
+                              onCheckedChange={() => handleStatusFilterToggle(option.value)}
+                            />
+                            <span className="text-win2-neutral-700">{option.label}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* フィルタクリアボタン */}
+                    {(sortValue !== "timestamp-desc" || statusFilter.size > 0 || searchQuery) && (
+                      <div className="flex justify-end">
+                        <button
+                          onClick={handleClearFilters}
+                          className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-win2-neutral-600 transition hover:bg-win2-neutral-100 hover:text-win2-neutral-900"
+                        >
+                          <X className="h-4 w-4" />
+                          フィルタをクリア
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
             {/* 申込履歴リスト */}
             <motion.div variants={fadeUpVariants} className="space-y-4">
               <h2 className="text-lg font-semibold text-win2-neutral-950">
-                全 {history.length} 件の申込
+                全 {sortedAndFilteredHistory.length} 件の申込
+                {sortedAndFilteredHistory.length !== history.length && (
+                  <span className="ml-2 text-sm font-normal text-win2-neutral-500">
+                    （{history.length}件中）
+                  </span>
+                )}
               </h2>
               <div className="space-y-4">
-                {history.map((item, index) => (
+                {sortedAndFilteredHistory.map((item, index) => (
                   <motion.div
                     key={`${item.eventId}-${index}`}
                     variants={fadeUpVariants}
