@@ -41,7 +41,8 @@ docs/
 │   ├── gas-a8net-update-guide.md         ← Google Apps Script修正ガイド（A8.net対応）
 │   ├── environment-variables-setup.md    ← 環境変数設定ガイド（GitHub Secrets + Vercel）
 │   ├── a8-conversion-matching.md         ← A8.net成果マッチング運用マニュアル（クリックログF/G列自動更新）
-│   └── microcms-cache-revalidation.md    ← microCMSキャッシュ再検証設定ガイド（ISR 60秒、トラブルシューティング）
+│   ├── microcms-cache-revalidation.md    ← microCMSキャッシュ再検証設定ガイド（ISR 60秒、トラブルシューティング）
+│   └── rentracks-investigation-report.md ← レントラックス成果トラッキング実装方法調査報告書（Phase 1: 情報収集待ち）
 │
 ├── architecture/             ← アーキテクチャ決定記録・インフラ構成
 │   ├── dns-infrastructure.md           ← DNS/メールインフラ構成、Wix DNS制限、RESEND_VALIDフィーチャーフラグ
@@ -119,6 +120,17 @@ docs/
   - 削除内容: Webhook, Cron, 型定義, APIクライアント, マッチングアルゴリズム
   - 再実装: GitHub Actions等の代替スケジューラ構築が必要
   - 詳細: `docs/handoff/2025-01-05-afb-removal-handoff.md` 参照
+
+#### `operations/` - 運用マニュアル・メンテナンスガイド
+
+| ファイル | 内容 | ステータス | 主要トピック |
+|---------|------|-----------|------------|
+| **afb-a8-hybrid-workflow.md** | AFB自動ポーリング + A8.net手動CSVハイブリッド運用マニュアル | ✅ 運用中（AFB同期一時停止中） | AFB自動同期（GitHub Actions、10分毎）、A8.net手動CSV（週1回、5分）、モニタリング方法、トラブルシューティング、定期作業スケジュール |
+| **gas-a8net-update-guide.md** | Google Apps Script修正ガイド（A8.net対応） | ✅ 実装完了 | HEADER_CANDIDATES拡張（A8.net固有カラム名）、APPROVED_VALUES拡張（A8.net固有ステータス値）、ステータス判定ロジック、実装手順、トラブルシューティング |
+| **environment-variables-setup.md** | 環境変数設定ガイド（GitHub Secrets + Vercel） | ✅ 実装完了 | GitHub Secrets設定、Vercel環境変数設定、CRON_SECRET生成方法、セキュリティベストプラクティス |
+| **a8-conversion-matching.md** | A8.net成果マッチング運用マニュアル | ✅ 運用中 | クリックログF/G列自動更新処理、Phase 1初回動作確認テスト、日常運用フロー（週1回、5分）、トラブルシューティング、技術仕様、FAQ |
+| **microcms-cache-revalidation.md** | microCMSキャッシュ再検証設定ガイド | ✅ 実装完了 | ISR 60秒設定、キャッシュ問題の原因、代替案（キャッシュ無効化、Webhook）、トラブルシューティング |
+| **rentracks-investigation-report.md** | レントラックス成果トラッキング実装方法調査報告書 | ⏳ 情報収集待ち | コンバージョンタグ方式（`_rt.cinfo`）、A8.net/AFBとの違い、広告主連携必須、実装前確認事項チェックリスト、実装スケジュール提案、リスクと注意事項 |
 
 #### `guides/` - ユーザー/開発者向けガイド
 
@@ -261,6 +273,63 @@ docs/
 ## 更新履歴
 
 このセクションは、ドキュメントの主要な更新を記録します。
+
+### 2025-11-23
+
+#### レントラックス（Rentracks）成果トラッキング実装方法調査完了
+- **operations/rentracks-investigation-report.md**: 新規作成（レントラックス調査報告書 v1.0.0）
+  - **調査範囲**: Web公開情報のみ（管理画面実機確認前）
+  - **調査結果サマリー**:
+    - レントラックスはA8.net/AFBとは根本的に異なる仕組み（URLパラメータ不可、JavaScriptタグ方式）
+    - コンバージョンタグ（`_rt.cinfo`）に会員ID・イベントIDを埋め込む方式
+    - **広告主側のタグ設置が必須**（メディア側だけでは完結しない）
+    - A8.netのようなURLパラメータ方式は使用不可
+  - **実装可否判定**:
+    - ✅ A8.net改良型（手動CSV + 広告主連携）: 実装可能（広告主連携が成功した場合）
+    - ⚠️ AFB型（自動ポーリング）: 条件付き可能（API提供があり、広告主連携も成功した場合）
+    - ❌ A8.net型（URLパラメータ）: 実装不可（レントラックスの仕様上不可）
+  - **実装前確認事項チェックリスト**:
+    - レントラックス担当者への問い合わせ事項（6項目）
+    - 広告主との調整事項（4項目）
+    - 技術実装前の確認（4項目）
+  - **推奨実装パターン**: A8.net改良型（手動CSV + 広告主連携）
+    - Phase 1: 広告主との連携設定（コンバージョンタグに`_rt.cinfo`埋め込み）
+    - Phase 2: GASコード拡張（HEADER_CANDIDATES追加）
+    - Phase 3: Google Sheets「成果CSV_RAW」へのデータ貼り付け
+    - Phase 4: クリックログのマッチング処理（既存GAS処理がそのまま動作）
+  - **リスクと注意事項**:
+    - 高リスク項目: 広告主との連携が必須、CSVフォーマットの不確定性、成果特定情報の取得失敗
+    - 推奨される対策: レントラックス担当者との密接な連携、段階的な実装、フォールバックプラン
+  - **実装スケジュール提案**: 合計5-8週間
+    - Phase 1: 情報収集（2週間）
+    - Phase 2: 広告主連携（2-4週間）
+    - Phase 3: GASコード実装（1週間）
+    - Phase 4: 運用開始（1週間）
+  - **参考リンク**: 8つの公式・技術記事リンク
+- **index.md**: 更新（operations/セクション追加、更新履歴追加 v2.3.0）
+  - ツリー構造に `rentracks-investigation-report.md` 追加
+  - `operations/` セクションのドキュメント概要テーブル新規作成（5ドキュメント）
+  - 更新履歴に2025-11-23エントリ追加
+- **ステータス**: Phase 1（情報収集）待ち、実装前の準備完了
+- **次のアクション**:
+  - Priority 1: レントラックス担当者への問い合わせ（成果レポートCSV機能、`_rt.cinfo`埋め込み可否、API提供有無）
+  - Priority 2: 広告主との連携可否の確認
+  - Priority 3: 実装判断（上記2つが成功した場合のみ、GASコード拡張を実施）
+
+### 2025-11-17
+
+#### microCMSキャッシュ再検証設定（ISR実装）
+- **operations/microcms-cache-revalidation.md**: 新規作成（microCMSキャッシュ再検証設定ガイド v1.0.0）
+  - 問題: microCMSコンテンツ更新がデプロイ済みサイトに反映されない（Next.js 15デフォルトキャッシング）
+  - 解決策: ISR（Incremental Static Regeneration）60秒設定
+  - 実装箇所: lib/microcms.ts、app/page.tsx、app/blog/**、app/category/**、app/api/blogs/route.ts
+  - 代替案: キャッシュ完全無効化、On-Demand Revalidation（Webhook）
+  - トラブルシューティング: ブラウザキャッシュ、CDNキャッシュ、APIレート制限
+- **コード変更**:
+  - `lib/microcms.ts`: すべてのmicroCMS関数に `customRequestInit: { next: { revalidate: 60 } }` 追加
+  - `app/page.tsx`, `app/blog/page.tsx`, `app/blog/[id]/page.tsx`, `app/category/[id]/page.tsx`: `export const revalidate = 60;` 追加
+  - `app/api/blogs/route.ts`: `export const revalidate = 60;` 追加
+- **影響**: microCMS更新後、最大60秒以内にデプロイ済みサイトに反映されるようになる
 
 ### 2025-11-15
 

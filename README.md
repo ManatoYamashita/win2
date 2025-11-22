@@ -1,401 +1,126 @@
-# WIN×Ⅱ
+# WIN×Ⅱ — 会員制キャッシュバック・ブログプラットフォーム
 
-会員制アフィリエイトブログプラットフォーム
+![WIN×Ⅱ OGP](public/ogp.jpg)
 
-## プロジェクト概要
+> microCMS と Google Sheets を核に、会員の行動を成果に変換する Next.js 15 製フルスタックアプリケーション。
 
-WIN×Ⅱ は、ASP（アフィリエイトサービスプロバイダー）の案件を紹介し、会員にキャッシュバックを提供する会員制ブログプラットフォームです。Next.js 15、microCMS、Google Sheets API を活用した現代的なJamstackアーキテクチャで構築されています。
-
-### 主要機能
-
-- **ブログ記事管理**: microCMS でコンテンツ管理、SEO対応（OGP、sitemap.xml）
-- **ASP案件紹介**: A8.net、AFB、もしもアフィリエイト、バリューコマース対応
-- **会員機能**: 登録・ログイン、マイページ、申込履歴管理
-- **キャッシュバックシステム**: 成果の20%を会員に還元
-- **トラッキング**: 会員・非会員（guest:UUID）のクリックログ記録
-
-### 実装状況
-
-✅ **Phase 1: 基盤構築 完了（100%）**:
-- Next.js 15.5.6 プロジェクト初期化（App Router、TypeScript 5 strict mode、Turbopack）
-- TailwindCSS v3.4.1 + shadcn/ui セットアップ（Button、Input、Card、Label、Form、Toast）
-- microCMS SDK 統合（Blog、Deal、Category 型定義完了）
-- Google Sheets API 認証・ユーティリティ関数実装
-- 基本レイアウトコンポーネント（Header、Footer、SessionProvider）
-- Next-Auth v4.24.11 セットアップ（CredentialsProvider）
-- `/api/track-click` 実装（id1トラッキング、guest UUID対応）
-
-✅ **Phase 2: 認証・会員機能 完了（Phase 2-1のみ実装）**:
-- 会員登録機能（Zod バリデーション + react-hook-form）
-- 会員登録 API（`/api/register`、bcrypt パスワードハッシュ化）
-- ログイン/ログアウト機能（Next-Auth v4 CredentialsProvider）
-- 認証保護ミドルウェア（`/mypage/*`、`/deals/*` 保護）
-- マイページ実装（登録情報表示、サイドナビゲーション）
-- 会員情報取得/更新 API（`/api/members/me`）
-- Email認証システム（Resend統合、トークン検証）
-- パスワードリセット機能（forgot-password, reset-password）
-- ⏭️ Phase 2-2, 2-3: Admin Dashboard等はスキップ（優先度低）
-
-✅ **Phase 3: ブログ機能・SEO最適化 完了（100%）**:
-- BlogCard、DealCTAButton、Pagination コンポーネント
-- ブログ一覧ページ（`/blog`、ページネーション対応）
-- ブログ詳細ページ（`/blog/[id]`、完全SEO/OGP対応）
-- カテゴリページ（`/category/[id]`、フィルタリング）
-- トップページ更新（ヒーローセクション + 最新記事表示）
-- microCMS完全統合（blogs, deals, categories API）
-- リッチテキストコンテンツ表示、関連案件CTA表示
-- **包括的SEO実装（2025-10-30）**:
-  - 全ページにメタデータ、OGP、Twitter Card、JSON-LD構造化データ
-  - Homepage: Organization + WebSiteスキーマ（サーバーコンポーネント化）
-  - 認証ページ: WebPageスキーマ（layout.tsx）
-  - ブログ詳細: Articleスキーマ
-  - ブログ一覧/カテゴリ: CollectionPageスキーマ
-
-⏳ **Phase 4 未着手**:
-- 案件一覧ページ（会員限定、フィルタリング）
-- 詳細検索機能
-- ユーザープロフィール編集
-- 通知設定
+[![Next.js](https://img.shields.io/badge/Next.js-15-black)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel-black)](https://vercel.com/)
 
 ---
 
-## 技術スタック
+## 1. プロダクト概要
+- ASP案件を紹介し、成果の20%を会員にキャッシュバックする会員制ブログ/メディア。
+- microCMS でコンテンツ管理、Google Sheets で会員・成果データを一元集計。
+- 会員/ゲスト双方を識別してクリックをトラッキングし、成果と紐付け。
+- 包括的SEO（OGP/JSON-LD/構造化データ）を全ページで適用。
 
-### フロントエンド
-- **Next.js**: 15.1.4（App Router、React Server Components）
-- **React**: 19
-- **TypeScript**: 5（strict mode、noUncheckedIndexedAccess 有効）
-- **TailwindCSS**: v3.4.1
-- **shadcn/ui**: Radix UI primitives ベース
+## 2. ハイライト
+- **トラッキング精度**: 会員IDまたは guest:UUID を id1 パラメータとして付与し、クリックログに記録。
+- **ハイブリッド成果反映**: A8.net（手動CSV）＋ AFB（API自動ポーリング）のハイブリッド運用を設計済み。
+- **安全な認証**: Next-Auth (CredentialsProvider) + bcrypt ハッシュ。メール認証/パスワードリセットも実装済み（Feature Flag付き）。
+- **CMS駆動の運用性**: microCMS でブログ・案件・カテゴリを一元管理。CTA ショートコードで記事内に案件ボタンを自動挿入。
+- **UX最適化**: App Router + Turbopack による高速開発体験、包括的な SEO メタデータ、レスポンシブデザイン。
 
-### バックエンド・API
-- **Next.js API Routes**: サーバーサイドAPI
-- **Next-Auth**: v4.24.11（安定版）
-- **Google Sheets API**: googleapis v164.1.0
-- **microCMS SDK**: v3.2.0（Headless CMS）
-- **bcryptjs**: v3.0.2（パスワードハッシュ化、salt rounds: 10）
+## 3. アーキテクチャ
+```
+Next.js 15 (App Router, RSC)
+ ├─ microCMS (blogs / deals / categories)
+ ├─ Google Sheets (会員リスト / クリックログ / 成果データ / 成果CSV_RAW)
+ ├─ Next-Auth (CredentialsProvider)
+ └─ Resend (メール認証・パスワードリセット) *Feature Flag
+```
+- 三層データ構造: microCMS（コンテンツ） / Google Sheets（会員・成果ログ） / Next.js API（集約・変換）
+- クリック計測: `/api/track-click` でログ記録 → ASPへリダイレクト（id1, id2付与）
+- 成果反映: GAS が日次処理し、会員マイページで閲覧
 
-### バリデーション・ユーティリティ
-- **zod**: v4.1.12
-- **class-variance-authority**: v0.7.1
+## 4. 主要機能
+- 会員登録・ログイン・マイページ（履歴閲覧/情報更新）
+- ブログ一覧・詳細・カテゴリページ（SEO対応・構造化データ）
+- CTAショートコード (`[CTA:dealId]`) で記事内に案件ボタンを自動生成
+- 成果トラッキング（会員/ゲスト対応）、クリックログ保存、id1パラメータ付与
+- メール認証／パスワードリセット（Resend、Feature Flag制御）
 
-### デプロイ
-- **Vercel**（予定）
+## 5. 技術スタック
+- **Frontend/Backend**: Next.js 15, React 19, TypeScript 5 (strict, noUncheckedIndexedAccess)
+- **Styling/UI**: TailwindCSS 3.4, shadcn/ui, Radix UI primitives
+- **Content**: microCMS v3.2.0
+- **Data/Tracking**: Google Sheets API (googleapis v164.1.0)
+- **Auth**: Next-Auth v4.24.11 (CredentialsProvider), bcryptjs v3.0.2
+- **Validation**: zod v4.1.12
+- **Infra**: Vercel（デプロイ対象）
 
----
-
-## クイックスタート
-
-### 前提条件
-
-- **Node.js**: 18.x 以上
-- **npm**: 9.x 以上
-- **Google Cloud Platform アカウント**: Sheets API サービスアカウント設定済み
-- **microCMS アカウント**: API キー発行済み
-
-### インストール
-
+## 6. クイックスタート
 ```bash
-# リポジトリクローン
 git clone <repository-url>
 cd win2
-
-# 依存関係インストール
 npm install
-
-# 環境変数設定
 cp .env.example .env.local
-# .env.local を編集して必要な環境変数を設定
+# .env.local を必要な値で編集
+npm run dev   # http://localhost:3000
 ```
 
-### 環境変数設定
-
-`.env.local` に以下を設定：
-
+### 必須環境変数（抜粋）
 ```bash
 # microCMS
-MICROCMS_SERVICE_DOMAIN=your-service-domain
-MICROCMS_API_KEY=your-api-key
+MICROCMS_SERVICE_DOMAIN=xxx
+MICROCMS_API_KEY=xxx
 
-# Google Sheets API
-GOOGLE_SHEETS_CLIENT_EMAIL=your-service-account@project.iam.gserviceaccount.com
+# Google Sheets
+GOOGLE_SHEETS_CLIENT_EMAIL=xxx
 GOOGLE_SHEETS_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-GOOGLE_SHEETS_SPREADSHEET_ID=your-spreadsheet-id
+GOOGLE_SHEETS_SPREADSHEET_ID=xxx
 
-# Next-Auth
+# Auth / App
 NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-secret-key  # openssl rand -base64 32 で生成推奨
+NEXTAUTH_SECRET=generate-with-openssl
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+その他の変数は `.env.example` を参照。
+
+### よく使うスクリプト
+- 開発: `npm run dev`
+- Lint: `npm run lint`
+- 型チェック: `npx tsc --noEmit`
+- 本番ビルド: `npm run build` → `npm run start`
+
+## 7. ディレクトリ（抜粋）
+```
+app/              # App Router（ページ・API）
+components/       # UI/レイアウト/ブログ・CTAなど
+lib/              # microCMS/Sheets/Auth/Validation
+docs/             # 仕様・ガイド・運用ドキュメント
+public/ogp.jpg    # カバー画像 (OGP)
 ```
 
-### 開発サーバー起動
+## 8. 主要APIとフロー
+- `/api/track-click`: クリックログ記録＋ASPリダイレクトURL生成（id1=id, id2=eventId 付与）
+- `/api/register`: 会員登録（Google Sheets 書き込み）
+- `/api/members/me`: 会員情報取得/更新
+- `/api/auth/[...nextauth]`: 認証・セッション管理
+- `/api/verify-email`, `/api/reset-password`: メール認証・パスワードリセット（Feature Flag）
 
-```bash
-npm run dev
-```
+## 9. セキュリティと運用
+- パスワードは bcrypt でハッシュ化（salt rounds: 10）
+- セッションは Next-Auth 管理（HttpOnly/Secure cookie）
+- .env* はコミット禁止
+- GAS は 3:10 JST に日次実行（成果CSV_RAW → 成果データ）
 
-ブラウザで [http://localhost:3000](http://localhost:3000) を開く。
+## 10. ロードマップ（抜粋）
+- 案件一覧ページ（会員限定フィルタリング）
+- 詳細検索（ブログ・案件横断）
+- 通知設定、プロフィール編集
+- Lighthouse 90+ 最適化
 
-**Note**: デフォルトでTurbopackが有効（`--turbo`フラグ）。高速なHMRと開発体験を提供。
+## 11. ドキュメント
+- `docs/index.md` — ドキュメント索引
+- `docs/specs/spec.md` — 要件定義
+- `docs/guides/cta-technical-guide.md` — CTA実装詳細
+- `docs/seo-implementation.md` — SEO/OGP/構造化データ
+- `docs/operations/` — A8/AFB ハイブリッド運用手順
+- `CLAUDE.md` — 開発者向けガイド
 
-### ビルド・本番起動
-
-```bash
-# プロダクションビルド
-npm run build
-
-# プロダクションサーバー起動
-npm run start
-```
-
-### リント・型チェック
-
-```bash
-# ESLint実行
-npm run lint
-
-# TypeScript型チェック
-npx tsc --noEmit
-```
-
----
-
-## ディレクトリ構成
-
-```text
-win2/
-├── app/                    # Next.js 15 App Router
-│   ├── layout.tsx          # ルートレイアウト
-│   ├── page.tsx            # トップページ（Phase 3更新: ヒーロー + 最新記事）
-│   ├── globals.css         # グローバルCSS
-│   ├── blog/               # ブログ関連ページ（Phase 3）
-│   │   ├── page.tsx        # ブログ一覧（ページネーション）
-│   │   └── [slug]/page.tsx # ブログ詳細（SEO/OGP対応）
-│   ├── category/           # カテゴリページ（Phase 3）
-│   │   └── [slug]/page.tsx # カテゴリ別記事一覧
-│   ├── login/              # ログインページ（Phase 2）
-│   ├── register/           # 会員登録ページ（Phase 2）
-│   ├── verify-email/       # Email認証ページ（Phase 2）
-│   ├── forgot-password/    # パスワードリセット要求（Phase 2）
-│   ├── reset-password/     # パスワードリセット（Phase 2）
-│   ├── mypage/             # マイページ（Phase 2）
-│   │   ├── page.tsx        # 登録情報表示
-│   │   └── history/page.tsx # 申込履歴
-│   └── api/                # API Routes
-│       ├── auth/[...nextauth]/route.ts  # Next-Auth endpoints
-│       ├── register/route.ts            # 会員登録API
-│       ├── members/me/route.ts          # 会員情報API
-│       ├── track-click/route.ts         # クリック追跡API
-│       ├── verify-email/route.ts        # Email認証トークン検証
-│       └── reset-password/route.ts      # パスワードリセット
-│
-├── components/             # Reactコンポーネント
-│   ├── blog/               # ブログコンポーネント（Phase 3）
-│   │   └── blog-card.tsx   # ブログカード
-│   ├── deal/               # 案件コンポーネント（Phase 3）
-│   │   └── deal-cta-button.tsx # CTAボタン（トラッキング付き）
-│   ├── providers/          # React Context Providers
-│   │   └── session-provider.tsx  # Next-Auth SessionProvider
-│   └── ui/                 # shadcn/ui コンポーネント
-│       ├── button.tsx      # ボタン
-│       ├── card.tsx        # カード
-│       ├── form.tsx        # フォーム
-│       ├── pagination.tsx  # ページネーション（Phase 3）
-│       └── ...             # その他UIコンポーネント
-│
-├── lib/                    # ユーティリティ・API関数
-│   ├── googleapis.ts       # Google Sheets 認証
-│   ├── sheets.ts           # Sheets 操作関数
-│   ├── microcms.ts         # microCMS クライアント
-│   ├── auth.ts             # Next-Auth 設定
-│   ├── guest-uuid.ts       # Guest UUID管理（Phase 1）
-│   ├── email.ts            # Email送信（Resend、Phase 2）
-│   ├── tokens.ts           # JWT トークン生成（Phase 2）
-│   ├── validations/        # Zod バリデーションスキーマ
-│   │   ├── auth.ts         # 認証関連スキーマ
-│   │   └── member.ts       # 会員情報スキーマ
-│   └── utils.ts            # ユーティリティ（cn, formatDate等）
-│
-├── hooks/                  # React カスタムフック
-│   └── use-toast.ts        # Toast通知フック
-│
-├── types/                  # TypeScript 型定義
-│   ├── microcms.ts         # microCMS API型
-│   └── next-auth.d.ts      # Next-Auth 型拡張
-│
-├── middleware.ts           # 認証保護ミドルウェア
-│
-├── docs/                   # プロジェクトドキュメント
-│   ├── index.md            # ドキュメント索引
-│   ├── design/             # デザインガイドライン
-│   │   └── color-guidelines.md # カラートークン定義
-│   ├── guides/             # 手順書・ガイド
-│   │   ├── cta-shortcode-guide.md
-│   │   ├── cta-technical-guide.md
-│   │   ├── email-setup.md
-│   │   ├── microcms-setup.md
-│   │   └── resend-setup.md
-│   ├── specs/              # 要件定義・仕様
-│   │   ├── spec.md         # 要件定義書
-│   │   └── google.md       # Google Sheets 構成
-│   └── dev/                # 開発ドキュメント
-│       ├── architecture.md # アーキテクチャ詳細
-│       ├── branch.md       # Git ブランチ戦略
-│       ├── environment.md  # 開発環境セットアップ
-│       └── seo-implementation.md # SEO実装ガイド
-│
-├── .env.local              # 環境変数（Git管理外）
-├── .env.example            # 環境変数テンプレート
-│
-├── tsconfig.json           # TypeScript 設定
-├── tailwind.config.ts      # TailwindCSS 設定
-├── components.json         # shadcn/ui 設定
-├── next.config.ts          # Next.js 設定
-│
-├── CLAUDE.md               # Claude Code向けガイド
-└── README.md               # 本ファイル
-```
-
----
-
-## データベース設計
-
-### Google Sheets 構成
-
-**シート1: 会員リスト**
-- memberId（UUID）、氏名、メールアドレス、パスワードハッシュ、生年月日、郵便番号、電話番号、登録日時
-
-**シート2: クリックログ**
-- 日時、memberId（or guest:UUID）、案件名、案件ID
-
-**シート3: 成果データ**（GAS自動出力）
-- 氏名、案件名、承認状況、キャッシュバック金額、memberId、原始報酬額、メモ
-
-**シート4: 成果CSV_RAW**（手動貼付）
-- id1、dealName、reward、status
-
-### microCMS API構成
-
-**blogs**: ブログ記事（title, slug, content, thumbnail, category, relatedDeals, etc.）
-**deals**: ASP案件（dealId, dealName, aspName, rewardAmount, cashbackRate, affiliateUrl, etc.）
-**categories**: カテゴリ（name, slug, displayOrder, isVisible）
-
----
-
-## 主要な開発規約
-
-### Git ブランチ戦略
-
-2ブランチ管理（dev/main）+ Feature branches
-
-- `main`: 本番環境リリースブランチ
-- `dev`: 開発統合ブランチ
-- `feature/*`: 機能追加ブランチ
-- `fix/*`: バグ修正ブランチ
-
-詳細は `docs/dev/branch.md` 参照。
-
-### コミットメッセージ形式
-
-```
-PREFIX: コミットメッセージ
-
-詳細説明（任意）
-```
-
-**PREFIX一覧**:
-- `FEATURE`: 新機能追加
-- `UPDATE`: 既存機能の改善・拡張
-- `FIX`: バグ修正
-- `REFACTOR`: リファクタリング
-- `STYLE`: コードスタイル修正
-- `DOC`: ドキュメント更新
-- `CHORE`: ビルド・設定ファイル変更
-
-### TypeScript 厳格設定
-
-- `strict: true`: 厳格な型チェック
-- `noUncheckedIndexedAccess: true`: 配列・オブジェクトアクセス時の undefined チェック必須
-
----
-
-## ドキュメント
-
-詳細なプロジェクト情報は `docs/` ディレクトリ配下を参照：
-
-- **[docs/index.md](docs/index.md)**: ドキュメント索引（このファイルから開始）
-- **[docs/specs/spec.md](docs/specs/spec.md)**: プロジェクト要件定義書（必読）
-- **[docs/email-setup.md](docs/email-setup.md)**: Email送信設定ガイド（Resend）
-- **[docs/microcms-setup.md](docs/microcms-setup.md)**: microCMS設定ガイド（API作成・フィールド定義）
-- **[docs/seo-implementation.md](docs/seo-implementation.md)**: SEO実装ガイド（メタデータ、OGP、Twitter Card、JSON-LD）
-- **[docs/dev/architecture.md](docs/dev/architecture.md)**: アーキテクチャ詳細
-- **[docs/dev/branch.md](docs/dev/branch.md)**: Git ブランチ戦略
-- **[CLAUDE.md](CLAUDE.md)**: Claude Code 向けプロジェクトガイド
-
----
-
-## 開発フェーズ
-
-### Phase 1: 環境構築・基盤実装（✅ 100% 完了）
-- [x] Next.js 15 プロジェクト初期化
-- [x] TailwindCSS + shadcn/ui セットアップ
-- [x] microCMS SDK 統合
-- [x] Google Sheets API 認証・ユーティリティ実装
-- [x] 基本レイアウトコンポーネント
-- [x] Next-Auth v4 基盤設定
-- [x] クリック追跡API（/api/track-click）
-
-### Phase 2: 認証・会員機能（✅ Phase 2-1 完了）
-- [x] 会員登録API + フォーム（Zod + react-hook-form）
-- [x] ログイン/ログアウト（Next-Auth v4 CredentialsProvider）
-- [x] 認証保護ミドルウェア
-- [x] マイページ（登録情報表示、サイドナビゲーション）
-- [x] 会員情報取得/更新API（/api/members/me）
-- [x] Email認証システム（Resend統合）
-- [x] パスワードリセット機能
-- [x] 申込履歴表示（/mypage/history）
-- [ ] Phase 2-2: Admin Dashboard（スキップ - 優先度低）
-- [ ] Phase 2-3: Advanced features（スキップ - 優先度低）
-
-### Phase 3: CMS連携・ブログ機能・SEO最適化（✅ 100% 完了）
-- [x] ブログ記事一覧ページ（/blog、ページネーション）
-- [x] ブログ詳細ページ（/blog/[id]、SSR）
-- [x] カテゴリページ（/category/[id]、フィルタリング）
-- [x] BlogCard、DealCTAButton、Pagination コンポーネント
-- [x] トップページ更新（ヒーローセクション + 最新記事）
-- [x] microCMS完全統合（API設定ガイド作成）
-- [x] リッチテキストコンテンツ表示
-- [x] **包括的SEO実装（2025-10-30）**:
-  - [x] 全ページにメタデータ、OGP、Twitter Card、JSON-LD構造化データ
-  - [x] Next.js 15 Metadata API使用
-  - [x] Homepage: Organization + WebSiteスキーマ（サーバーコンポーネント化）
-  - [x] 認証ページ: layout.tsxでWebPageスキーマ
-  - [x] ブログ詳細: Articleスキーマ
-  - [x] ブログ一覧/カテゴリ: CollectionPageスキーマ
-  - [x] ルートレイアウト: title.template、包括的robots設定
-  - [x] SEO実装ドキュメント作成（docs/seo-implementation.md）
-
-### Phase 4: 機能拡張（未着手）
-- [ ] 案件一覧ページ（会員限定、フィルタリング）
-- [ ] 詳細検索機能（ブログ・案件）
-- [ ] ユーザープロフィール編集
-- [ ] Email通知設定
-- [ ] sitemap.xml自動生成
-
-### Phase 5: テスト・最適化（未着手）
-- [ ] A8.net テストアカウント動作確認
-- [ ] レスポンシブデザイン調整
-- [ ] Lighthouseパフォーマンス最適化（目標: 90+）
-- [ ] セキュリティ監査
-- [ ] 本番デプロイ（Vercel）
-
----
-
-## ライセンス
-
-本プロジェクトはプライベート利用を想定しています。
-
----
-
-## 連絡先
-
-プロジェクトに関する質問や提案は、プロジェクトオーナーまで連絡してください。
+## 12. ライセンス / 連絡先
+- 本プロジェクトはプライベート利用を想定しています。
+- ご質問・ご提案はプロジェクトオーナーまで。
