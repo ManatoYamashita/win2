@@ -39,52 +39,57 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
     };
     return [...categories]
       .sort((a, b) => getTimestamp(b) - getTimestamp(a))
-      .slice(0, 5);
+      .filter((category) => Boolean(category.name));
   }, [categories]);
 
   return (
     <nav className="bg-orange-500 shadow-md">
       <div className="container mx-auto">
-        {/* 水平スクロール対応 */}
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex items-center space-x-1 py-3 px-4 min-w-max">
-            {/* 全ての投稿 */}
-            <Link
-              href="/blog"
-              className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
-                isAllPostsActive
-                  ? "bg-orange-600 text-white shadow-md"
-                  : "text-white hover:bg-orange-600"
-              }`}
-            >
-              全ての投稿
-            </Link>
+        <div className="flex flex-col gap-2 py-3 px-4 sm:flex-row sm:items-center sm:gap-3 sm:px-4">
+          {/* 左右の固定リンク */}
+          <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-start sm:gap-2">
+            <div className="sm:sticky sm:left-0 sm:z-10 sm:bg-orange-500 sm:pr-2">
+              <Link
+                href="/blog"
+                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                  isAllPostsActive
+                    ? "bg-orange-600 text-white shadow-md"
+                    : "text-white hover:bg-orange-600"
+                }`}
+              >
+                全ての投稿へ
+              </Link>
+            </div>
+            <div className="sm:sticky sm:right-0 sm:z-10 sm:bg-orange-500 sm:pl-2">
+              <Link
+                href="/categories"
+                className="px-4 py-2 rounded-lg font-medium whitespace-nowrap text-white/90 transition hover:bg-orange-600 hover:text-white"
+              >
+                カテゴリ一覧へ
+              </Link>
+            </div>
+          </div>
 
-            {/* カテゴリリスト */}
-            {latestCategories.map((category) => {
-              const isActive = currentCategoryId === category.id;
-              return (
-                <Link
-                  key={category.id}
-                  href={`/category/${category.id}`}
-                  className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
-                    isActive
-                      ? "bg-orange-600 text-white shadow-md"
-                      : "text-white hover:bg-orange-600"
-                  }`}
-                >
-                  {category.name}
-                </Link>
-              );
-            })}
-
-            {/* 全カテゴリリンク */}
-            <Link
-              href="/categories"
-              className="px-4 py-2 rounded-lg font-medium whitespace-nowrap text-white/90 transition hover:bg-orange-600 hover:text-white"
-            >
-              全てのカテゴリへ
-            </Link>
+          {/* カテゴリリスト（横スクロール領域を確保） */}
+          <div className="-mx-4 overflow-x-auto scrollbar-hide px-4 sm:mx-0 sm:px-0">
+            <div className="flex items-center gap-2 min-w-max">
+              {latestCategories.map((category) => {
+                const isActive = currentCategoryId === category.id;
+                return (
+                  <Link
+                    key={category.id}
+                    href={`/category/${category.id}`}
+                    className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                      isActive
+                        ? "bg-orange-600 text-white shadow-md"
+                        : "text-white hover:bg-orange-600"
+                    }`}
+                  >
+                    {category.name}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>

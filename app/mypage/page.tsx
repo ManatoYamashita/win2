@@ -140,7 +140,7 @@ export default function MypagePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-win2-surface-cream-50 via-white to-win2-surface-cream-100 px-4">
+    <div className="min-h-screen">
       <motion.div
         className="mx-auto flex w-full max-w-5xl flex-col gap-8"
         variants={containerVariants}
@@ -162,10 +162,19 @@ export default function MypagePage() {
           </p>
           <div className="mt-6 flex flex-wrap gap-4">
             <Link
-              href="/blog"
+              href="/mypage/history"
               className={cn(
                 buttonVariants({ size: "lg" }),
                 "rounded-full bg-white px-8 text-win2-primary-orage shadow-lg shadow-white/30 hover:bg-white/90"
+              )}
+            >
+              申込履歴を見る
+            </Link>
+            <Link
+              href="/blog"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "rounded-full border-2 border-white bg-transparent px-8 text-white shadow-lg hover:bg-white/10"
               )}
             >
               ブログで最新情報を見る

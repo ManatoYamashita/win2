@@ -471,7 +471,7 @@ Parameter Tracking Report CSV Download (5 min/week)
 **Click Log Sheet Structure**:
 ```
 A: 日時 | B: 会員ID (id1) | C: 案件名 | D: 案件ID | E: イベントID (id2)
-| F: 申し込み案件名 (GAS更新) | G: ステータス (GAS更新)
+| F: 申し込み案件名 (GAS更新) | G: STATUS (GAS更新)
 ```
 
 **Matching Algorithm** (`code.gs.js` L128-147):
