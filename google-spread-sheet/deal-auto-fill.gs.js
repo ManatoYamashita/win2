@@ -5,7 +5,7 @@
  *  - アフィリエイトURL (A列) が編集されたときに自動実行
  *  - 案件名: URLからページタイトルを自動取得（取得失敗時は「不明なタイトル」）
  *  - ASP名: URLから自動判定（A8.net, AFB, もしも, バリューコマース）
- *  - 報酬額, キャッシュバック率, 有効/無効: デフォルト値を自動入力
+ *  - 報酬額, 有効/無効: デフォルト値を自動入力
  *
  * 列構成:
  *  A: アフィリエイトURL (編集検知対象)
@@ -13,7 +13,7 @@
  *  C: 案件名
  *  D: ASP名
  *  E: 報酬額
- *  F: キャッシュバック率
+ *  F: （未使用）
  *  G: 有効/無効
  */
 
@@ -134,10 +134,8 @@ function autoFillDefaults(sheet, row) {
     sheet.getRange(row, 5).setValue(0);
   }
 
-  // F列（cashbackRate）が空ならデフォルト値 20%
-  if (!sheet.getRange(row, 6).getValue()) {
-    sheet.getRange(row, 6).setValue(0.20);
-  }
+  // F列は未使用のため自動入力なし
+  // （旧仕様: キャッシュバック率 20% を自動設定していた）
 
   // G列（isActive）が空ならTRUE
   if (!sheet.getRange(row, 7).getValue()) {
