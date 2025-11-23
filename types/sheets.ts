@@ -73,7 +73,7 @@ export interface ClickLog {
  * A: 氏名
  * B: 案件名
  * C: 承認状況
- * D: キャッシュバック金額
+ * D: 参考報酬額
  * E: memberId(参考)
  * F: イベントID(参考) - UUID v4
  * G: 原始報酬額(参考)
@@ -83,7 +83,7 @@ export interface Result {
   name: string;
   dealName: string;
   status: string;                // 承認状況
-  cashbackAmount: number;        // キャッシュバック金額
+  referenceReward: number;       // 参考報酬額
   memberId: string;              // 参考
   eventId: string;               // UUID v4 for tracking click-to-result linkage
   originalReward: number;        // 原始報酬額（参考）

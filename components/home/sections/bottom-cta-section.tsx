@@ -13,7 +13,7 @@ export function BottomCtaSection({ resolveCta }: BottomCtaSectionProps) {
       <div className="mx-auto flex max-w-[860px] flex-col items-center gap-5 px-6 text-center text-white lg:px-8">
         <h2 className="text-3xl font-bold md:text-4xl">いますぐ WIN×Ⅱ をはじめましょう</h2>
         <p className="text-sm leading-relaxed text-white/90 md:text-base">
-          暮らしをもっとお得に、もっとスマートに。WIN×Ⅱの無料メルマガ会員登録でキャッシュバック特典と最新情報を手に入れてください。
+          暮らしをもっとお得に、もっとスマートに。WIN×Ⅱの無料メルマガ会員登録で最新情報とお役立ち情報を手に入れてください。
         </p>
         <div className="flex flex-wrap justify-center gap-4">
           {(() => {

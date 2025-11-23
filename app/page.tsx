@@ -10,9 +10,9 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
   description:
-    "WIN×Ⅱは、保険・不動産・転職・エンタメなど、暮らしに役立つサービスを無料でご紹介し、キャッシュバックも受けられる会員制プラットフォームです。300件以上の厳選サービスから最適な選択をサポートします。",
+    "WIN×Ⅱは、保険・不動産・転職・エンタメなど、暮らしに役立つサービスを無料でご紹介し、成果も受けられる会員制プラットフォームです。300件以上の厳選サービスから最適な選択をサポートします。",
   keywords: [
-    "キャッシュバック",
+    "成果",
     "アフィリエイト",
     "保険相談",
     "不動産査定",
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
     description:
-      "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。アフィリエイトブログプラットフォームです。",
+      "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。成果に応じた会員制プラットフォーム。",
     images: [
       {
         url: `${appUrl}/ogp.jpg`,
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "WIN×Ⅱ - 暮らしをもっとお得に、もっとスマートに",
     description:
-      "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。アフィリエイトブログプラットフォームです。",
+      "保険・不動産・転職・エンタメなど、300件以上の厳選サービスをご紹介。成果に応じた会員制プラットフォーム。",
     images: [`${appUrl}/ogp.jpg`],
   },
   alternates: {
@@ -68,7 +68,7 @@ const organizationSchema = {
   url: appUrl,
   logo: `${appUrl}/assets/win2/logo.webp`,
   description:
-    "保険・不動産・転職・エンタメなど、暮らしに役立つサービスを無料でご紹介し、キャッシュバックも受けられる会員制プラットフォーム",
+    "保険・不動産・転職・エンタメなど、暮らしに役立つサービスを無料でご紹介できる会員制プラットフォーム",
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "Customer Service",

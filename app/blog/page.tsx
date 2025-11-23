@@ -13,10 +13,10 @@ export const metadata: Metadata = {
   description: "会員制アフィリエイトブログWIN×Ⅱのブログ記事一覧ページです。お得な案件情報や攻略法を発信しています。",
   keywords: [
     "アフィリエイトブログ",
-    "キャッシュバック情報",
     "WIN×Ⅱ",
     "副業",
     "お得情報",
+    "案件情報",
   ],
   openGraph: {
     title: "ブログ一覧 | WIN×Ⅱ",
@@ -80,7 +80,7 @@ export default async function BlogListPage() {
         "@context": "https://schema.org",
         "@type": "ItemList",
         name: "WIN×Ⅱ ブログ記事一覧",
-        description: "キャッシュバックやアフィリエイトに役立つブログ記事をまとめたリスト",
+        description: "アフィリエイトに役立つブログ記事をまとめたリスト",
         itemListElement: initialBlogs.map((blog, index) => ({
           "@type": "ListItem",
           position: index + 1,

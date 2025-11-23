@@ -67,7 +67,7 @@ export function ServiceSection() {
                   WIN×Ⅱってどんな<span className="text-win2-primary-orage">サービス</span>？
                 </h2>
                 <p className="mt-4 text-base text-slate-600">
-                  暮らしに必要な情報をワンストップでキャッチアップ。サービス比較、キャッシュバック情報、特典を一つのダッシュボードで管理できます。
+                  暮らしに必要な情報をワンストップでキャッチアップ。サービス比較、特典情報を一つのダッシュボードで管理できます。
                 </p>
               </div>
             </div>

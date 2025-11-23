@@ -53,7 +53,6 @@ export interface DealRow {
   companyName?: string;
   rawAffiliateUrl?: string;
   rewardAmount?: number;
-  cashbackRate?: number;
   isActive?: boolean;
 }
 
@@ -80,7 +79,7 @@ export interface ClickLogRow {
  * A: 氏名 (or "非会員")
  * B: 案件名
  * C: 承認状況
- * D: キャッシュバック金額
+ * D: 参考報酬額
  * E: memberId(参考)
  * F: 原始報酬額(参考)
  * G: メモ
@@ -89,7 +88,7 @@ export interface ResultRow {
   name: string;
   dealName: string;
   status: string;
-  cashbackAmount: number;
+  referenceReward: number;
   memberId: string;
   originalReward: number;
   memo?: string;
@@ -339,7 +338,7 @@ export async function getResultsByMemberId(memberId: string): Promise<ResultRow[
         name: row[0] || "",
         dealName: row[1] || "",
         status: row[2] || "",
-        cashbackAmount: parseFloat(row[3] || "0") || 0,
+        referenceReward: parseFloat(row[3] || "0") || 0,
         memberId: row[4] || "",
         originalReward: parseFloat(row[5] || "0") || 0,
         memo: row[6] || "",
@@ -531,7 +530,7 @@ export async function getClickLogByEventId(eventId: string): Promise<ClickLogRow
  *
  * ASP Webhookから受信した成果データを「成果CSV_RAW」シートに追記します。
  * このデータは後でGAS（Google Apps Script）によって処理され、
- * キャッシュバック金額の計算と「成果データ」シートへの転記が行われます。
+ * 「成果データ」シートへの転記が行われます。
  *
  * シート構成（成果CSV_RAW）:
  * A: 日時 (ISO8601)
