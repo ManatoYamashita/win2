@@ -8,14 +8,14 @@ const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 export const metadata: Metadata = {
   title: "マイページ | WIN×Ⅱ",
   description:
-    "WIN×Ⅱ会員向けの管理ページです。登録情報の確認や申込履歴の確認、キャッシュバック状況のチェックが行えます。",
+    "WIN×Ⅱ会員向けの管理ページです。登録情報の確認や申込履歴の確認、成果状況のチェックが行えます。",
   alternates: {
     canonical: `${appUrl}/mypage`,
   },
   openGraph: {
     title: "マイページ | WIN×Ⅱ",
     description:
-      "WIN×Ⅱ会員向けの管理ページです。登録情報の確認や申込履歴の確認、キャッシュバック状況のチェックが行えます。",
+      "WIN×Ⅱ会員向けの管理ページです。登録情報の確認や申込履歴の確認、成果状況のチェックが行えます。",
     url: `${appUrl}/mypage`,
     type: "website",
     siteName: "WIN×Ⅱ",
@@ -48,7 +48,7 @@ export default function MypageLayout({
     "@type": "WebPage",
     name: "WIN×Ⅱ会員マイページ",
     description:
-      "WIN×Ⅱ会員が登録情報や申込履歴を確認し、キャッシュバック状況を把握するためのマイページ",
+      "WIN×Ⅱ会員が登録情報や申込履歴を確認し、成果状況を把握するためのマイページ",
     url: `${appUrl}/mypage`,
     isPartOf: {
       "@type": "WebSite",
