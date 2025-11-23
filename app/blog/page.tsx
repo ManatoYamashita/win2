@@ -80,7 +80,7 @@ export default async function BlogListPage() {
         "@context": "https://schema.org",
         "@type": "ItemList",
         name: "WIN×Ⅱ ブログ記事一覧",
-        description: "キャッシュバックやアフィリエイトに役立つブログ記事をまとめたリスト",
+        description: "アフィリエイトに役立つブログ記事をまとめたリスト",
         itemListElement: initialBlogs.map((blog, index) => ({
           "@type": "ListItem",
           position: index + 1,

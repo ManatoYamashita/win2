@@ -39,7 +39,7 @@ export async function generateMetadata({
   const excerpt = extractExcerpt(blog.content, 120);
   const canonicalUrl = `${appUrl}/blog/${id}`;
   const primaryImage = blog.thumbnail?.url || `${appUrl}/ogp.jpg`;
-  const keywordBase = ["アフィリエイト", "キャッシュバック", "WIN×Ⅱ", "お得情報"];
+  const keywordBase = ["アフィリエイト", "WIN×Ⅱ", "お得情報", "案件情報"];
   const categoryKeywords = blog.category ? [`${blog.category.name} アフィリエイト`] : ["その他 アフィリエイト"];
 
   return {
