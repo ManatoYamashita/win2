@@ -26,7 +26,6 @@ interface HistoryItem {
   eventId: string;            // イベントID
   status: string | null;      // ステータス（未確定/成果確定/否認、G列が空の場合はnull）
   statusLabel: string | null; // ステータス表示ラベル（G列が空の場合はnull）
-  cashbackAmount?: number;    // キャッシュバック金額（成果がある場合）
   originalReward?: number;    // 原始報酬額（参考、成果がある場合）
 }
 
@@ -78,7 +77,6 @@ export async function GET(_request: NextRequest) {
       // ステータス判定ロジック
       let status: string | null;
       let statusLabel: string | null;
-      let cashbackAmount: number | undefined;
       let originalReward: number | undefined;
 
       if (hasGASStatus && log.status) {
@@ -92,7 +90,6 @@ export async function GET(_request: NextRequest) {
         } else if (normalizedStatus.includes("成果確定") || normalizedStatus.includes("確定") || normalizedStatus.includes("approved")) {
           status = "approved";
           statusLabel = "成果確定";
-          cashbackAmount = result?.cashbackAmount;
           originalReward = result?.originalReward;
         } else if (normalizedStatus.includes("否認") || normalizedStatus.includes("cancelled")) {
           status = "cancelled";
@@ -112,7 +109,6 @@ export async function GET(_request: NextRequest) {
         } else if (resultStatus.includes("成果確定") || resultStatus.includes("確定") || resultStatus.includes("approved")) {
           status = "approved";
           statusLabel = "成果確定";
-          cashbackAmount = result.cashbackAmount;
           originalReward = result.originalReward;
         } else if (resultStatus.includes("否認") || resultStatus.includes("cancelled")) {
           status = "cancelled";
@@ -134,7 +130,6 @@ export async function GET(_request: NextRequest) {
         eventId: log.eventId,
         status,
         statusLabel,
-        cashbackAmount,
         originalReward,
       };
     });

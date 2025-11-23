@@ -59,8 +59,6 @@ interface SortOption {
 const SORT_OPTIONS: SortOption[] = [
   { value: "timestamp-desc", label: "新しい順", sortKey: "timestamp", sortOrder: "desc" },
   { value: "timestamp-asc", label: "古い順", sortKey: "timestamp", sortOrder: "asc" },
-  { value: "cashback-desc", label: "キャッシュバック高い順", sortKey: "cashbackAmount", sortOrder: "desc" },
-  { value: "cashback-asc", label: "キャッシュバック低い順", sortKey: "cashbackAmount", sortOrder: "asc" },
 ];
 
 /**
@@ -156,16 +154,6 @@ function HistoryCard({ item }: { item: HistoryItem }) {
               </div>
             )}
 
-            {/* キャッシュバック金額（成果確定の場合のみ） */}
-            {item.status === "approved" && item.cashbackAmount !== undefined && (
-              <div className="rounded-lg bg-gradient-to-r from-win2-accent-rose/10 to-win2-primary-orage/10 p-4">
-                <p className="text-xs text-win2-neutral-600">キャッシュバック金額</p>
-                <p className="mt-1 text-2xl font-bold text-win2-primary-orage">
-                  ¥{item.cashbackAmount.toLocaleString()}
-                </p>
-              </div>
-            )}
-
             {/* 報酬額（参考） */}
             {item.originalReward !== undefined && item.originalReward > 0 && (
               <p className="text-xs text-win2-neutral-600">
@@ -256,10 +244,6 @@ export default function HistoryPage() {
         const dateA = new Date(a.timestamp).getTime();
         const dateB = new Date(b.timestamp).getTime();
         return selectedSort.sortOrder === "desc" ? dateB - dateA : dateA - dateB;
-      } else if (selectedSort.sortKey === "cashbackAmount") {
-        const amountA = a.cashbackAmount ?? 0;
-        const amountB = b.cashbackAmount ?? 0;
-        return selectedSort.sortOrder === "desc" ? amountB - amountA : amountA - amountB;
       }
       return 0;
     });
@@ -331,7 +315,7 @@ export default function HistoryPage() {
             </div>
           </div>
           <p className="mt-4 text-sm text-white/80 md:text-base">
-            これまでに申し込んだ案件の一覧です。ステータスとキャッシュバック金額を確認できます。
+            これまでに申し込んだ案件の一覧です。ステータスと成果を確認できます。
           </p>
         </motion.div>
 
@@ -345,7 +329,7 @@ export default function HistoryPage() {
                   まだ申込がありません
                 </h2>
                 <p className="mt-2 text-sm text-win2-neutral-600">
-                  ブログから気になる案件を探して、お得なキャッシュバックを受け取りましょう。
+                  ブログから気になる案件を探して、サービスを申し込みましょう。
                 </p>
                 <div className="mt-6">
                   <Link
@@ -374,13 +358,13 @@ export default function HistoryPage() {
                       <div className="flex flex-wrap gap-2">
                         <StatusBadge status="pending" label="未確定" />
                         <span className="text-xs text-blue-700">
-                          成果が発生しました。承認されるとキャッシュバックが確定します。
+                          成果が発生しました。承認されると成果が確定します。
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <StatusBadge status="approved" label="成果確定" />
                         <span className="text-xs text-blue-700">
-                          キャッシュバックが確定しました。おめでとうございます！
+                          成果が確定しました。おめでとうございます！
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2">

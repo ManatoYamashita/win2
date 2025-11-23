@@ -197,7 +197,7 @@ export async function sendPasswordResetNotification(
           </p>
 
           <p style="color: #9ca3af; font-size: 12px; text-align: center; border-top: 1px solid #e5e7eb; padding-top: 16px; margin-top: 32px;">
-            WIN×Ⅱ - アフィリエイト×キャッシュバックプラットフォーム
+            WIN×Ⅱ - アフィリエイトブログプラットフォーム
           </p>
         </div>
       `,

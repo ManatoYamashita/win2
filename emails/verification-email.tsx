@@ -74,7 +74,7 @@ export function VerificationEmail({
           </Text>
 
           <Text style={footer}>
-            WIN×Ⅱ - アフィリエイト×キャッシュバックプラットフォーム
+            WIN×Ⅱ - アフィリエイトブログプラットフォーム
           </Text>
         </Container>
       </Body>

@@ -69,7 +69,7 @@ export default function PrivacyPage() {
           <p className="mb-4">収集した個人情報は、以下の目的で利用いたします。</p>
           <ul className="list-disc pl-6 mb-4 space-y-2">
             <li>会員登録、認証、および会員管理</li>
-            <li>キャッシュバックの計算および提供</li>
+            <li>成果の計算および提供</li>
             <li>アフィリエイト成果の追跡（id1パラメータによる識別）</li>
             <li>サービスの提供、維持、改善</li>
             <li>お問い合わせへの対応</li>

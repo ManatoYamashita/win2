@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-WIN×Ⅱ is a membership-based affiliate blog platform that provides cashback to members on ASP (Affiliate Service Provider) deals. The system tracks conversions using unique member IDs (or guest UUIDs for non-members) and calculates cashback based on approved conversions.
+WIN×Ⅱ is a membership-based affiliate blog platform that tracks conversions for ASP (Affiliate Service Provider) deals. The system tracks conversions using unique member IDs (or guest UUIDs for non-members) for accurate performance reporting.
 
 ## Tech Stack
 
@@ -134,16 +134,16 @@ The system supports both authenticated members and anonymous users:
 2. **Google Sheets Layer**: Transactional data (members, click logs, conversions)
 3. **Next.js API Layer**: Bridge between frontend, microCMS, and Google Sheets
 
-### Cashback Calculation Flow
+### Conversion Tracking Flow
 
 ```
 User clicks deal → /api/track-click logs click → Redirect to ASP with id1 parameter
 → Conversion occurs on ASP → Manual CSV export → Paste into "成果CSV_RAW" sheet
-→ GAS runs daily at 3:10 → Matches id1 with memberId → Calculates 20% cashback (approved only)
+→ GAS runs daily at 3:10 → Matches id1 with memberId → Processes conversion data
 → Outputs to "成果データ" sheet → Member views in /mypage/history
 ```
 
-**Important**: Non-members (`guest:UUID`) get 0 cashback but conversions are still tracked.
+**Important**: Both members and non-members (`guest:UUID`) conversions are tracked for reporting.
 
 ## Google Sheets Structure
 
@@ -160,8 +160,8 @@ The master spreadsheet contains 4 sheets:
    - Columns: id1, dealName, reward, status
 
 4. **成果データ** (Processed Conversion Data)
-   - GAS output with calculated cashback
-   - Columns: 氏名, 案件名, 承認状況, キャッシュバック金額, memberId(参考), 原始報酬額(参考), メモ
+   - GAS output with processed conversion records
+   - Columns: 氏名, 案件名, 承認状況, 参考報酬額, memberId(参考), 原始報酬額(参考), メモ
 
 ## microCMS API Design
 
@@ -170,7 +170,7 @@ The master spreadsheet contains 4 sheets:
 - Used for: Blog listing and detail pages
 
 ### API 2: deals
-- Contains: dealId, dealName, aspName, description, rewardAmount, cashbackRate, affiliateUrl
+- Contains: dealId, dealName, aspName, description, rewardAmount, affiliateUrl
 - Used for: Deal listing (member-only) and inline CTAs in blog posts
 - **Key field**: `affiliateUrl` - template URL to which `?id1={memberId}&id2={eventId}&eventId={eventId}` is appended at runtime
 
@@ -302,9 +302,8 @@ The existing GAS script:
 - Runs daily at 3:10 AM JST
 - Reads "成果CSV_RAW" sheet
 - Matches id1 parameter with memberId
-- Calculates cashback: reward × 20% (floor rounding)
-- Only pays on approved conversions (configurable)
-- Handles guest:UUID as "非会員" with 0 cashback
+- Processes conversion data based on approval status
+- Handles guest:UUID as "非会員" for tracking purposes
 - Outputs to "成果データ" sheet
 
 **Do not modify GAS** unless explicitly requested.
@@ -640,7 +639,7 @@ When implementing tracking functionality:
 ### Phase 5 (Optional)
 - Admin dashboard for content management
 - Subdomain support (gambling/fortune-telling categories)
-- Agency/referral system with tiered cashback
+- Agency/referral system with tiered rewards
 - Multiple ASP support expansion (AFB, もしも, バリュコマ)
 - Analytics dashboard (conversion rates, popular deals)
 - A/B testing for blog CTAs
