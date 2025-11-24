@@ -178,7 +178,9 @@ export default function HistoryPage() {
 
   // ソート/フィルタ状態管理
   const [sortValue, setSortValue] = useState<string>("timestamp-desc");
-  const [statusFilter, setStatusFilter] = useState<Set<string>>(new Set());
+  const [statusFilter, setStatusFilter] = useState<Set<string>>(
+    () => new Set(["pending", "approved", "cancelled"])
+  );
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   useEffect(() => {
@@ -315,7 +317,7 @@ export default function HistoryPage() {
             </div>
           </div>
           <p className="mt-4 text-sm text-white/80 md:text-base">
-            これまでに申し込んだ案件の一覧です。ステータスと成果を確認できます。
+            これまでに申し込んだ案件の一覧です。
           </p>
         </motion.div>
 
@@ -354,23 +356,23 @@ export default function HistoryPage() {
                   <div className="flex items-start gap-3">
                     <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
                     <div className="space-y-2 text-sm text-blue-900">
-                      <p className="font-semibold">ステータスについて</p>
+                      <p className="font-semibold">申し込みしたサービスの状態</p>
                       <div className="flex flex-wrap gap-2">
                         <StatusBadge status="pending" label="未確定" />
                         <span className="text-xs text-blue-700">
-                          成果が発生しました。承認されると成果が確定します。
+                          サービスの申し込みを確認中です。
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <StatusBadge status="approved" label="成果確定" />
                         <span className="text-xs text-blue-700">
-                          成果が確定しました。おめでとうございます！
+                          サービスの申し込みが完了しました。
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <StatusBadge status="cancelled" label="否認" />
                         <span className="text-xs text-blue-700">
-                          成果が否認されました。条件を満たしていない可能性があります。
+                          なし
                         </span>
                       </div>
                     </div>
