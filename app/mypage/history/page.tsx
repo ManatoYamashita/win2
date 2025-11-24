@@ -372,7 +372,7 @@ export default function HistoryPage() {
                       <div className="flex flex-wrap gap-2">
                         <StatusBadge status="cancelled" label="否認" />
                         <span className="text-xs text-blue-700">
-                          なし
+                          申し込みが正常に行えませんでした。
                         </span>
                       </div>
                     </div>
