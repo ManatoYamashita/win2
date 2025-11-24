@@ -44,7 +44,6 @@ WIN×ⅡのCTA（Call To Action）機能は、ブログ記事内のショート�
 │     ├─ B: 案件ID（主キー）                                    │
 │     ├─ C: 案件名（GAS自動入力）                               │
 │     ├─ D: ASP名（GAS自動入力）                                │
-│     └─ E-G: 報酬額、キャッシュバック率、有効/無効             │
 │                                                               │
 │  2. クリックログ                                              │
 │     ├─ A: 日時                                                │
@@ -346,7 +345,6 @@ export async function getDealById(dealId: string): Promise<DealRow | null> {
     aspName: dealRow[3],          // D列: ASP名
     affiliateUrl: dealRow[0],     // A列: アフィリエイトURL
     rewardAmount: parseFloat(dealRow[4] ?? "0") || 0,
-    cashbackRate: parseFloat(dealRow[5] ?? "0.2") || 0.2,
     isActive: true,
   };
 }

@@ -27,7 +27,6 @@ export type CategoryResponse = Category & MicroCMSDate;
 //   description: string;
 //   thumbnail: MicroCMSImage;
 //   rewardAmount: number;          // 報酬額
-//   cashbackRate: number;          // 還元率（既定値: 0.2）
 //   category: Category[];
 //   affiliateUrl: string;          // アフィリエイトURLテンプレート
 //   isActive: boolean;             // 公開状態

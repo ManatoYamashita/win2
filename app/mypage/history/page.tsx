@@ -29,14 +29,13 @@ interface HistoryItem {
   eventId: string;
   status: string | null;
   statusLabel: string | null;
-  cashbackAmount?: number;
   originalReward?: number;
 }
 
 /**
  * ソートキー型定義
  */
-type SortKey = "timestamp" | "cashbackAmount";
+type SortKey = "timestamp";
 
 /**
  * ソート順序型定義
