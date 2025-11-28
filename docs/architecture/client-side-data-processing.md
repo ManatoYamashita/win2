@@ -153,7 +153,6 @@ const filtered = data.filter((item) => {
 /**
  * ソートキー型定義
  */
-type SortKey = "timestamp" | "cashbackAmount" | "dealName";
 
 /**
  * ソート順序型定義
@@ -176,8 +175,6 @@ interface SortOption {
 const SORT_OPTIONS: SortOption[] = [
   { value: "timestamp-desc", label: "新しい順", sortKey: "timestamp", sortOrder: "desc" },
   { value: "timestamp-asc", label: "古い順", sortKey: "timestamp", sortOrder: "asc" },
-  { value: "cashback-desc", label: "キャッシュバック高い順", sortKey: "cashbackAmount", sortOrder: "desc" },
-  { value: "cashback-asc", label: "キャッシュバック低い順", sortKey: "cashbackAmount", sortOrder: "asc" },
 ];
 ```
 
@@ -208,9 +205,6 @@ const sortedData = useMemo(() => {
     }
 
     // 数値ソート（null/undefined対応）
-    if (selectedSort.sortKey === "cashbackAmount") {
-      const amountA = a.cashbackAmount ?? 0; // undefined → 0
-      const amountB = b.cashbackAmount ?? 0;
       return selectedSort.sortOrder === "desc" ? amountB - amountA : amountA - amountB;
     }
 
@@ -300,7 +294,6 @@ const sortedData = useMemo(() => {
 **ファイル**: `/app/mypage/history/page.tsx`
 
 **実装機能**:
-- ソート: 4オプション（新しい順/古い順/キャッシュバック高い順/低い順）
 - フィルタ: ステータス複数選択 + 案件名検索
 - UI: shadcn/ui Select/Checkbox + レスポンシブ対応
 

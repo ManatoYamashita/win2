@@ -168,12 +168,10 @@ describe("AFB Postback Webhook", () => {
 
 4. **GAS実行:**
    - Google Apps Script → 手動実行
-   - 「成果データ」シートにキャッシュバック計算結果が出力されるか確認
 
 5. **ダッシュボード確認:**
    ```
    http://localhost:3000/mypage/history
-   # member-e2e-test でログインし、キャッシュバック履歴を確認
    ```
 
 ---

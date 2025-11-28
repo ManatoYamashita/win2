@@ -29,14 +29,13 @@ interface HistoryItem {
   eventId: string;
   status: string | null;
   statusLabel: string | null;
-  cashbackAmount?: number;
   originalReward?: number;
 }
 
 /**
  * ソートキー型定義
  */
-type SortKey = "timestamp" | "cashbackAmount";
+type SortKey = "timestamp";
 
 /**
  * ソート順序型定義
@@ -372,7 +371,7 @@ export default function HistoryPage() {
                       <div className="flex flex-wrap gap-2">
                         <StatusBadge status="cancelled" label="否認" />
                         <span className="text-xs text-blue-700">
-                          なし
+                          申し込みが正常に行えませんでした。
                         </span>
                       </div>
                     </div>

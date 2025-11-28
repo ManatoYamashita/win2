@@ -64,7 +64,6 @@ Format: &id1=value&id2=value...
 > (This feature is NOT intended for point sites)
 
 **Implication for WIN×Ⅱ:**
-- WIN×Ⅱ operates a cashback/point reward model
 - **High risk of terms of service violation**
 - **Account suspension risk**
 - **Legal/contractual review required before implementation**
@@ -148,10 +147,7 @@ Basis: Downloaded CSV from "Report Download" button contained only aggregated pr
 4. Document complete column structure
 
 **Step 5: Policy Compliance Check**
-1. Review A8.net Terms of Service regarding point sites / cashback models
 2. Consider contacting A8.net support to clarify:
-   - Whether cashback reward models are permitted
-   - Whether parameter tracking can be used for member-specific cashback calculation
    - Any restrictions or guidelines for this use case
 
 **Verification Log Document:** See `docs/dev/a8-parameter-tracking-verification.md`
@@ -294,7 +290,6 @@ To prepare for the possibility that Parameter Tracking is unavailable, investiga
 **Actions**:
 1. Document final conclusion in `docs/dev/a8-parameter-tracking-verification.md`
 2. Close GitHub Issue #22 with negative result
-3. Change A8.net operation policy to "aggregate reporting only (no member-specific cashback)"
 4. Prioritize alternative ASP implementation:
    - **First**: もしもアフィリエイト investigation (1-2 weeks)
    - **Second**: バリューコマース investigation (1-2 weeks)
@@ -335,13 +330,11 @@ The following official documentation was referenced during verification:
 
 **Questions to Ask:**
 1. Can media members export CSV data from Parameter Tracking Reports?
-2. Is a cashback/point reward business model compliant with A8.net policies?
 3. Are there any restrictions on using parameter tracking for member-specific conversion attribution?
 4. What is the recommended approach for tracking individual member conversions?
 
 **Risk Assessment:**
 - Contacting support may trigger policy review
-- If cashback model is non-compliant, account could be flagged
 - Consider consulting with legal/business team before reaching out
 
 #### 🎯 Implementation Decision Matrix
@@ -361,7 +354,6 @@ The following official documentation was referenced during verification:
 **Actions:**
 - Previous assessment (implementation blocked) was correct
 - Maintain "afb first" priority
-- Use A8.net for aggregate reporting only (no member-specific cashback)
 
 **Timeline:** No additional work required
 
@@ -371,7 +363,6 @@ The following official documentation was referenced during verification:
 - **Discontinue A8.net integration entirely**
 - Remove A8.net deals from platform
 - Focus exclusively on afb and other ASPs
-- Consider alternative ASPs with clear cashback policy support
 
 **Timeline:** 1 day (removal of A8.net references)
 
@@ -751,7 +742,6 @@ https://yourdomain.com/api/webhooks/asp-conversion
    - Begin production use
 
 3. **If CSV Verification Fails:**
-   - Revert to aggregate reporting only (no member-specific cashback)
    - Prioritize alternative ASPs (もしも, バリューコマース)
 
 **Policy Risk:**

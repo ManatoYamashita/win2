@@ -8,7 +8,6 @@
 
 ## 概要
 
-AFB（アフィリエイトB）のリアルタイムポストバック機能を使用して、会員別の成果トラッキングとキャッシュバック計算を自動化します。
 
 ### なぜAFB優先なのか？
 
@@ -50,8 +49,6 @@ https://yourdomain.com/api/webhooks/afb-postback?paid={trackingId}&u={eventId}&p
 ```typescript
 const statusMap: Record<string, "pending" | "approved" | "cancelled"> = {
   "0": "pending",    // 未承認（成果発生）
-  "1": "approved",   // 承認（キャッシュバック確定）
-  "9": "cancelled",  // 非承認（キャッシュバックなし）
 };
 ```
 
@@ -289,7 +286,6 @@ curl "http://localhost:3000/api/webhooks/afb-postback?paid=test-member-123&u=eve
 2. AFBテスト環境からポストバック送信
 3. Google Sheetsに成果データが記録されることを確認
 4. GASスクリプト実行（3:10または手動）
-5. 成果データシートにキャッシュバック金額が反映されることを確認
 
 #### 4.3 本番環境デプロイ前チェックリスト
 
@@ -327,10 +323,8 @@ curl "http://localhost:3000/api/webhooks/afb-postback?paid=test-member-123&u=eve
 7. GASスクリプト自動実行（毎日3:10）
    - 成果CSV_RAWシートから未処理データ取得
    - クリックログシートと突合（trackingIdベース）
-   - キャッシュバック金額計算（報酬額 × 20%）
    ↓
 8. 成果データシートに出力
-   - 氏名, 案件名, 承認状況, キャッシュバック金額, memberId, 原始報酬額, メモ
    ↓
 9. 会員がマイページで確認（/mypage/history）
 ```
@@ -406,7 +400,6 @@ const clientIP = request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
 
 **集計項目:**
 1. 総成果件数（承認/未承認/却下）
-2. 総報酬額・総キャッシュバック額
 3. 会員別ランキング
 4. 案件別パフォーマンス
 
