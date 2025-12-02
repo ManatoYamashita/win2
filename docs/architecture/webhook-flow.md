@@ -48,7 +48,6 @@ This document outlines the technical architecture for receiving real-time conver
 │  1. Validate signature                │
 │  2. Parse payload (ASP-specific)      │
 │  3. Match eventId with click log      │
-│  4. Calculate cashback                │
 │  5. Write to Google Sheets            │
 └──────┬───────────────────────────────┘
        │
@@ -58,7 +57,6 @@ This document outlines the technical architecture for receiving real-time conver
 │  - Member name                        │
 │  - Deal name                          │
 │  - Status                             │
-│  - Cashback amount                    │
 │  - Timestamp                          │
 └───────────────────────────────────────┘
 ```
@@ -167,7 +165,6 @@ POST /api/webhooks/asp-conversion?asp=afb&type=conversion
 | `program_id` | string | ASP's program/deal identifier | ✅ Yes |
 | `program_name` | string | Human-readable program name | No |
 | `order_id` | string | Order/transaction identifier | No |
-| `amount` | number | Commission amount (before cashback calculation) | ✅ Yes |
 | `currency` | string | Currency code (default: JPY) | No |
 | `status` | string | `pending`, `approved`, `cancelled`, `rejected` | ✅ Yes |
 | `timestamp` | string | ISO 8601 timestamp | ✅ Yes |
@@ -262,8 +259,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // 8. Calculate cashback
-    const cashback = calculateCashback(
       validatedPayload.amount,
       validatedPayload.tracking_id,
       validatedPayload.status
@@ -275,7 +270,6 @@ export async function POST(request: Request) {
       memberName: clickLog?.memberName || '非会員',
       dealName: validatedPayload.program_name || clickLog?.dealName || '不明',
       status: validatedPayload.status,
-      cashbackAmount: cashback,
       eventId: validatedPayload.event_id,
       originalAmount: validatedPayload.amount,
       orderId: validatedPayload.order_id,
@@ -441,32 +435,23 @@ async function getMemberInfo(memberId: string): Promise<{ name: string } | null>
 
 ---
 
-## Cashback Calculation Logic
 
 ### Rules
 
-1. **Cashback Rate:** 20% of commission amount (floor rounding)
-2. **Guest Users:** 0 yen cashback (members only)
 3. **Status-Based Payment:**
    - `pending`: Log but don't pay
-   - `approved`: Calculate and pay cashback
-   - `cancelled` / `rejected`: 0 yen cashback
 
 ### Implementation
 
-**File: `lib/webhooks/calculate-cashback.ts`**
 
 ```typescript
-export const CASHBACK_RATE = 0.20; // 20%
 export const ONLY_PAY_ON_APPROVED = true;
 export const ROUNDING_MODE = 'FLOOR'; // 'FLOOR', 'CEIL', 'ROUND'
 
-export function calculateCashback(
   amount: number,
   trackingId: string,
   status: string
 ): number {
-  // Guest users get 0 cashback
   if (trackingId.startsWith('guest:')) {
     return 0;
   }
@@ -476,19 +461,13 @@ export function calculateCashback(
     return 0;
   }
 
-  // Calculate cashback: amount × rate
-  const cashback = amount * CASHBACK_RATE;
 
   // Apply rounding
   switch (ROUNDING_MODE) {
     case 'FLOOR':
-      return Math.floor(cashback);
     case 'CEIL':
-      return Math.ceil(cashback);
     case 'ROUND':
-      return Math.round(cashback);
     default:
-      return Math.floor(cashback);
   }
 }
 ```
@@ -497,19 +476,14 @@ export function calculateCashback(
 
 ```typescript
 // Example 1: Member, approved, 5000 yen commission
-calculateCashback(5000, 'member123', 'approved');
 // → 1000 (floor(5000 × 0.20))
 
 // Example 2: Member, pending, 5000 yen commission
-calculateCashback(5000, 'member123', 'pending');
 // → 0 (only pay on approved)
 
 // Example 3: Guest, approved, 5000 yen commission
-calculateCashback(5000, 'guest:550e8400-e29b-41d4-a716-446655440000', 'approved');
-// → 0 (guests don't get cashback)
 
 // Example 4: Member, approved, 5555 yen commission
-calculateCashback(5555, 'member123', 'approved');
 // → 1111 (floor(5555 × 0.20))
 ```
 
@@ -527,7 +501,6 @@ export async function writeConversionData(data: {
   memberName: string;
   dealName: string;
   status: string;
-  cashbackAmount: number;
   eventId: string;
   originalAmount: number;
   orderId?: string;
@@ -548,7 +521,6 @@ export async function writeConversionData(data: {
       data.memberName,           // A: 氏名
       data.dealName,             // B: 案件名
       data.status,               // C: 承認状況
-      data.cashbackAmount,       // D: キャッシュバック金額
       data.memberId,             // E: memberId（参考）
       data.eventId,              // F: イベントID（参考）
       data.originalAmount,       // G: 原始報酬額（参考）
@@ -586,7 +558,6 @@ export async function writeConversionData(data: {
 | A | 氏名 | Member name (or "非会員" for guests) |
 | B | 案件名 | Deal/program name |
 | C | 承認状況 | Status (`pending`, `approved`, `cancelled`, `rejected`) |
-| D | キャッシュバック金額 | Cashback amount (JPY) |
 | E | memberId（参考） | Member ID or guest:UUID |
 | F | イベントID（参考） | Event ID (UUID v4) |
 | G | 原始報酬額（参考） | Original commission amount |
@@ -737,7 +708,6 @@ console.log('[Webhook] Received request', {
 console.log('[Webhook] Successfully processed', {
   eventId: payload.event_id,
   conversionId,
-  cashback,
 });
 
 // Log errors
@@ -932,7 +902,6 @@ If performance issues arise, implement async processing.
    - [ ] Implement webhook endpoint
    - [ ] Implement signature verification
    - [ ] Implement eventId matching logic
-   - [ ] Implement cashback calculation
    - [ ] Implement Google Sheets write function
 
 3. **Testing**

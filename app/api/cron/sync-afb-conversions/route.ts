@@ -23,7 +23,7 @@ import type { ConversionWebhookData } from "@/lib/sheets";
  * 注意事項:
  * - AFB APIはid1パラメータをレスポンスに含まないため、trackingIdとeventIdは空白で記録
  * - マッチングアルゴリズムが後で時間ベース・案件名ベースで照合を行う
- * - GASが毎日3:10にキャッシュバック計算を実行
+ * - GASが毎日3:10に処理を実行
  *
  * セキュリティ:
  * - GitHub Actionsからのリクエストのみ許可（CRON_SECRET検証）

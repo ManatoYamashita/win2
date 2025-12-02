@@ -135,7 +135,6 @@ function autoFillDefaults(sheet, row) {
   }
 
   // F列は未使用のため自動入力なし
-  // （旧仕様: キャッシュバック率 20% を自動設定していた）
 
   // G列（isActive）が空ならTRUE
   if (!sheet.getRange(row, 7).getValue()) {

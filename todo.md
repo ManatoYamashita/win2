@@ -54,7 +54,6 @@
 - ❌ 案件詳細ページ（/deals/[id]）
 - ❌ 成果履歴ページ（/mypage/history）
 - ❌ GASとの連携動作確認
-- ❌ キャッシュバック計算の動作確認
 
 ### Phase 5: テスト・最適化・デプロイ ❌ 0% Complete
 - ❌ E2Eテスト（Playwright）
@@ -161,7 +160,7 @@
      - dealName（例: "楽天カード"）
      - aspName: "A8.net"
      - affiliateUrl（トラッキングURL）
-     - rewardAmount, cashbackRate（20%）
+     - rewardAmount
      - thumbnail画像アップロード
 
 3. **Blogs作成**
@@ -216,7 +215,7 @@
 
 2. **コンポーネント作成**
    - [ ] `components/deal/deal-card.tsx` を作成
-     - thumbnail, dealName, aspName, rewardAmount, cashbackRate 表示
+     - thumbnail, dealName, aspName, rewardAmount 表示
      - "申し込む" ボタン → /api/track-click 呼び出し
    - [ ] `components/deal/deal-filter.tsx` を作成（カテゴリ、ASP別フィルタ）
 
@@ -249,7 +248,7 @@
 // 必要な機能:
 - Deal型プロパティ受け取り
 - サムネイル画像表示
-- 報酬額・キャッシュバック額計算表示
+- 報酬額表示
 - "申し込む" ボタン → handleApply()
 - handleApply() で /api/track-click 呼び出し
 - レスポンスのtrackingUrlへリダイレクト
@@ -300,9 +299,8 @@
      - レスポンス: `{ results: ResultRow[] }`
 
 3. **UI実装**
-   - [ ] テーブル表示（案件名、承認状況、キャッシュバック金額、日時）
+   - [ ] テーブル表示（案件名、承認状況、日時）
    - [ ] ステータスバッジ（承認済み、未承認、否認）
-   - [ ] 合計キャッシュバック金額表示
    - [ ] フィルタリング（承認状況別）
    - [ ] ソート機能（日時順）
 
@@ -327,7 +325,6 @@
   - 承認済み: green
   - 未承認: yellow
   - 否認: red
-- 合計キャッシュバック金額計算
 - 空状態の表示（成果がない場合）
 ```
 
@@ -357,12 +354,6 @@
    - [ ] トリガー設定確認（毎日3:10実行）
    - [ ] 手動実行してprocessResults()の動作確認
    - [ ] "成果データ" シートに処理結果が出力されるか確認
-
-3. **キャッシュバック計算確認**
-   - [ ] 報酬額の20%が正しく計算されているか確認
-   - [ ] 承認済み案件のみキャッシュバックが付与されているか確認
-   - [ ] guest:UUID の場合は0円になっているか確認
-   - [ ] 会員の場合はmemberIdと氏名が正しく紐付いているか確認
 
 #### テストシナリオ
 ```
