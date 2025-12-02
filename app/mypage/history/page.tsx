@@ -74,7 +74,7 @@ interface StatusFilterOption {
  */
 const STATUS_FILTER_OPTIONS: StatusFilterOption[] = [
   { value: "pending", label: "未確定" },
-  { value: "approved", label: "成果確定" },
+  { value: "approved", label: "確定" },
   { value: "cancelled", label: "否認" },
   { value: "none", label: "ステータスなし" },
 ];
@@ -351,27 +351,27 @@ export default function HistoryPage() {
           <>
             {/* ステータス説明 */}
             <motion.div variants={fadeUpVariants}>
-              <Card className="border-0 bg-blue-50 shadow-sm">
+              <Card className="border-0 bg-win2-neutral-50 shadow-sm">
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
-                    <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
-                    <div className="space-y-2 text-sm text-blue-900">
+                    <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-win2-neutral-600" />
+                    <div className="space-y-2 text-sm text-win2-neutral-900">
                       <p className="font-semibold">申し込みしたサービスの状態</p>
                       <div className="flex flex-wrap gap-2">
                         <StatusBadge status="pending" label="未確定" />
-                        <span className="text-xs text-blue-700">
+                        <span className="text-xs text-win2-neutral-600">
                           サービスの申し込みを確認中です。
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        <StatusBadge status="approved" label="成果確定" />
-                        <span className="text-xs text-blue-700">
+                        <StatusBadge status="approved" label="確定" />
+                        <span className="text-xs text-win2-neutral-600">
                           サービスの申し込みが完了しました。
                         </span>
                       </div>
                       <div className="flex flex-wrap gap-2">
                         <StatusBadge status="cancelled" label="否認" />
-                        <span className="text-xs text-blue-700">
+                        <span className="text-xs text-win2-neutral-600">
                           なし
                         </span>
                       </div>
