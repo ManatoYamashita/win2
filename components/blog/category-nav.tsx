@@ -71,37 +71,58 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
           </div>
 
           {/* カテゴリリスト（横スクロール領域を確保） */}
-          <div className="-mx-4 overflow-x-auto scrollbar-hide px-4 sm:mx-0 sm:px-0">
-            <div className="flex items-center gap-2 min-w-max">
-              {latestCategories.map((category) => {
-                const isActive = currentCategoryId === category.id;
-                return (
-                  <Link
-                    key={category.id}
-                    href={`/category/${category.id}`}
-                    className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
-                      isActive
-                        ? "bg-orange-600 text-white shadow-md"
-                        : "text-white hover:bg-orange-600"
-                    }`}
-                  >
-                    {category.name}
-                  </Link>
-                );
-              })}
+          <div className="relative -mx-4 sm:mx-0">
+            {/* 左側のグラデーション（スクロールヒント） */}
+            <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-8 bg-gradient-to-r from-orange-500 to-transparent sm:w-12" />
+
+            {/* 右側のグラデーション（スクロールヒント） */}
+            <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-8 bg-gradient-to-l from-orange-500 to-transparent sm:w-12" />
+
+            {/* スクロール可能エリア */}
+            <div className="overflow-x-auto scrollbar-thin px-4 sm:px-0">
+              <div className="flex items-center gap-2 min-w-max">
+                {latestCategories.map((category) => {
+                  const isActive = currentCategoryId === category.id;
+                  return (
+                    <Link
+                      key={category.id}
+                      href={`/category/${category.id}`}
+                      className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                        isActive
+                          ? "bg-orange-600 text-white shadow-md"
+                          : "text-white hover:bg-orange-600"
+                      }`}
+                    >
+                      {category.name}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* スクロールバー非表示のためのCSS */}
+      {/* スクロールバーのスタイリング */}
       <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
+        .scrollbar-thin::-webkit-scrollbar {
+          height: 6px;
         }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+        .scrollbar-thin::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 3px;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+          background: rgba(255, 255, 255, 0.4);
+          border-radius: 3px;
+          transition: background 0.2s;
+        }
+        .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+          background: rgba(255, 255, 255, 0.6);
+        }
+        .scrollbar-thin {
+          scrollbar-width: thin;
+          scrollbar-color: rgba(255, 255, 255, 0.4) rgba(255, 255, 255, 0.1);
         }
       `}</style>
     </nav>
