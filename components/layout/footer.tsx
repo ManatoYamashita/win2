@@ -37,12 +37,12 @@ export function Footer() {
             プライバシーポリシー
           </Link>
           <a
-            href="https://www.oshiro-group.com"
+            href="https://www.ohshiro-group.com"
             target="_blank"
             rel="noopener noreferrer"
             className="text-gray-600 hover:text-orange-600 transition-colors"
           >
-            運営会社: Oshiro Group
+            運営会社: Ohshiro Group
           </a>
         </div>
 
