@@ -71,7 +71,7 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
           </div>
 
           {/* カテゴリリスト（横スクロール領域を確保） */}
-          <div className="relative -mx-4 sm:mx-0">
+          <div className="relative w-full overflow-hidden">
             {/* 左側のグラデーション（スクロールヒント） */}
             <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-8 bg-gradient-to-r from-orange-500 to-transparent sm:w-12" />
 
@@ -79,8 +79,8 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
             <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-8 bg-gradient-to-l from-orange-500 to-transparent sm:w-12" />
 
             {/* スクロール可能エリア */}
-            <div className="overflow-x-auto scrollbar-thin px-4 sm:px-0">
-              <div className="flex items-center gap-2 min-w-max">
+            <div className="overflow-x-auto scrollbar-thin">
+              <div className="flex items-center gap-2">
                 {latestCategories.map((category) => {
                   const isActive = currentCategoryId === category.id;
                   return (
