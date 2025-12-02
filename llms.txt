@@ -1,0 +1,45 @@
+# WINxII
+
+> 会員制アフィリエイトブログ基盤。Next.js 15 App RouterとGoogle Sheets/microCMSを繋ぎ、会員IDまたはguest UUIDでクリックと成果を一元追跡します。
+
+Next.js 15.5.6（React 19, TypeScript strict, shadcn/ui, Tailwind 3）を採用。認証はNext-Auth Credentials、データはmicroCMS＋Google Sheets、A8.net/AFBのハイブリッド成果連携を前提とした設計です。クリックログ → 成果CSV_RAW → GAS処理 → 成果データ → 会員マイページ表示の流れを重視します。
+
+## Overview
+
+- [README](https://github.com/ManatoYamashita/win2/blob/main/README.md): セットアップ概要とプロジェクトの全体像。
+- [CLAUDE.md](https://github.com/ManatoYamashita/win2/blob/main/CLAUDE.md): アーキテクチャ概要、主要依存、運用上の注意点。
+- [docs/index.md](https://github.com/ManatoYamashita/win2/blob/main/docs/index.md): ドキュメントハブ。目的別に参照先を整理。
+
+## Specifications
+
+- [docs/specs/spec.md](https://github.com/ManatoYamashita/win2/blob/main/docs/specs/spec.md): 全体要件と機能仕様。
+- [docs/specs/asp.md](https://github.com/ManatoYamashita/win2/blob/main/docs/specs/asp.md): ASP連携要件と制約。
+- [docs/specs/google.md](https://github.com/ManatoYamashita/win2/blob/main/docs/specs/google.md): Google Sheets構成とカラム設計。
+
+## Architecture & Data Flows
+
+- [docs/dev/architecture.md](https://github.com/ManatoYamashita/win2/blob/main/docs/dev/architecture.md): App Router構成とデータフロー全体図。
+- [docs/architecture/webhook-flow.md](https://github.com/ManatoYamashita/win2/blob/main/docs/architecture/webhook-flow.md): Webhook／ポーリング周りのシーケンス。
+- [docs/architecture/client-side-data-processing.md](https://github.com/ManatoYamashita/win2/blob/main/docs/architecture/client-side-data-processing.md): クライアント側データ処理の指針。
+
+## Implementation Guides
+
+- [docs/guides/microcms-setup.md](https://github.com/ManatoYamashita/win2/blob/main/docs/guides/microcms-setup.md): microCMS設定とAPI利用手順。
+- [docs/guides/cta-technical-guide.md](https://github.com/ManatoYamashita/win2/blob/main/docs/guides/cta-technical-guide.md): CTAショートコードと追跡の技術詳細。
+- [docs/guides/cta-shortcode-guide.md](https://github.com/ManatoYamashita/win2/blob/main/docs/guides/cta-shortcode-guide.md): クライアント向けCTA埋め込み手順。
+- [docs/dev/seo-implementation.md](https://github.com/ManatoYamashita/win2/blob/main/docs/dev/seo-implementation.md): SEO/OGP/構造化データ実装。
+- [docs/analytics/gtm-setup.md](https://github.com/ManatoYamashita/win2/blob/main/docs/analytics/gtm-setup.md): GTM/GA4設定とイベント送信の手順。
+
+## Operations & Runbooks
+
+- [docs/operations/afb-a8-hybrid-workflow.md](https://github.com/ManatoYamashita/win2/blob/main/docs/operations/afb-a8-hybrid-workflow.md): AFB自動ポーリング＋A8.net手動CSVの運用手順。
+- [docs/operations/a8-conversion-matching.md](https://github.com/ManatoYamashita/win2/blob/main/docs/operations/a8-conversion-matching.md): A8.net成果CSVの照合とクリックログ更新手順。
+- [docs/operations/environment-variables-setup.md](https://github.com/ManatoYamashita/win2/blob/main/docs/operations/environment-variables-setup.md): 必須環境変数とSecrets設定。
+- [docs/operations/gas-a8net-update-guide.md](https://github.com/ManatoYamashita/win2/blob/main/docs/operations/gas-a8net-update-guide.md): GAS更新手順とA8.net特有のヘッダー対応。
+- [docs/handoff/asp-integration-session-handoff.md](https://github.com/ManatoYamashita/win2/blob/main/docs/handoff/asp-integration-session-handoff.md): ASP連携に関するハンドオフメモ。
+
+## Optional
+
+- [docs/reports/summary-1.md](https://github.com/ManatoYamashita/win2/blob/main/docs/reports/summary-1.md): 進捗サマリと所感。
+- [docs/handoff/2025-01-05-afb-removal-handoff.md](https://github.com/ManatoYamashita/win2/blob/main/docs/handoff/2025-01-05-afb-removal-handoff.md): AFB一時停止時の経緯。
+- [docs/operations/webhook-monitoring.md](https://github.com/ManatoYamashita/win2/blob/main/docs/operations/webhook-monitoring.md): Webhook監視・運用メモ。
