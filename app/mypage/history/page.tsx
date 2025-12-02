@@ -125,8 +125,8 @@ function StatusBadge({ status, label }: { status: string; label: string }) {
  */
 function HistoryCard({ item }: { item: HistoryItem }) {
   return (
-    <Card className="border-0 shadow-[0_8px_30px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_40px_rgba(15,23,42,0.1)]">
-      <CardContent className="p-6">
+    <Card className="border-2 border-win2-neutral-100 shadow-md transition hover:border-win2-primary-orage/30 hover:shadow-lg">
+      <CardContent className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 space-y-3">
             {/* 案件名 */}
@@ -184,8 +184,8 @@ export default function HistoryPage() {
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   // 開閉状態管理
-  const [isStatusInfoOpen, setIsStatusInfoOpen] = useState<boolean>(false);
-  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(true);
+  const [isStatusInfoOpen, setIsStatusInfoOpen] = useState<boolean>(true);
+  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -295,7 +295,7 @@ export default function HistoryPage() {
   return (
     <div className="min-h-screen">
       <motion.div
-        className="mx-auto flex w-full max-w-5xl flex-col gap-8"
+        className="mx-auto flex w-full max-w-5xl flex-col gap-10"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -355,8 +355,8 @@ export default function HistoryPage() {
           <>
             {/* ステータス説明 */}
             <motion.div variants={fadeUpVariants}>
-              <Card className="border-0 bg-win2-neutral-50 shadow-sm">
-                <CardContent className="p-4">
+              <Card className="border-2 border-win2-neutral-200 bg-win2-neutral-50 shadow-md">
+                <CardContent className="p-5">
                   {/* クリック可能なヘッダー */}
                   <button
                     onClick={() => setIsStatusInfoOpen(!isStatusInfoOpen)}
@@ -417,8 +417,8 @@ export default function HistoryPage() {
 
             {/* ソート・フィルタUI */}
             <motion.div variants={fadeUpVariants}>
-              <Card className="border-0 bg-gradient-to-br from-white to-win2-neutral-50 shadow-sm">
-                <CardContent className="p-6">
+              <Card className="border-2 border-win2-primary-orage/20 bg-gradient-to-br from-white to-win2-neutral-50 shadow-md">
+                <CardContent className="p-5">
                   {/* クリック可能なヘッダー */}
                   <button
                     onClick={() => setIsFilterOpen(!isFilterOpen)}
