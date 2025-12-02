@@ -22,7 +22,6 @@
 
 ### 目的
 
-WIN×Ⅱプラットフォームにおいて、複数のASP（Affiliate Service Provider）からの成果データを統合管理し、**メンバー別のキャッシュバック計算を自動化**するシステムを構築します。
 
 ### 主要機能
 
@@ -34,8 +33,6 @@ WIN×Ⅱプラットフォームにおいて、複数のASP（Affiliate Service 
    - Webhook/Postback APIによる即時通知（AFB, ValueCommerce）
    - 定期ポーリングAPIによる自動取得（もしも, AccessTrade）
 
-3. **自動キャッシュバック計算**
-   - 承認された成果に対する20%キャッシュバック自動計算
    - Google Sheets「成果データ」への自動出力
 
 4. **重複防止とエラーハンドリング**

@@ -100,7 +100,6 @@ const organizationSchema = {
   name: "WIN×Ⅱ",
   url: appUrl,
   logo: `${appUrl}/assets/win2/logo.webp`,
-  description: "保険・不動産・転職・エンタメなど、暮らしに役立つサービスを無料でご紹介し、キャッシュバックも受けられる会員制プラットフォーム",
   sameAs: [],
 };
 ```
@@ -113,7 +112,6 @@ const websiteSchema = {
   "@type": "WebSite",
   name: "WIN×Ⅱ",
   url: appUrl,
-  description: "保険・不動産・転職・エンタメなど、暮らしに役立つサービスを無料でご紹介し、キャッシュバックも受けられる会員制プラットフォーム",
   inLanguage: "ja-JP",
 };
 ```

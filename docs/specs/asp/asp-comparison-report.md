@@ -82,7 +82,6 @@ Phase 5: ⏸️ 手動運用継続
 **採用方針:** A8.netは**集計レポートとしてのみ使用**
 
 - ✅ 総報酬額の把握（ダッシュボード表示）
-- ❌ 会員別キャッシュバック機能は提供しない
 - 📋 代替手段: AFB・ValueCommerceで会員別トラッキング実装
 
 **将来の選択肢:**
@@ -385,7 +384,6 @@ https://yourdomain.com/api/webhooks/accesstrade-postback?info={memberId}&orderId
 お世話になっております。
 WIN×Ⅱのパートナーです。
 
-現在、会員別のキャッシュバック機能を実装したいと考えております。
 以下の点についてご教示いただけますでしょうか：
 
 1. S2S通知（Server to Server postback）機能は利用可能でしょうか？
@@ -511,7 +509,6 @@ https://hb.afl.rakuten.co.jp/hgc/xxx/?pc=xxx&m=xxx
 4. GASスクリプトで処理（3:10自動実行）
 
 **制限事項:**
-- ❌ 会員別キャッシュバックは提供しない
 - ✅ 総報酬額のみダッシュボードに表示
 
 参考: `docs/specs/asp/infotop/manual-csv-workflow.md`, `docs/specs/asp/janet/manual-csv-workflow.md`
@@ -1008,7 +1005,6 @@ npm install oauth-1.0a fast-xml-parser bottleneck
 4. GASスクリプトで処理（3:10自動実行）
 
 **制限事項:**
-- ❌ 会員別キャッシュバックは提供しない
 - ✅ 総報酬額のみダッシュボードに表示
 
 参考: `docs/specs/asp/infotop/manual-csv-workflow.md`, `docs/specs/asp/janet/manual-csv-workflow.md`

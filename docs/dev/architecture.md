@@ -342,7 +342,6 @@ export interface ResultRow {
   name: string;
   dealName: string;
   status: string;
-  cashbackAmount: number;
   memberId: string;
   originalReward: number;
   memo?: string;
@@ -411,7 +410,6 @@ export interface Deal {
   description: string;
   thumbnail: MicroCMSImage;
   rewardAmount: number;
-  cashbackRate: number;
   category: Category[];
   affiliateUrl: string;
   isActive: boolean;

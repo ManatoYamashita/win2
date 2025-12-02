@@ -19,8 +19,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { cn, formatJapaneseDateTime } from "@/lib/utils";
-import { motion } from "framer-motion";
-import { AlertCircle, FileText, ArrowLeft, Search, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { AlertCircle, FileText, ArrowLeft, Search, X, ChevronDown } from "lucide-react";
 
 interface HistoryItem {
   timestamp: string;
@@ -29,14 +29,13 @@ interface HistoryItem {
   eventId: string;
   status: string | null;
   statusLabel: string | null;
-  cashbackAmount?: number;
   originalReward?: number;
 }
 
 /**
  * ソートキー型定義
  */
-type SortKey = "timestamp" | "cashbackAmount";
+type SortKey = "timestamp";
 
 /**
  * ソート順序型定義
@@ -74,7 +73,7 @@ interface StatusFilterOption {
  */
 const STATUS_FILTER_OPTIONS: StatusFilterOption[] = [
   { value: "pending", label: "未確定" },
-  { value: "approved", label: "成果確定" },
+  { value: "approved", label: "確定" },
   { value: "cancelled", label: "否認" },
   { value: "none", label: "ステータスなし" },
 ];
@@ -125,8 +124,8 @@ function StatusBadge({ status, label }: { status: string; label: string }) {
  */
 function HistoryCard({ item }: { item: HistoryItem }) {
   return (
-    <Card className="border-0 shadow-[0_8px_30px_rgba(15,23,42,0.06)] transition hover:shadow-[0_12px_40px_rgba(15,23,42,0.1)]">
-      <CardContent className="p-6">
+    <Card className="border-2 border-win2-neutral-100 shadow-md transition hover:border-win2-primary-orage/30 hover:shadow-lg">
+      <CardContent className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 space-y-3">
             {/* 案件名 */}
@@ -182,6 +181,10 @@ export default function HistoryPage() {
     () => new Set(["pending", "approved", "cancelled"])
   );
   const [searchQuery, setSearchQuery] = useState<string>("");
+
+  // 開閉状態管理
+  const [isStatusInfoOpen, setIsStatusInfoOpen] = useState<boolean>(true);
+  const [isFilterOpen, setIsFilterOpen] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -291,7 +294,7 @@ export default function HistoryPage() {
   return (
     <div className="min-h-screen">
       <motion.div
-        className="mx-auto flex w-full max-w-5xl flex-col gap-8"
+        className="mx-auto flex w-full max-w-5xl flex-col gap-10"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
@@ -351,118 +354,179 @@ export default function HistoryPage() {
           <>
             {/* ステータス説明 */}
             <motion.div variants={fadeUpVariants}>
-              <Card className="border-0 bg-blue-50 shadow-sm">
-                <CardContent className="p-4">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600" />
-                    <div className="space-y-2 text-sm text-blue-900">
-                      <p className="font-semibold">申し込みしたサービスの状態</p>
-                      <div className="flex flex-wrap gap-2">
-                        <StatusBadge status="pending" label="未確定" />
-                        <span className="text-xs text-blue-700">
-                          サービスの申し込みを確認中です。
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <StatusBadge status="approved" label="成果確定" />
-                        <span className="text-xs text-blue-700">
-                          サービスの申し込みが完了しました。
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                        <StatusBadge status="cancelled" label="否認" />
-                        <span className="text-xs text-blue-700">
-                          なし
-                        </span>
-                      </div>
+              <Card className="border-2 border-win2-neutral-200 bg-win2-neutral-50 shadow-md">
+                <CardContent className="p-5">
+                  {/* クリック可能なヘッダー */}
+                  <button
+                    onClick={() => setIsStatusInfoOpen(!isStatusInfoOpen)}
+                    className="flex w-full items-start gap-3 text-left transition hover:opacity-80"
+                    aria-expanded={isStatusInfoOpen}
+                    aria-label="ステータス説明を開閉"
+                  >
+                    <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-win2-neutral-600" />
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-win2-neutral-900">
+                        申し込みしたサービスの状態
+                      </p>
                     </div>
-                  </div>
+                    <ChevronDown
+                      className={cn(
+                        "mt-0.5 h-5 w-5 flex-shrink-0 text-win2-neutral-600 transition-transform duration-200",
+                        isStatusInfoOpen && "rotate-180"
+                      )}
+                    />
+                  </button>
+
+                  {/* コラプシブルコンテンツ */}
+                  <AnimatePresence initial={false}>
+                    {isStatusInfoOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="ml-8 mt-3 space-y-2 text-sm text-win2-neutral-900">
+                          <div className="flex flex-wrap gap-2">
+                            <StatusBadge status="pending" label="未確定" />
+                            <span className="text-xs text-win2-neutral-600">
+                              サービスの申し込みを確認中です。
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <StatusBadge status="approved" label="確定" />
+                            <span className="text-xs text-win2-neutral-600">
+                              サービスの申し込みが完了しました。
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            <StatusBadge status="cancelled" label="否認" />
+                            <span className="text-xs text-win2-neutral-600">
+                              なし
+                            </span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </CardContent>
               </Card>
             </motion.div>
 
             {/* ソート・フィルタUI */}
             <motion.div variants={fadeUpVariants}>
-              <Card className="border-0 bg-gradient-to-br from-white to-win2-neutral-50 shadow-sm">
-                <CardContent className="p-6">
-                  <div className="space-y-4">
-                    {/* ソート・検索 行 */}
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                      {/* ソートセレクト */}
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-win2-neutral-700">
-                          並べ替え:
-                        </span>
-                        <Select value={sortValue} onValueChange={setSortValue}>
-                          <SelectTrigger className="w-[200px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {SORT_OPTIONS.map((option) => (
-                              <SelectItem key={option.value} value={option.value}>
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
+              <Card className="border-2 border-win2-primary-orage/20 bg-gradient-to-br from-white to-win2-neutral-50 shadow-md">
+                <CardContent className="p-5">
+                  {/* クリック可能なヘッダー */}
+                  <button
+                    onClick={() => setIsFilterOpen(!isFilterOpen)}
+                    className="flex w-full items-center justify-between text-left transition hover:opacity-80"
+                    aria-expanded={isFilterOpen}
+                    aria-label="並べ替え・検索・絞り込みを開閉"
+                  >
+                    <h2 className="text-base font-semibold text-win2-neutral-900">
+                      並べ替え・検索・絞り込み
+                    </h2>
+                    <ChevronDown
+                      className={cn(
+                        "h-5 w-5 flex-shrink-0 text-win2-neutral-600 transition-transform duration-200",
+                        isFilterOpen && "rotate-180"
+                      )}
+                    />
+                  </button>
 
-                      {/* 検索 */}
-                      <div className="relative flex-1 sm:max-w-xs">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-win2-neutral-400" />
-                        <Input
-                          type="text"
-                          placeholder="案件名で検索..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="pl-9 pr-9"
-                        />
-                        {searchQuery && (
-                          <button
-                            onClick={() => setSearchQuery("")}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-win2-neutral-400 hover:text-win2-neutral-600"
-                            aria-label="検索をクリア"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
-                        )}
-                      </div>
-                    </div>
+                  {/* コラプシブルコンテンツ */}
+                  <AnimatePresence initial={false}>
+                    {isFilterOpen && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2, ease: "easeInOut" }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-4 space-y-4">
+                          {/* ソート・検索 行 */}
+                          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                            {/* ソートセレクト */}
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-win2-neutral-700">
+                                並べ替え:
+                              </span>
+                              <Select value={sortValue} onValueChange={setSortValue}>
+                                <SelectTrigger className="w-[200px]">
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {SORT_OPTIONS.map((option) => (
+                                    <SelectItem key={option.value} value={option.value}>
+                                      {option.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            </div>
 
-                    {/* ステータスフィルタ行 */}
-                    <div className="space-y-2">
-                      <span className="text-sm font-medium text-win2-neutral-700">
-                        ステータス絞り込み:
-                      </span>
-                      <div className="flex flex-wrap gap-3">
-                        {STATUS_FILTER_OPTIONS.map((option) => (
-                          <label
-                            key={option.value}
-                            className="flex cursor-pointer items-center gap-2 rounded-md border border-win2-neutral-200 bg-white px-3 py-2 text-sm transition hover:border-win2-primary-orage hover:bg-win2-primary-orage/5"
-                          >
-                            <Checkbox
-                              checked={statusFilter.has(option.value)}
-                              onCheckedChange={() => handleStatusFilterToggle(option.value)}
-                            />
-                            <span className="text-win2-neutral-700">{option.label}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
+                            {/* 検索 */}
+                            <div className="relative flex-1 sm:max-w-xs">
+                              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-win2-neutral-400" />
+                              <Input
+                                type="text"
+                                placeholder="案件名で検索..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-9 pr-9"
+                              />
+                              {searchQuery && (
+                                <button
+                                  onClick={() => setSearchQuery("")}
+                                  className="absolute right-3 top-1/2 -translate-y-1/2 text-win2-neutral-400 hover:text-win2-neutral-600"
+                                  aria-label="検索をクリア"
+                                >
+                                  <X className="h-4 w-4" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
 
-                    {/* フィルタクリアボタン */}
-                    {(sortValue !== "timestamp-desc" || statusFilter.size > 0 || searchQuery) && (
-                      <div className="flex justify-end">
-                        <button
-                          onClick={handleClearFilters}
-                          className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-win2-neutral-600 transition hover:bg-win2-neutral-100 hover:text-win2-neutral-900"
-                        >
-                          <X className="h-4 w-4" />
-                          フィルタをクリア
-                        </button>
-                      </div>
+                          {/* ステータスフィルタ行 */}
+                          <div className="space-y-2">
+                            <span className="text-sm font-medium text-win2-neutral-700">
+                              ステータス絞り込み:
+                            </span>
+                            <div className="flex flex-wrap gap-3">
+                              {STATUS_FILTER_OPTIONS.map((option) => (
+                                <label
+                                  key={option.value}
+                                  className="flex cursor-pointer items-center gap-2 rounded-md border border-win2-neutral-200 bg-white px-3 py-2 text-sm transition hover:border-win2-primary-orage hover:bg-win2-primary-orage/5"
+                                >
+                                  <Checkbox
+                                    checked={statusFilter.has(option.value)}
+                                    onCheckedChange={() => handleStatusFilterToggle(option.value)}
+                                  />
+                                  <span className="text-win2-neutral-700">{option.label}</span>
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* フィルタクリアボタン */}
+                          {(sortValue !== "timestamp-desc" || statusFilter.size > 0 || searchQuery) && (
+                            <div className="flex justify-end">
+                              <button
+                                onClick={handleClearFilters}
+                                className="inline-flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium text-win2-neutral-600 transition hover:bg-win2-neutral-100 hover:text-win2-neutral-900"
+                              >
+                                <X className="h-4 w-4" />
+                                フィルタをクリア
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
                     )}
-                  </div>
+                  </AnimatePresence>
                 </CardContent>
               </Card>
             </motion.div>

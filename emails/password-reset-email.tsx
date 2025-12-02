@@ -75,7 +75,7 @@ export function PasswordResetEmail({
           </Text>
 
           <Text style={footer}>
-            WIN×Ⅱ - アフィリエイト×キャッシュバックプラットフォーム
+            WIN×Ⅱ - 会員制アフィリエイトブログプラットフォーム
           </Text>
         </Container>
       </Body>
