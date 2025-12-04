@@ -1,5 +1,12 @@
 /**
  * WIN×Ⅱ A8.net成果マッチング処理（2025/11/15 v4.0.0）
+ * 
+ * 関連コミット
+
+  a80b8d9 - FEATURE: Rentracksトラッキング対応（URLドメイン自動判定）
+  8e2a254 - FEATURE: GAS Rentracksマッチング対応（uix分割処理）
+  5a5d7bc - DOC: GASデプロイガイド作成（Rentracks対応v4.1.0）
+
  * -------------------------------------------------------------------
  * シート:
  *  - `成果CSV_RAW`：A8.net Parameter Tracking Report CSV貼付（ヘッダ1行＋データ）
@@ -15,6 +22,10 @@
  *
  * A8.net Parameter Tracking Report 対応:
  *  - HEADER_CANDIDATES: パラメータ(id1)、パラメータ(id2)、プログラム名、ステータス名
+ * 
+ *  - ヘッダー候補にRentracks用ヘッダーを追加（備考、uix、プロダクト、状況）
+ *  - UUID v4の5パーツ構造を利用した分割アルゴリズム実装
+ *  - 下位互換性を保証（A8.net CSVはそのまま動作）
  */
 
 const SHEET_RAW = '成果CSV_RAW';
@@ -22,18 +33,37 @@ const SHEET_CLICKLOG = 'クリックログ';
 
 const HEADER_CANDIDATES = {
   memberId: [
+    // === 既存A8.net用（変更なし） ===
     'パラメータ(id1)', 'パラメータid1', 'パラメータ（id1）', 'パラメータ（ID1）', 'パラメータID1',
-    'id1', 'memberid', 'member_id', '会員id', '会員ＩＤ', '会員ｉｄ'
+    'id1', 'memberid', 'member_id', '会員id', '会員ＩＤ', '会員ｉｄ',
+
+    // === Rentracks用を追加 ===
+    'uix', '備考', 'remarks', 'note', 'memo'
   ],
+
   eventId: [
+    // === 既存A8.net用（変更なし） ===
     'パラメータ(id2)', 'パラメータid2', 'パラメータ（id2）', 'パラメータ（ID2）', 'パラメータID2',
-    'id2', 'eventid', 'event_id', 'イベントid', 'イベントＩＤ'
+    'id2', 'eventid', 'event_id', 'イベントid', 'イベントＩＤ',
+
+    // === Rentracks用を追加 ===
+    'uix', '備考', 'remarks', 'note', 'memo'
   ],
+
   dealName: [
-    'プログラム名', '案件名', '商品名', '広告名', 'program', 'dealname', 'offer', 'サービス名', '広告主名'
+    // === 既存（変更なし） ===
+    'プログラム名', '案件名', '商品名', '広告名', 'program', 'dealname', 'offer', 'サービス名', '広告主名',
+
+    // === Rentracks用を追加 ===
+    'プロダクト', 'product'
   ],
+
   status: [
-    'ステータス名', '承認状況', 'ステータス', '状態', 'status'
+    // === 既存（変更なし） ===
+    'ステータス名', '承認状況', 'ステータス', '状態', 'status',
+
+    // === Rentracks用を追加 ===
+    '状況', 'situation', 'approval_status'
   ]
 };
 
@@ -114,11 +144,33 @@ function recordConversionsToClickLog() {
     const row = rawValues[i];
     if (isRowEmpty_(row)) continue;
 
-    const memberId = safeCell_(row[col.memberId]);
-    const eventId = safeCell_(row[col.eventId]);
+    // === 既存処理: id1, id2, 案件名, ステータス抽出 ===
+    let memberId = safeCell_(row[col.memberId]);
+    let eventId = safeCell_(row[col.eventId]);
     const dealName = col.dealName >= 0 ? safeCell_(row[col.dealName]) : '';
     const status = col.status >= 0 ? safeCell_(row[col.status]) : '';
 
+    // ===== ここから新規追加: uix パラメータ分割処理（Rentracks対応） =====
+    // uix形式の場合（memberId-eventId）を分割
+    // 例: "b91765a2-f57d-4c82-bd07-9e0436f560da-event-uuid-123" → 分割
+    if (memberId.includes('-') && (!eventId || eventId === '')) {
+      const parts = memberId.split('-');
+
+      // UUID形式は5パーツ（xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx）
+      // 最初の5パーツをmemberId、残りをeventIdとする
+      if (parts.length > 5) {
+        memberId = parts.slice(0, 5).join('-');  // 最初の5パーツをUUID v4として結合
+        eventId = parts.slice(5).join('-');      // 残りをeventIdとして結合
+
+        console.log(`[info] uix分割成功: memberId=${memberId}, eventId=${eventId}`);
+      } else {
+        // パーツが5個以下の場合は分割失敗（不正なフォーマット）
+        console.log(`[warn] uix分割失敗（パーツ不足）: ${memberId}`);
+      }
+    }
+    // ===== 新規追加ここまで =====
+
+    // === 既存処理: 空チェック（以下変更なし） ===
     if (!memberId || !eventId) {
       console.log(`[warn] 行${i+1}: id1またはid2が空です`);
       continue;
