@@ -31,9 +31,11 @@ import { formatJapaneseDateTime } from "@/lib/utils";
  *    - 各クリック毎にユニークなIDを生成
  * 5. Google Sheets「クリックログ」に記録
  *    - 列構成: 日時, 会員ID, 案件名, 案件ID, イベントID
- * 6. affiliateUrlに ?id1={trackingId}&id2={eventId}&eventId={eventId} を付与
+ * 6. URLドメインから自動判定してトラッキングURLを生成
+ *    - Rentracks（rentracks.jp/rentracks.co.jp）: ?uix={trackingId}-{eventId} を付与
+ *    - A8.net等その他ASP: ?id1={trackingId}&id2={eventId}&eventId={eventId} を付与
  *    - trackingId = memberId or guest:UUID
- *    - eventId = UUID v4（クリック毎にユニーク、id2パラメータにもセット）
+ *    - eventId = UUID v4（クリック毎にユニーク）
  * 7. レスポンス返却（非会員の場合はguest UUID Cookieを設定）
  *
  * @param request - NextRequest オブジェクト
@@ -109,13 +111,36 @@ export async function POST(request: NextRequest) {
       eventId,
     });
 
-    // 6. affiliateUrlに ?id1={trackingId}&id2={eventId}&eventId={eventId} を付与
+    // 6. URLドメインから自動判定してトラッキングURL生成
     const trackingUrl = new URL(deal.affiliateUrl);
-    trackingUrl.searchParams.set("id1", trackingId);
-    trackingUrl.searchParams.set("id2", eventId);
-    trackingUrl.searchParams.set("eventId", eventId);
+    const urlLower = deal.affiliateUrl.toLowerCase();
 
-    console.log("[track-click] Tracking URL generated:", trackingUrl.toString());
+    // URLドメインでASP判定（Rentracks: rentracks.jp/rentracks.co.jp）
+    if (urlLower.includes("rentracks.jp") || urlLower.includes("rentracks.co.jp")) {
+      // ===== Rentracks方式: uix パラメータ =====
+      const uixValue = `${trackingId}-${eventId}`;
+      trackingUrl.searchParams.set("uix", uixValue);
+
+      console.log("[track-click] Rentracks URL generated:", {
+        dealId,
+        dealName: deal.dealName,
+        detectedASP: "Rentracks",
+        uix: uixValue,
+        trackingUrl: trackingUrl.toString()
+      });
+    } else {
+      // ===== A8.net等その他ASP: id1, id2, eventId パラメータ（既存処理） =====
+      trackingUrl.searchParams.set("id1", trackingId);
+      trackingUrl.searchParams.set("id2", eventId);
+      trackingUrl.searchParams.set("eventId", eventId);
+
+      console.log("[track-click] A8.net/other ASP URL generated:", {
+        dealId,
+        dealName: deal.dealName,
+        detectedASP: urlLower.includes("a8.net") ? "A8.net" : "other",
+        trackingUrl: trackingUrl.toString()
+      });
+    }
 
     // 7. レスポンス返却（非会員の場合はCookie設定）
     // GTM tracking用に追加情報を含める
