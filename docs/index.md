@@ -41,6 +41,8 @@ docs/
 │   ├── gas-a8net-update-guide.md         ← Google Apps Script修正ガイド（A8.net対応）
 │   ├── environment-variables-setup.md    ← 環境変数設定ガイド（GitHub Secrets + Vercel）
 │   ├── a8-conversion-matching.md         ← A8.net成果マッチング運用マニュアル（クリックログF/G列自動更新）
+│   ├── gas-deployment-guide.md           ← GASデプロイガイド（Rentracks対応v4.1.0、デプロイ手順、トラブルシューティング）
+│   ├── rentracks-conversion-matching.md  ← Rentracks成果マッチング運用マニュアル（週1回CSV処理、uix分割、トラブルシューティング、技術仕様）
 │   ├── microcms-cache-revalidation.md    ← microCMSキャッシュ再検証設定ガイド（ISR 60秒、トラブルシューティング）
 │   └── rentracks-investigation-report.md ← レントラックス成果トラッキング実装方法調査報告書（Phase 1: 情報収集待ち）
 │
@@ -129,8 +131,10 @@ docs/
 | **gas-a8net-update-guide.md** | Google Apps Script修正ガイド（A8.net対応） | ✅ 実装完了 | HEADER_CANDIDATES拡張（A8.net固有カラム名）、APPROVED_VALUES拡張（A8.net固有ステータス値）、ステータス判定ロジック、実装手順、トラブルシューティング |
 | **environment-variables-setup.md** | 環境変数設定ガイド（GitHub Secrets + Vercel） | ✅ 実装完了 | GitHub Secrets設定、Vercel環境変数設定、CRON_SECRET生成方法、セキュリティベストプラクティス |
 | **a8-conversion-matching.md** | A8.net成果マッチング運用マニュアル | ✅ 運用中 | クリックログF/G列自動更新処理、Phase 1初回動作確認テスト、日常運用フロー（週1回、5分）、トラブルシューティング、技術仕様、FAQ |
+| **gas-deployment-guide.md** | GASデプロイガイド（Rentracks対応v4.1.0） | ✅ 実装完了 | デプロイ手順、v4.1.0変更点（HEADER_CANDIDATES拡張、uix分割処理）、トラブルシューティング、サンプルCSVテストデータ、期待される実行結果 |
+| **rentracks-conversion-matching.md** | Rentracks成果マッチング運用マニュアル（v1.0.0） | ✅ 運用準備完了 | 週1回の運用フロー（5分）、詳細手順（Rentracks CSV→Google Sheets→GAS実行）、トラブルシューティング（5つの問題パターン）、技術仕様（uixパラメータ形式、CSV構造、GAS処理フロー）、FAQ（8つの質問と回答） |
 | **microcms-cache-revalidation.md** | microCMSキャッシュ再検証設定ガイド | ✅ 実装完了 | ISR 60秒設定、キャッシュ問題の原因、代替案（キャッシュ無効化、Webhook）、トラブルシューティング |
-| **rentracks-investigation-report.md** | レントラックス成果トラッキング実装方法調査報告書 | ⏳ 情報収集待ち | コンバージョンタグ方式（`_rt.cinfo`）、A8.net/AFBとの違い、広告主連携必須、実装前確認事項チェックリスト、実装スケジュール提案、リスクと注意事項 |
+| **rentracks-investigation-report.md** | レントラックス成果トラッキング実装方法調査報告書 | ⏸️ アーカイブ | コンバージョンタグ方式（`_rt.cinfo`）、A8.net/AFBとの違い、広告主連携必須、実装前確認事項チェックリスト、実装スケジュール提案、リスクと注意事項 |
 
 #### `guides/` - ユーザー/開発者向けガイド
 
@@ -273,6 +277,51 @@ docs/
 ## 更新履歴
 
 このセクションは、ドキュメントの主要な更新を記録します。
+
+### 2025-12-04
+
+#### Rentracks成果トラッキング実装完了（Phase 1 & Phase 2 & Phase 3）
+- **operations/gas-deployment-guide.md**: 新規作成（GASデプロイガイド v1.0.0）
+  - デプロイ手順の詳細説明（Google Sheets → Apps Script編集 → コード貼り付け → 保存）
+  - v4.1.0変更点（HEADER_CANDIDATES拡張、uix分割処理）
+  - トラブルシューティングガイド（5つの問題パターンと解決策）
+  - サンプルCSVテストデータとクリックログ期待結果
+- **operations/rentracks-conversion-matching.md**: 新規作成（Rentracks成果マッチング運用マニュアル v1.0.0）
+  - システムフロー図とA8.netとの違い
+  - 週1回の運用フロー（5分、6ステップ）
+  - 詳細手順（Rentracks管理画面ログイン、注文リストCSVダウンロード、Google Sheets貼り付け、GAS実行、結果確認）
+  - トラブルシューティング（5つの問題パターン：データなし、ヘッダー検出失敗、uix分割失敗、マッチング失敗、空データ）
+  - 技術仕様（uixパラメータ形式、Rentracks「注文リスト」CSV構造、GAS処理フロー、クリックログシート構造）
+  - FAQ（8つの質問と回答：A8.net CSV同時処理、成果CSV_RAW自動クリア、処理期限、guest:UUID扱い、失敗成果の再処理、実行頻度制限、案件識別、uix分割失敗時の対処）
+- **app/api/track-click/route.ts**: Rentracks対応実装（v2.0.0）
+  - URLドメイン自動判定ロジック追加（rentracks.jp / rentracks.co.jp検出）
+  - uixパラメータ生成（`{trackingId}-{eventId}`形式）
+  - A8.net処理は既存コード維持（下位互換性保証）
+  - 詳細なログ出力（detectedASP, trackingUrl, uix値）
+- **google-spread-sheet/code.gs.js**: Rentracks対応実装（v4.1.0）
+  - HEADER_CANDIDATES拡張（memberId/eventId: 'uix', '備考', 'remarks', 'note', 'memo'）
+  - HEADER_CANDIDATES拡張（dealName: 'プロダクト', 'product'）
+  - HEADER_CANDIDATES拡張（status: '状況', 'situation', 'approval_status'）
+  - uix分割処理実装（UUID v4形式検証、5パーツ判定、guest:UUID対応）
+  - A8.net CSV処理は既存処理維持（下位互換性保証）
+- **Gitコミット**:
+  - `a80b8d9` - FEATURE: Rentracksトラッキング対応（URLドメイン自動判定）
+  - `8e2a254` - FEATURE: GAS Rentracksマッチング対応（uix分割処理）
+  - `5a5d7bc` - DOC: GASデプロイガイド作成（Rentracks対応v4.1.0）
+- **テスト結果**:
+  - ✅ TC4（Rentracks × 非会員）: uixパラメータ生成成功
+  - ✅ TC2（A8.net × 非会員）: id1/id2/eventIdパラメータ生成成功（回帰テスト合格）
+  - ✅ URLドメイン自動判定: 両ASPとも正しく検出
+  - ✅ クリックログ記録: Google Sheetsへの記録成功
+- **実装期間**: Phase 1-3完了（約8時間）
+  - Phase 1（URL判定実装、テスト実行、Vercelデプロイ）: 約4.5時間
+  - Phase 2（GAS拡張、コードレビュー、デプロイガイド）: 約3時間
+  - Phase 3（運用マニュアル作成）: 約0.5時間
+- **ステータス**: 実装完了、運用準備完了、ユーザーによるGASデプロイ待ち
+- **次のアクション**:
+  - Priority 1: ユーザーがGASエディタにコードをデプロイ（5分）
+  - Priority 2: Rentracks「注文リスト」CSVダウンロードと初回テスト実行（10分）
+  - Priority 3: 週1回の定期運用開始（5分/週）
 
 ### 2025-11-23
 
