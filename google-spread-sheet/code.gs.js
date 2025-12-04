@@ -1,5 +1,12 @@
 /**
  * WIN×Ⅱ A8.net成果マッチング処理（2025/11/15 v4.0.0）
+ * 
+ * 関連コミット
+
+  a80b8d9 - FEATURE: Rentracksトラッキング対応（URLドメイン自動判定）
+  8e2a254 - FEATURE: GAS Rentracksマッチング対応（uix分割処理）
+  5a5d7bc - DOC: GASデプロイガイド作成（Rentracks対応v4.1.0）
+
  * -------------------------------------------------------------------
  * シート:
  *  - `成果CSV_RAW`：A8.net Parameter Tracking Report CSV貼付（ヘッダ1行＋データ）
@@ -15,6 +22,10 @@
  *
  * A8.net Parameter Tracking Report 対応:
  *  - HEADER_CANDIDATES: パラメータ(id1)、パラメータ(id2)、プログラム名、ステータス名
+ * 
+ *  - ヘッダー候補にRentracks用ヘッダーを追加（備考、uix、プロダクト、状況）
+ *  - UUID v4の5パーツ構造を利用した分割アルゴリズム実装
+ *  - 下位互換性を保証（A8.net CSVはそのまま動作）
  */
 
 const SHEET_RAW = '成果CSV_RAW';
