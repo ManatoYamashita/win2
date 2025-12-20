@@ -1,6 +1,6 @@
 /**
- * WIN×Ⅱ A8.net成果マッチング処理（2025/11/15 v4.0.0）
- * 
+ * WIN×Ⅱ 成果マッチング＆ステータス色分け処理（2025/12/21 v4.2.0）
+ *
  * 関連コミット
 
   a80b8d9 - FEATURE: Rentracksトラッキング対応（URLドメイン自動判定）
@@ -16,16 +16,23 @@
  *  - 成果CSV_RAWから id1（会員ID） + id2（イベントID）、案件名、ステータスを取得
  *  - クリックログの該当行（B列=id1, E列=id2）を検索
  *  - 該当行のF列に「申し込み案件名」、G列に「ステータス」を記録
+ *  - G列の値に応じて行の背景色を自動設定（未確定=薄黄、確定=薄緑、否認=薄赤、キャンセル=薄グレー、その他=濃黄）
  *
  * 実行方法:
  *  - 手動実行: メニュー「成果処理」→「成果をクリックログに記録」
+ *  - 手動実行: メニュー「成果処理」→「クリックログの背景色を更新」
  *
  * A8.net Parameter Tracking Report 対応:
  *  - HEADER_CANDIDATES: パラメータ(id1)、パラメータ(id2)、プログラム名、ステータス名
- * 
+ *
+ * Rentracks対応:
  *  - ヘッダー候補にRentracks用ヘッダーを追加（備考、uix、プロダクト、状況）
  *  - UUID v4の5パーツ構造を利用した分割アルゴリズム実装
  *  - 下位互換性を保証（A8.net CSVはそのまま動作）
+ *
+ * v4.2.0 新機能（2025-12-21）:
+ *  - クリックログシートのステータスに応じた行背景色自動設定機能
+ *  - 背景色ルール: 空=白、未確定=薄黄(#FFF9C4)、確定=薄緑(#C8E6C9)、否認=薄赤(#FFCDD2)、キャンセル=薄グレー(#E0E0E0)、その他=濃黄(#FFD700)
  */
 
 const SHEET_RAW = '成果CSV_RAW';
@@ -72,6 +79,7 @@ function onOpen() {
   SpreadsheetApp.getUi()
     .createMenu('成果処理')
     .addItem('成果をクリックログに記録', 'recordConversionsToClickLog')
+    .addItem('クリックログの背景色を更新', 'applyClickLogRowColors')
     .addToUi();
 }
 
@@ -206,6 +214,9 @@ function recordConversionsToClickLog() {
   const summaryMessage = `成果マッチング処理完了\n\n成功: ${matched}件\n失敗: ${notMatched}件`;
   console.log(`[info] 処理完了: マッチング成功=${matched}, マッチング失敗=${notMatched}`);
 
+  // 背景色自動更新
+  applyClickLogRowColors();
+
   if (notMatched > 0 && notMatched <= 10) {
     // 失敗が10件以下なら詳細表示
     SpreadsheetApp.getUi().alert(summaryMessage + '\n\n【失敗した成果】\n' + notMatchedList.join('\n'));
@@ -259,4 +270,74 @@ function safeCell_(v) {
 
 function isRowEmpty_(arr) {
   return arr.every(v => !safeCell_(v));
+}
+
+// =============== 背景色設定 ===============
+/**
+ * クリックログシートのステータスに応じて行の背景色を設定
+ *
+ * 背景色ルール:
+ * - G列が空: デフォルト（白）
+ * - G列が"未確定": 薄い黄色 (#FFF9C4)
+ * - G列が"確定": 薄い緑 (#C8E6C9)
+ * - G列が"否認": 薄い赤 (#FFCDD2)
+ * - G列が"キャンセル": 薄いグレー (#E0E0E0)
+ * - G列がその他の値: 濃い黄色 (#FFD700)
+ *
+ * パフォーマンス最適化:
+ * - バッチ処理により一括で背景色を設定
+ * - データが存在する最終行までのみ処理
+ */
+function applyClickLogRowColors() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const clickLogSheet = ss.getSheetByName(SHEET_CLICKLOG);
+
+  if (!clickLogSheet) {
+    console.log('[error] クリックログシートが見つかりません');
+    return;
+  }
+
+  const dataRange = clickLogSheet.getDataRange();
+  const values = dataRange.getValues();
+  const numRows = values.length;
+
+  if (numRows <= 1) {
+    console.log('[info] クリックログにデータがありません');
+    return;
+  }
+
+  // 背景色配列を作成（バッチ処理用）
+  const backgrounds = [];
+
+  for (let i = 1; i < numRows; i++) {
+    const row = values[i];
+    const statusValue = safeCell_(row[6]); // G列（0-indexedで6）
+
+    let bgColor = null; // デフォルト（白）
+
+    if (statusValue === '') {
+      bgColor = null; // 空の場合はデフォルト
+    } else if (statusValue === '未確定') {
+      bgColor = '#FFF9C4'; // 薄い黄色
+    } else if (statusValue === '確定') {
+      bgColor = '#C8E6C9'; // 薄い緑
+    } else if (statusValue === '否認') {
+      bgColor = '#FFCDD2'; // 薄い赤
+    } else if (statusValue === 'キャンセル') {
+      bgColor = '#E0E0E0'; // 薄いグレー
+    } else {
+      bgColor = '#FFD700'; // その他の値は濃い黄色
+    }
+
+    // 7列分の背景色配列（A～G列）
+    backgrounds.push([bgColor, bgColor, bgColor, bgColor, bgColor, bgColor, bgColor]);
+  }
+
+  // 一括で背景色を設定（パフォーマンス向上）
+  if (backgrounds.length > 0) {
+    const targetRange = clickLogSheet.getRange(2, 1, backgrounds.length, 7);
+    targetRange.setBackgrounds(backgrounds);
+  }
+
+  console.log(`[info] クリックログの行背景色を更新しました（${backgrounds.length}行）`);
 }
