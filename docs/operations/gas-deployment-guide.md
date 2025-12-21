@@ -2,7 +2,7 @@
 
 ## 概要
 
-このガイドでは、ステータス色分け対応のGASコード（v4.2.0）をGoogle Sheetsにデプロイする手順を説明します。
+このガイドでは、H列ASP名自動記録対応のGASコード（v4.3.3）をGoogle Sheetsにデプロイする手順を説明します。
 
 ## 前提条件
 
@@ -259,6 +259,91 @@ if (col.eventId < 0) {
 - ✅ A8.net CSV も引き続き正常に動作
 - ✅ エラーの代わりに情報ログを出力
 
+## v4.3.3の変更点（H列ASP名自動記録）
+
+### 1. 新規機能: クリックログH列にASP名を記録
+
+**機能概要**:
+
+成果マッチング処理時に、成果データのソースASP（A8.netまたはRentracks）を自動判定し、クリックログのH列に記録します。
+
+**ASP判定ロジック**:
+
+| 条件 | 判定結果 | H列記録値 |
+|------|----------|-----------|
+| 成果CSV_RAW に eventId列が存在する | A8.net CSV | `"A8.net"` |
+| 成果CSV_RAW に eventId列が存在しない | Rentracks CSV | `"Rentracks"` |
+
+**実装の特徴**:
+
+- ✅ **自動判定**: 成果CSV_RAWのヘッダー構造からASPを自動識別
+- ✅ **F/G列処理との統合**: 既存の案件名・ステータス更新と同時にH列も更新
+- ✅ **下位互換性**: 既存のF/G列更新処理に影響なし
+
+### 2. クリックログシート構造（更新後）
+
+**v4.3.3での変更**:
+
+```
+A: 日時
+B: 会員ID (id1)
+C: 案件名
+D: 案件ID
+E: イベントID (id2)
+F: 申し込み案件名（GAS更新 - v4.0.0〜）
+G: ステータス（GAS更新 - v4.0.0〜）
+★H: ASP名（GAS更新 - v4.3.3新規）
+```
+
+**推奨事項**:
+
+クリックログシートのH1セルに「ASP名」または「ASP」ヘッダーを手動で追加することを推奨します（任意）。
+
+### 3. 使用例
+
+**シナリオ1: A8.net CSV処理**
+
+1. 成果CSV_RAWに A8.net Parameter Tracking Report CSV を貼り付け
+2. メニュー「成果処理」→「成果をクリックログに記録」実行
+3. クリックログ更新確認:
+   - F列: プログラム名
+   - G列: ステータス名
+   - **★H列: "A8.net"**
+
+**シナリオ2: Rentracks CSV処理**
+
+1. 成果CSV_RAWに Rentracks 注文リスト CSV を貼り付け
+2. メニュー「成果処理」→「成果をクリックログに記録」実行
+3. クリックログ更新確認:
+   - F列: プロダクト名
+   - G列: 状況（"確定" または "未確定"）
+   - **★H列: "Rentracks"**
+
+### 4. コンソールログ出力例
+
+**A8.net CSV処理時**:
+
+```
+[info] カラム検出: {memberId: 0, eventId: 1, dealName: 2, status: 3}
+[info] 検出されたASP: A8.net
+[info] マッチング成功: id1=UUID, id2=eventID → 案件名=プログラム名, ステータス=成果確定, ASP=A8.net
+```
+
+**Rentracks CSV処理時**:
+
+```
+[info] eventId列が見つかりません。Rentracks uix形式として処理します。
+[info] 検出されたASP: Rentracks
+[info] uix分割成功: memberId=UUID, eventId=eventID
+[info] マッチング成功: id1=UUID, id2=eventID → 案件名=プロダクト名, ステータス=確定, ASP=Rentracks
+```
+
+### 5. 下位互換性
+
+- ✅ 既存のF列（案件名）・G列（ステータス）更新処理は完全に維持
+- ✅ A8.net CSV、Rentracks CSV の両方で正常動作
+- ✅ v4.3.2以前のデータとの互換性あり（H列が空でもエラーなし）
+
 ## トラブルシューティング
 
 ### メニュー「成果処理」が表示されない
@@ -329,16 +414,16 @@ if (col.eventId < 0) {
 2. ⏸️ Rentracks「注文リスト」CSVダウンロード（週1回運用）
 3. ⏸️ 成果CSV_RAWにCSV貼り付け
 4. ⏸️ GASスクリプト実行
-5. ⏸️ クリックログF/G列更新確認
+5. ⏸️ クリックログF/G/H列更新確認
 
 ## 関連ドキュメント
 
-- **プランファイル**: `.claude/plans/quirky-snuggling-hamming.md`
+- **プランファイル**: `.claude/plans/harmonic-marinating-lemon.md`
 - **GASソースコード**: `google-spread-sheet/code.gs.js`
 - **Rentracks仕様**: プランファイル「技術仕様」セクション
 
 ---
 
-**バージョン**: v4.2.0（ステータス色分け対応）
+**バージョン**: v4.3.3（H列ASP名自動記録対応）
 **最終更新**: 2025-12-21
 **作成者**: Claude Code
