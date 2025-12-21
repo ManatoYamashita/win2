@@ -14,7 +14,7 @@
  * 処理内容:
  *  - 成果CSV_RAWから id1（会員ID） + id2（イベントID）、案件名、ステータスを取得
  *  - クリックログの該当行（B列=id1, E列=id2）を検索
- *  - 該当行のF列に「申し込み案件名」、G列に「ステータス」を記録
+ *  - 該当行のF列に「申し込み案件名」、G列に「ステータス」、H列に「ASP名」を記録
  *  - G列の値に応じて行の背景色を自動設定（未確定=薄黄、確定=薄緑、否認=薄赤、キャンセル=薄グレー、その他=濃黄）
  *
  * 実行方法:
@@ -47,6 +47,12 @@
  *  - FIX: eventId 列の必須チェックを削除
  *  - 原因: Rentracks CSV では eventId 列が存在しないためエラーが発生
  *  - 修正: eventId は任意として扱い、見つからない場合は警告ログのみ
+ *
+ * v4.3.3 機能追加（2025-12-21）:
+ *  - FEATURE: クリックログH列にASP名を自動記録（"A8.net" / "Rentracks"）
+ *  - 判定ロジック: col.eventId の有無でASP判別（eventId列あり=A8.net、なし=Rentracks）
+ *  - 変更箇所: recordConversionsToClickLog() 関数内にASP判定とH列書き込みを追加
+ *  - 互換性: 既存のF/G列更新処理に影響なし
  */
 
 const SHEET_RAW = '成果CSV_RAW';
@@ -102,9 +108,9 @@ function onOpen() {
  *
  * 処理フロー:
  * 1. 成果CSV_RAWからデータ読み込み
- * 2. id1, id2, 案件名, ステータスを抽出
+ * 2. id1, id2, 案件名, ステータス, ASP名を抽出
  * 3. クリックログから該当行を検索（B列=id1, E列=id2）
- * 4. 該当行のF列・G列を更新
+ * 4. 該当行のF列・G列・H列を更新
  */
 function recordConversionsToClickLog() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -144,9 +150,13 @@ function recordConversionsToClickLog() {
   }
 
   // eventId は任意（Rentracks: uix分割で対応、A8.net: 専用列で対応）
+  // ASP名を判定（H列記録用）
+  let aspName = "A8.net";  // デフォルト: A8.net（eventId列がある場合）
   if (col.eventId < 0) {
+    aspName = "Rentracks";  // eventId列がない場合はRentracks
     console.log('[info] eventId列が見つかりません。Rentracks uix形式として処理します。');
   }
+  console.log(`[info] 検出されたASP: ${aspName}`);
 
   console.log('[info] カラム検出:', col);
 
@@ -224,11 +234,12 @@ function recordConversionsToClickLog() {
     }
 
     if (matchedRowIndex >= 0) {
-      // F列（案件名）、G列（ステータス）を更新
+      // F列（案件名）、G列（ステータス）、H列（ASP名）を更新
       clickLogSheet.getRange(matchedRowIndex + 1, 6).setValue(dealName);  // F列（1-indexed）
       clickLogSheet.getRange(matchedRowIndex + 1, 7).setValue(status);    // G列（1-indexed）
+      clickLogSheet.getRange(matchedRowIndex + 1, 8).setValue(aspName);   // ★H列（ASP名）（1-indexed）
       matched++;
-      console.log(`[info] マッチング成功: id1=${memberId}, id2=${eventId} → 案件名=${dealName}, ステータス=${status}`);
+      console.log(`[info] マッチング成功: id1=${memberId}, id2=${eventId} → 案件名=${dealName}, ステータス=${status}, ASP=${aspName}`);
     } else {
       console.log(`[warn] マッチング失敗: id1=${memberId}, id2=${eventId} に一致するクリックログが見つかりませんでした`);
       notMatchedList.push(`id1=${memberId}, id2=${eventId}`);
