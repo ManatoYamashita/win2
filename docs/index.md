@@ -287,6 +287,19 @@ docs/
 
 このセクションは、ドキュメントの主要な更新を記録します。
 
+### 2025-12-21 (5回目)
+- **GAS v4.3.2 → v4.3.3: H列にASP名自動記録機能実装**
+  - **google-spread-sheet/code.gs.js**: v4.3.2 → v4.3.3
+    - FEATURE: クリックログH列にASP名を自動記録（"A8.net" / "Rentracks"）
+    - ASP判定ロジック: `col.eventId >= 0` → "A8.net"、`col.eventId < 0` → "Rentracks"
+    - 変更箇所: `findConversionsByHeaders_()` の戻り値拡張、`recordConversionsToClickLog()` のH列書き込み追加
+    - 互換性: 既存のF/G列更新処理に影響なし
+  - **docs/operations/gas-deployment-guide.md**: v4.3.3セクション追加
+    - ASP判定ロジック表、クリックログ構造図（H列追加）、使用例を追記
+  - **docs/operations/rentracks-conversion-matching.md**: クリックログ構造図更新（H列: ASP名追加）
+  - **docs/operations/a8-conversion-matching.md**: クリックログ構造図更新（H列: ASP名追加）
+  - **ステータス**: 実装完了、ドキュメント更新完了
+
 ### 2025-12-21 (4回目)
 - **GAS v4.3.1 → v4.3.2: eventId 必須チェック削除の緊急修正**
   - **google-spread-sheet/code.gs.js**: v4.3.1 → v4.3.2

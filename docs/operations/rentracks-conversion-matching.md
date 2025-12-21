@@ -448,6 +448,7 @@ D列: 案件ID                   | rentracks-test-001
 E列: イベントID (id2)         | event-uuid-123
 F列: 申し込み案件名 (GAS更新) | サンプル商品A
 G列: ステータス (GAS更新)     | 承認
+H列: ASP名 (GAS更新)          | Rentracks
 ```
 
 ---
