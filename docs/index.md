@@ -322,7 +322,18 @@ docs/
   - **ステータス**: 実装完了、GASデプロイ待ち
 
 ### 2025-12-21
-- **GAS v4.2.0**: クリックログシート ステータス色分け機能実装（`applyClickLogRowColors()`関数追加）
+- **GAS v4.2.0: クリックログシート ステータス色分け機能実装**
+  - **google-spread-sheet/code.gs.js**: v4.1.0 → v4.2.0
+    - 新規関数追加: `applyClickLogRowColors()` - G列（ステータス）の値に応じて行背景色を自動設定
+    - 背景色ルール: 空=白、未確定=薄黄(#FFF9C4)、確定=薄緑(#C8E6C9)、否認=薄赤(#FFCDD2)、キャンセル=薄グレー(#E0E0E0)、その他=濃黄(#FFD700)
+    - 自動適用: `recordConversionsToClickLog()`実行後に背景色を自動更新
+    - 手動実行: メニュー「成果処理」→「クリックログの背景色を更新」
+    - パフォーマンス最適化: バッチ処理による一括背景色設定
+  - **docs/operations/gas-deployment-guide.md**: v4.2.0対応に更新
+    - v4.2.0の変更点セクション追加（背景色ルール、使用例、メリット）
+    - メニュー確認項目に「クリックログの背景色を更新」追加
+    - バージョン情報更新（v4.2.0、2025-12-21）
+  - **ステータス**: 実装完了、GASデプロイ待ち
 
 ### 2025-12-04
 - **Rentracks成果トラッキング実装完了**: `operations/gas-deployment-guide.md`, `operations/rentracks-conversion-matching.md`新規作成、URLドメイン自動判定、uixパラメータ生成
@@ -331,7 +342,18 @@ docs/
 - **Rentracks調査報告書作成**: `operations/rentracks-investigation-report.md`新規作成（JavaScriptタグ方式、広告主連携必須、5-8週間実装見積）
 
 ### 2025-11-17
-- **microCMSキャッシュ再検証設定**: `operations/microcms-cache-revalidation.md`新規作成、ISR 60秒設定実装
+- **microCMSキャッシュ再検証設定（ISR実装）**
+  - **operations/microcms-cache-revalidation.md**: 新規作成（microCMSキャッシュ再検証設定ガイド v1.0.0）
+    - 問題: microCMSコンテンツ更新がデプロイ済みサイトに反映されない（Next.js 15デフォルトキャッシング）
+    - 解決策: ISR（Incremental Static Regeneration）60秒設定
+    - 実装箇所: lib/microcms.ts、app/page.tsx、app/blog/**、app/category/**、app/api/blogs/route.ts
+    - 代替案: キャッシュ完全無効化、On-Demand Revalidation（Webhook）
+    - トラブルシューティング: ブラウザキャッシュ、CDNキャッシュ、APIレート制限
+  - **コード変更**:
+    - `lib/microcms.ts`: すべてのmicroCMS関数に `customRequestInit: { next: { revalidate: 60 } }` 追加
+    - `app/page.tsx`, `app/blog/page.tsx`, `app/blog/[id]/page.tsx`, `app/category/[id]/page.tsx`: `export const revalidate = 60;` 追加
+    - `app/api/blogs/route.ts`: `export const revalidate = 60;` 追加
+  - **影響**: microCMS更新後、最大60秒以内にデプロイ済みサイトに反映されるようになる
 
 ### 2025-11-15
 - **AFB自動ポーリング + A8.net手動CSVハイブリッド実装完了**: `operations/`配下4ドキュメント新規作成、GitHub Actions 10分毎実行、GAS v3.0.0（onEditトリガー）、A8.net Parameter Tracking検証完了
@@ -362,7 +384,13 @@ docs/
 - **Phase 2-1 Email Verification & Password Reset実装完了**: `guides/email-setup.md`新規作成
 
 ### 2025-01-25
-- **Phase 1実装状況を反映**: `dev/architecture.md`新規作成、`specs/spec.md`技術スタックバージョン番号追加
+- **Phase 1 実装状況を反映**
+  - `specs/spec.md`: 技術スタックに具体的なバージョン番号を追加（Next.js 15.1.4、React 19、TailwindCSS v3.4.1 等）
+  - `specs/spec.md`: Phase 1 チェックリストを更新し、70%完了状況を反映
+  - 完了項目: Next.js初期化、TailwindCSS、microCMS SDK、Google Sheets API、shadcn/ui、基本レイアウト
+  - 実装中: Next-Auth設定
+  - `dev/architecture.md`: 新規作成（ディレクトリ構成とTypeScript設定の詳細を文書化）
+  - 本ファイル（`index.md`）: 更新履歴セクション追加
 
 ---
 
