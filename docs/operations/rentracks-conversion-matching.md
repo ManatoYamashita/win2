@@ -313,6 +313,49 @@ Google Sheetsに以下のシートが存在すること:
 
 ---
 
+### 6. id1とid2が同じ値になる（v4.3.1で修正済み）
+
+**症状**: GAS実行後、全成果が失敗し、失敗ログで id1 と id2 が同じ値を表示
+
+```
+成功: 0件
+失敗: 4件
+
+【失敗した成果】
+id1=0f23d556-348a-4da7-b18d-311ed5b3fd81-4a501767-adf9-49d2-8051-e1db3b671de8
+id2=0f23d556-348a-4da7-b18d-311ed5b3fd81-4a501767-adf9-49d2-8051-e1db3b671de8
+```
+
+**原因（v4.3.0以前のバグ）**:
+
+- HEADER_CANDIDATES.eventId に `'uix'`, `'備考'` が重複して含まれていた
+- `findColIdx_()` が Rentracks CSV の「備考」列を memberId と eventId の両方で検出
+- 両変数が同じ列を指すため、uix 分割処理が実行されなかった
+
+**修正内容（v4.3.1）**:
+
+- HEADER_CANDIDATES.eventId から `'uix'`, `'備考'`, `'remarks'`, `'note'`, `'memo'` を削除
+- これらのヘッダー候補は memberId 専用として維持
+- eventId は A8.net の `パラメータ(ID2)` 専用として動作
+
+**解決策**:
+
+1. **GASコード更新**（v4.3.1以降）:
+   - `google-spread-sheet/code.gs.js` を最新版に更新
+   - v4.3.1 以降であれば自動的に修正済み
+
+2. **動作確認**:
+   - Rentracks CSVを再度「成果CSV_RAW」に貼り付け
+   - GASメニュー実行
+   - 成功件数が増加することを確認
+
+3. **バージョン確認方法**:
+   - GASエディタを開く
+   - コード先頭のコメントで `v4.3.1` 以降であることを確認
+   - 見つからない場合は `docs/operations/gas-deployment-guide.md` に従ってコード更新
+
+---
+
 ## 技術仕様
 
 ### uixパラメータ形式

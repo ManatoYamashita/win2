@@ -1,5 +1,5 @@
 /**
- * WIN×Ⅱ 成果マッチング＆ステータス色分け処理（2025/12/21 v4.3.0）
+ * WIN×Ⅱ 成果マッチング＆ステータス色分け処理（2025/12/21 v4.3.1）
  *
  * 関連コミット
 
@@ -39,6 +39,11 @@
  *  - HEADER_CANDIDATES拡張: status候補に「承認済件数」を追加
  *  - ステータス変換処理: 0→"未確定", 1→"確定"
  *  - A8.net CSVとの下位互換性を保証
+ *
+ * v4.3.1 緊急修正（2025-12-21）:
+ *  - FIX: HEADER_CANDIDATES.eventId から uix/備考 を削除
+ *  - 原因: memberIdとeventIdが同じ列を検出し、uix分割処理が失敗
+ *  - 影響: Rentracks CSV処理の正常化（A8.net互換性は維持）
  */
 
 const SHEET_RAW = '成果CSV_RAW';
@@ -55,12 +60,10 @@ const HEADER_CANDIDATES = {
   ],
 
   eventId: [
-    // === 既存A8.net用（変更なし） ===
+    // === A8.net専用（Rentracksはuix分割で対応） ===
     'パラメータ(id2)', 'パラメータid2', 'パラメータ（id2）', 'パラメータ（ID2）', 'パラメータID2',
-    'id2', 'eventid', 'event_id', 'イベントid', 'イベントＩＤ',
-
-    // === Rentracks用を追加 ===
-    'uix', '備考', 'remarks', 'note', 'memo'
+    'id2', 'eventid', 'event_id', 'イベントid', 'イベントＩＤ'
+    // Rentracks uix/備考列はmemberId専用（eventId候補から除外）
   ],
 
   dealName: [

@@ -287,6 +287,18 @@ docs/
 
 このセクションは、ドキュメントの主要な更新を記録します。
 
+### 2025-12-21 (3回目)
+- **GAS v4.3.0 → v4.3.1: HEADER_CANDIDATES重複検出問題の緊急修正**
+  - **google-spread-sheet/code.gs.js**: v4.3.0 → v4.3.1
+    - FIX: HEADER_CANDIDATES.eventId から uix/備考 を削除
+    - 原因: memberIdとeventIdが同じ列を検出し、uix分割処理が失敗
+    - 影響: Rentracks CSV処理の正常化（A8.net互換性は維持）
+  - **docs/operations/gas-deployment-guide.md**: v4.3.1セクション追加
+    - 問題の詳細説明（症状、根本原因、修正後の動作）
+  - **docs/operations/rentracks-conversion-matching.md**: トラブルシューティング#6追加
+    - 「id1とid2が同じ値になる」問題の解決方法を明記
+  - **ステータス**: 実装完了、GASデプロイ待ち
+
 ### 2025-12-21 (2回目)
 - **GAS v4.2.0 → v4.3.0: Rentracks承認済件数対応**
   - **google-spread-sheet/code.gs.js**: v4.2.0 → v4.3.0
