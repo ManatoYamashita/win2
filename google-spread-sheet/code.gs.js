@@ -1,5 +1,5 @@
 /**
- * WIN×Ⅱ 成果マッチング＆ステータス色分け処理（2025/12/21 v4.3.1）
+ * WIN×Ⅱ 成果マッチング＆ステータス色分け処理（2025/12/21 v4.3.2）
  *
  * 関連コミット
 
@@ -44,6 +44,12 @@
  *  - FIX: HEADER_CANDIDATES.eventId から uix/備考 を削除
  *  - 原因: memberIdとeventIdが同じ列を検出し、uix分割処理が失敗
  *  - 影響: Rentracks CSV処理の正常化（A8.net互換性は維持）
+ *
+ * v4.3.2 緊急修正（2025-12-21）:
+ *  - FIX: eventId 列の必須チェックを削除
+ *  - 原因: Rentracks CSV では eventId 列が存在しないためエラーが発生
+ *  - 修正: eventId は任意として扱い、見つからない場合は警告ログのみ
+ *  - 影響: Rentracks CSV が正常に処理可能に
  */
 
 const SHEET_RAW = '成果CSV_RAW';
@@ -134,14 +140,15 @@ function recordConversionsToClickLog() {
     status: findColIdx_(header, HEADER_CANDIDATES.status)
   };
 
-  // 必須カラムチェック
+  // 必須カラムチェック（memberIdのみ）
   if (col.memberId < 0) {
     SpreadsheetApp.getUi().alert('エラー: id1（会員ID）カラムが見つかりません\n\nヘッダー候補: パラメータ(id1), id1, memberid');
     throw new Error('id1カラムが見つかりません');
   }
+
+  // eventId は任意（Rentracks: uix分割で対応、A8.net: 専用列で対応）
   if (col.eventId < 0) {
-    SpreadsheetApp.getUi().alert('エラー: id2（イベントID）カラムが見つかりません\n\nヘッダー候補: パラメータ(id2), id2, eventid');
-    throw new Error('id2カラムが見つかりません');
+    console.log('[info] eventId列が見つかりません。Rentracks uix形式として処理します。');
   }
 
   console.log('[info] カラム検出:', col);

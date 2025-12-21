@@ -287,6 +287,17 @@ docs/
 
 このセクションは、ドキュメントの主要な更新を記録します。
 
+### 2025-12-21 (4回目)
+- **GAS v4.3.1 → v4.3.2: eventId 必須チェック削除の緊急修正**
+  - **google-spread-sheet/code.gs.js**: v4.3.1 → v4.3.2
+    - FIX: eventId 列の必須チェックを削除（L142-145）
+    - 原因: Rentracks CSV では eventId 列が存在しないためエラーが発生
+    - 修正: eventId は任意として扱い、見つからない場合は警告ログのみ
+    - 影響: Rentracks CSV が正常に処理可能に
+  - **docs/operations/gas-deployment-guide.md**: v4.3.2セクション追加
+    - v4.3.1デプロイ後のエラー詳細と修正内容を記載
+  - **ステータス**: 実装完了、GASデプロイ待ち
+
 ### 2025-12-21 (3回目)
 - **GAS v4.3.0 → v4.3.1: HEADER_CANDIDATES重複検出問題の緊急修正**
   - **google-spread-sheet/code.gs.js**: v4.3.0 → v4.3.1
@@ -297,7 +308,7 @@ docs/
     - 問題の詳細説明（症状、根本原因、修正後の動作）
   - **docs/operations/rentracks-conversion-matching.md**: トラブルシューティング#6追加
     - 「id1とid2が同じ値になる」問題の解決方法を明記
-  - **ステータス**: 実装完了、GASデプロイ待ち
+  - **ステータス**: 実装完了、GASデプロイ完了（v4.3.2で追加修正）
 
 ### 2025-12-21 (2回目)
 - **GAS v4.2.0 → v4.3.0: Rentracks承認済件数対応**

@@ -183,7 +183,7 @@ eventId: "event-uuid-123"
 - ✅ Rentracks CSVとA8.net CSVの両方に対応
 - ✅ uix分割処理（v4.1.0）との整合性を保証
 
-## v4.3.1の変更点（HEADER_CANDIDATES重複検出問題の修正）
+## v4.3.1〜v4.3.2の変更点（HEADER_CANDIDATES重複検出問題の修正）
 
 ### 1. 緊急バグ修正
 
@@ -220,6 +220,44 @@ eventId: "event-uuid-123"
 - ✅ Rentracks CSV処理の正常化
 - ✅ A8.net互換性は完全に維持（パラメータ(ID2)列は検出される）
 - ✅ ユーザー操作は不要（GASコード更新のみで自動的に修正）
+
+### 4. v4.3.2 追加修正（eventId 必須チェック削除）
+
+**問題**:
+
+v4.3.1 デプロイ後、Rentracks CSV処理時に以下のエラーが発生:
+```
+エラー: id2（イベントID）カラムが見つかりません
+ヘッダー候補: パラメータ(id2), id2, eventid
+```
+
+**原因**:
+
+- GAS コード L142-145 で eventId 列の必須チェックが実装されていた
+- Rentracks CSV には eventId 列が存在しない（uix分割で対応する仕様）
+- A8.net 用の必須チェックが Rentracks CSV を不当にエラーとして扱っていた
+
+**修正内容（v4.3.2）**:
+
+```javascript
+// 修正前（v4.3.1）
+if (col.eventId < 0) {
+  SpreadsheetApp.getUi().alert('エラー: id2（イベントID）カラムが見つかりません...');
+  throw new Error('id2カラムが見つかりません');
+}
+
+// 修正後（v4.3.2）
+// eventId は任意（Rentracks: uix分割で対応、A8.net: 専用列で対応）
+if (col.eventId < 0) {
+  console.log('[info] eventId列が見つかりません。Rentracks uix形式として処理します。');
+}
+```
+
+**影響**:
+
+- ✅ Rentracks CSV が正常に処理可能に
+- ✅ A8.net CSV も引き続き正常に動作
+- ✅ エラーの代わりに情報ログを出力
 
 ## トラブルシューティング
 
