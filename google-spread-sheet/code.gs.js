@@ -1,12 +1,11 @@
-<<<<<<< HEAD
->>>>>>> origin/dev
+/**
+ * 成果CSV_RAW → クリックログ マッチング処理
  *
- * 関連コミット
-
-  a80b8d9 - FEATURE: Rentracksトラッキング対応（URLドメイン自動判定）
-  8e2a254 - FEATURE: GAS Rentracksマッチング対応（uix分割処理）
-  5a5d7bc - DOC: GASデプロイガイド作成（Rentracks対応v4.1.0）
-
+ * 関連コミット:
+ *  - a80b8d9 - FEATURE: Rentracksトラッキング対応（URLドメイン自動判定）
+ *  - 8e2a254 - FEATURE: GAS Rentracksマッチング対応（uix分割処理）
+ *  - 5a5d7bc - DOC: GASデプロイガイド作成（Rentracks対応v4.1.0）
+ *
  * -------------------------------------------------------------------
  * シート:
  *  - `成果CSV_RAW`：A8.net Parameter Tracking Report CSV貼付（ヘッダ1行＋データ）
@@ -32,7 +31,6 @@
  *
  * v4.2.0 新機能（2025-12-21）:
  *  - クリックログシートのステータスに応じた行背景色自動設定機能
-<<<<<<< HEAD
  *
  * v4.3.0 新機能（2025-12-21）:
  *  - Rentracks承認済件数（0/1）→ステータス文字列変換機能
@@ -49,7 +47,6 @@
  *  - FIX: eventId 列の必須チェックを削除
  *  - 原因: Rentracks CSV では eventId 列が存在しないためエラーが発生
  *  - 修正: eventId は任意として扱い、見つからない場合は警告ログのみ
->>>>>>> origin/dev
  */
 
 const SHEET_RAW = '成果CSV_RAW';
