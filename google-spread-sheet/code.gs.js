@@ -1,12 +1,11 @@
 /**
- * WIN×Ⅱ 成果マッチング＆ステータス色分け処理（2025/12/21 v4.2.0）
+ * 成果CSV_RAW → クリックログ マッチング処理
  *
- * 関連コミット
-
-  a80b8d9 - FEATURE: Rentracksトラッキング対応（URLドメイン自動判定）
-  8e2a254 - FEATURE: GAS Rentracksマッチング対応（uix分割処理）
-  5a5d7bc - DOC: GASデプロイガイド作成（Rentracks対応v4.1.0）
-
+ * 関連コミット:
+ *  - a80b8d9 - FEATURE: Rentracksトラッキング対応（URLドメイン自動判定）
+ *  - 8e2a254 - FEATURE: GAS Rentracksマッチング対応（uix分割処理）
+ *  - 5a5d7bc - DOC: GASデプロイガイド作成（Rentracks対応v4.1.0）
+ *
  * -------------------------------------------------------------------
  * シート:
  *  - `成果CSV_RAW`：A8.net Parameter Tracking Report CSV貼付（ヘッダ1行＋データ）
@@ -32,7 +31,22 @@
  *
  * v4.2.0 新機能（2025-12-21）:
  *  - クリックログシートのステータスに応じた行背景色自動設定機能
- *  - 背景色ルール: 空=白、未確定=薄黄(#FFF9C4)、確定=薄緑(#C8E6C9)、否認=薄赤(#FFCDD2)、キャンセル=薄グレー(#E0E0E0)、その他=濃黄(#FFD700)
+ *
+ * v4.3.0 新機能（2025-12-21）:
+ *  - Rentracks承認済件数（0/1）→ステータス文字列変換機能
+ *  - HEADER_CANDIDATES拡張: status候補に「承認済件数」を追加
+ *  - ステータス変換処理: 0→"未確定", 1→"確定"
+ *  - A8.net CSVとの下位互換性を保証
+ *
+ * v4.3.1 緊急修正（2025-12-21）:
+ *  - FIX: HEADER_CANDIDATES.eventId から uix/備考 を削除
+ *  - 原因: memberIdとeventIdが同じ列を検出し、uix分割処理が失敗
+ *  - 影響: Rentracks CSV処理の正常化（A8.net互換性は維持）
+ *
+ * v4.3.2 緊急修正（2025-12-21）:
+ *  - FIX: eventId 列の必須チェックを削除
+ *  - 原因: Rentracks CSV では eventId 列が存在しないためエラーが発生
+ *  - 修正: eventId は任意として扱い、見つからない場合は警告ログのみ
  */
 
 const SHEET_RAW = '成果CSV_RAW';
@@ -49,12 +63,10 @@ const HEADER_CANDIDATES = {
   ],
 
   eventId: [
-    // === 既存A8.net用（変更なし） ===
+    // === A8.net専用（Rentracksはuix分割で対応） ===
     'パラメータ(id2)', 'パラメータid2', 'パラメータ（id2）', 'パラメータ（ID2）', 'パラメータID2',
-    'id2', 'eventid', 'event_id', 'イベントid', 'イベントＩＤ',
-
-    // === Rentracks用を追加 ===
-    'uix', '備考', 'remarks', 'note', 'memo'
+    'id2', 'eventid', 'event_id', 'イベントid', 'イベントＩＤ'
+    // Rentracks uix/備考列はmemberId専用（eventId候補から除外）
   ],
 
   dealName: [
@@ -70,7 +82,8 @@ const HEADER_CANDIDATES = {
     'ステータス名', '承認状況', 'ステータス', '状態', 'status',
 
     // === Rentracks用を追加 ===
-    '状況', 'situation', 'approval_status'
+    '状況', 'situation', 'approval_status',
+    '承認済件数', '承認済み件数', 'approved_count', 'approved'
   ]
 };
 
@@ -124,14 +137,15 @@ function recordConversionsToClickLog() {
     status: findColIdx_(header, HEADER_CANDIDATES.status)
   };
 
-  // 必須カラムチェック
+  // 必須カラムチェック（memberIdのみ）
   if (col.memberId < 0) {
     SpreadsheetApp.getUi().alert('エラー: id1（会員ID）カラムが見つかりません\n\nヘッダー候補: パラメータ(id1), id1, memberid');
     throw new Error('id1カラムが見つかりません');
   }
+
+  // eventId は任意（Rentracks: uix分割で対応、A8.net: 専用列で対応）
   if (col.eventId < 0) {
-    SpreadsheetApp.getUi().alert('エラー: id2（イベントID）カラムが見つかりません\n\nヘッダー候補: パラメータ(id2), id2, eventid');
-    throw new Error('id2カラムが見つかりません');
+    console.log('[info] eventId列が見つかりません。Rentracks uix形式として処理します。');
   }
 
   console.log('[info] カラム検出:', col);
@@ -156,7 +170,19 @@ function recordConversionsToClickLog() {
     let memberId = safeCell_(row[col.memberId]);
     let eventId = safeCell_(row[col.eventId]);
     const dealName = col.dealName >= 0 ? safeCell_(row[col.dealName]) : '';
-    const status = col.status >= 0 ? safeCell_(row[col.status]) : '';
+    let status = col.status >= 0 ? safeCell_(row[col.status]) : '';
+
+    // ===== ここから新規追加: Rentracks承認済件数→ステータス変換処理 =====
+    // Rentracks CSVの「承認済件数」列は0/1の数値で記録されている
+    // 0 → "未確定"、1 → "確定" に変換
+    if (status === '0') {
+      status = '未確定';
+      console.log(`[info] Rentracks承認済件数変換: 0 → 未確定`);
+    } else if (status === '1') {
+      status = '確定';
+      console.log(`[info] Rentracks承認済件数変換: 1 → 確定`);
+    }
+    // ===== 新規追加ここまで =====
 
     // ===== ここから新規追加: uix パラメータ分割処理（Rentracks対応） =====
     // uix形式の場合（memberId-eventId）を分割
