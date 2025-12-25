@@ -7,6 +7,7 @@ import { Loader2 } from "lucide-react";
 import type { BlogResponse, Category } from "@/types/microcms";
 import { Card } from "@/components/ui/card";
 import { extractExcerpt } from "@/lib/blog-utils";
+import RestrictedBadge from "@/components/blog/restricted-badge";
 
 interface BlogCardProps {
   blog: BlogResponse;
@@ -55,8 +56,8 @@ export function BlogCard({ blog }: BlogCardProps) {
 
           {/* 右側: コンテンツ */}
           <div className="flex-1 p-6">
-            {/* カテゴリバッジ */}
-            <div className="flex gap-2 mb-3">
+            {/* カテゴリバッジ & 年齢制限バッジ */}
+            <div className="flex gap-2 mb-3 flex-wrap">
               {categories.slice(0, 2).map((cat) => (
                 <span
                   key={cat.id}
@@ -65,6 +66,7 @@ export function BlogCard({ blog }: BlogCardProps) {
                   {cat.name}
                 </span>
               ))}
+              {blog.restricted && <RestrictedBadge />}
             </div>
 
             {/* タイトル */}
