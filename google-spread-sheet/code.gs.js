@@ -1,12 +1,11 @@
 /**
- * WIN×Ⅱ 成果マッチング＆ステータス色分け処理（2025/12/21 v4.2.0）
+ * 成果CSV_RAW → クリックログ マッチング処理
  *
- * 関連コミット
-
-  a80b8d9 - FEATURE: Rentracksトラッキング対応（URLドメイン自動判定）
-  8e2a254 - FEATURE: GAS Rentracksマッチング対応（uix分割処理）
-  5a5d7bc - DOC: GASデプロイガイド作成（Rentracks対応v4.1.0）
-
+ * 関連コミット:
+ *  - a80b8d9 - FEATURE: Rentracksトラッキング対応（URLドメイン自動判定）
+ *  - 8e2a254 - FEATURE: GAS Rentracksマッチング対応（uix分割処理）
+ *  - 5a5d7bc - DOC: GASデプロイガイド作成（Rentracks対応v4.1.0）
+ *
  * -------------------------------------------------------------------
  * シート:
  *  - `成果CSV_RAW`：A8.net Parameter Tracking Report CSV貼付（ヘッダ1行＋データ）
@@ -15,7 +14,7 @@
  * 処理内容:
  *  - 成果CSV_RAWから id1（会員ID） + id2（イベントID）、案件名、ステータスを取得
  *  - クリックログの該当行（B列=id1, E列=id2）を検索
- *  - 該当行のF列に「申し込み案件名」、G列に「ステータス」を記録
+ *  - 該当行のF列に「申し込み案件名」、G列に「ステータス」、H列に「ASP名」を記録
  *  - G列の値に応じて行の背景色を自動設定（未確定=薄黄、確定=薄緑、否認=薄赤、キャンセル=薄グレー、その他=濃黄）
  *
  * 実行方法:
@@ -32,7 +31,28 @@
  *
  * v4.2.0 新機能（2025-12-21）:
  *  - クリックログシートのステータスに応じた行背景色自動設定機能
- *  - 背景色ルール: 空=白、未確定=薄黄(#FFF9C4)、確定=薄緑(#C8E6C9)、否認=薄赤(#FFCDD2)、キャンセル=薄グレー(#E0E0E0)、その他=濃黄(#FFD700)
+ *
+ * v4.3.0 新機能（2025-12-21）:
+ *  - Rentracks承認済件数（0/1）→ステータス文字列変換機能
+ *  - HEADER_CANDIDATES拡張: status候補に「承認済件数」を追加
+ *  - ステータス変換処理: 0→"未確定", 1→"確定"
+ *  - A8.net CSVとの下位互換性を保証
+ *
+ * v4.3.1 緊急修正（2025-12-21）:
+ *  - FIX: HEADER_CANDIDATES.eventId から uix/備考 を削除
+ *  - 原因: memberIdとeventIdが同じ列を検出し、uix分割処理が失敗
+ *  - 影響: Rentracks CSV処理の正常化（A8.net互換性は維持）
+ *
+ * v4.3.2 緊急修正（2025-12-21）:
+ *  - FIX: eventId 列の必須チェックを削除
+ *  - 原因: Rentracks CSV では eventId 列が存在しないためエラーが発生
+ *  - 修正: eventId は任意として扱い、見つからない場合は警告ログのみ
+ *
+ * v4.3.3 機能追加（2025-12-21）:
+ *  - FEATURE: クリックログH列にASP名を自動記録（"A8.net" / "Rentracks"）
+ *  - 判定ロジック: col.eventId の有無でASP判別（eventId列あり=A8.net、なし=Rentracks）
+ *  - 変更箇所: recordConversionsToClickLog() 関数内にASP判定とH列書き込みを追加
+ *  - 互換性: 既存のF/G列更新処理に影響なし
  */
 
 const SHEET_RAW = '成果CSV_RAW';
@@ -49,12 +69,10 @@ const HEADER_CANDIDATES = {
   ],
 
   eventId: [
-    // === 既存A8.net用（変更なし） ===
+    // === A8.net専用（Rentracksはuix分割で対応） ===
     'パラメータ(id2)', 'パラメータid2', 'パラメータ（id2）', 'パラメータ（ID2）', 'パラメータID2',
-    'id2', 'eventid', 'event_id', 'イベントid', 'イベントＩＤ',
-
-    // === Rentracks用を追加 ===
-    'uix', '備考', 'remarks', 'note', 'memo'
+    'id2', 'eventid', 'event_id', 'イベントid', 'イベントＩＤ'
+    // Rentracks uix/備考列はmemberId専用（eventId候補から除外）
   ],
 
   dealName: [
@@ -70,7 +88,8 @@ const HEADER_CANDIDATES = {
     'ステータス名', '承認状況', 'ステータス', '状態', 'status',
 
     // === Rentracks用を追加 ===
-    '状況', 'situation', 'approval_status'
+    '状況', 'situation', 'approval_status',
+    '承認済件数', '承認済み件数', 'approved_count', 'approved'
   ]
 };
 
@@ -89,9 +108,9 @@ function onOpen() {
  *
  * 処理フロー:
  * 1. 成果CSV_RAWからデータ読み込み
- * 2. id1, id2, 案件名, ステータスを抽出
+ * 2. id1, id2, 案件名, ステータス, ASP名を抽出
  * 3. クリックログから該当行を検索（B列=id1, E列=id2）
- * 4. 該当行のF列・G列を更新
+ * 4. 該当行のF列・G列・H列を更新
  */
 function recordConversionsToClickLog() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -124,15 +143,20 @@ function recordConversionsToClickLog() {
     status: findColIdx_(header, HEADER_CANDIDATES.status)
   };
 
-  // 必須カラムチェック
+  // 必須カラムチェック（memberIdのみ）
   if (col.memberId < 0) {
     SpreadsheetApp.getUi().alert('エラー: id1（会員ID）カラムが見つかりません\n\nヘッダー候補: パラメータ(id1), id1, memberid');
     throw new Error('id1カラムが見つかりません');
   }
+
+  // eventId は任意（Rentracks: uix分割で対応、A8.net: 専用列で対応）
+  // ASP名を判定（H列記録用）
+  let aspName = "A8.net";  // デフォルト: A8.net（eventId列がある場合）
   if (col.eventId < 0) {
-    SpreadsheetApp.getUi().alert('エラー: id2（イベントID）カラムが見つかりません\n\nヘッダー候補: パラメータ(id2), id2, eventid');
-    throw new Error('id2カラムが見つかりません');
+    aspName = "Rentracks";  // eventId列がない場合はRentracks
+    console.log('[info] eventId列が見つかりません。Rentracks uix形式として処理します。');
   }
+  console.log(`[info] 検出されたASP: ${aspName}`);
 
   console.log('[info] カラム検出:', col);
 
@@ -156,7 +180,19 @@ function recordConversionsToClickLog() {
     let memberId = safeCell_(row[col.memberId]);
     let eventId = safeCell_(row[col.eventId]);
     const dealName = col.dealName >= 0 ? safeCell_(row[col.dealName]) : '';
-    const status = col.status >= 0 ? safeCell_(row[col.status]) : '';
+    let status = col.status >= 0 ? safeCell_(row[col.status]) : '';
+
+    // ===== ここから新規追加: Rentracks承認済件数→ステータス変換処理 =====
+    // Rentracks CSVの「承認済件数」列は0/1の数値で記録されている
+    // 0 → "未確定"、1 → "確定" に変換
+    if (status === '0') {
+      status = '未確定';
+      console.log(`[info] Rentracks承認済件数変換: 0 → 未確定`);
+    } else if (status === '1') {
+      status = '確定';
+      console.log(`[info] Rentracks承認済件数変換: 1 → 確定`);
+    }
+    // ===== 新規追加ここまで =====
 
     // ===== ここから新規追加: uix パラメータ分割処理（Rentracks対応） =====
     // uix形式の場合（memberId-eventId）を分割
@@ -198,11 +234,12 @@ function recordConversionsToClickLog() {
     }
 
     if (matchedRowIndex >= 0) {
-      // F列（案件名）、G列（ステータス）を更新
+      // F列（案件名）、G列（ステータス）、H列（ASP名）を更新
       clickLogSheet.getRange(matchedRowIndex + 1, 6).setValue(dealName);  // F列（1-indexed）
       clickLogSheet.getRange(matchedRowIndex + 1, 7).setValue(status);    // G列（1-indexed）
+      clickLogSheet.getRange(matchedRowIndex + 1, 8).setValue(aspName);   // ★H列（ASP名）（1-indexed）
       matched++;
-      console.log(`[info] マッチング成功: id1=${memberId}, id2=${eventId} → 案件名=${dealName}, ステータス=${status}`);
+      console.log(`[info] マッチング成功: id1=${memberId}, id2=${eventId} → 案件名=${dealName}, ステータス=${status}, ASP=${aspName}`);
     } else {
       console.log(`[warn] マッチング失敗: id1=${memberId}, id2=${eventId} に一致するクリックログが見つかりませんでした`);
       notMatchedList.push(`id1=${memberId}, id2=${eventId}`);

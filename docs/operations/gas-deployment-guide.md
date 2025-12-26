@@ -2,7 +2,7 @@
 
 ## 概要
 
-このガイドでは、ステータス色分け対応のGASコード（v4.2.0）をGoogle Sheetsにデプロイする手順を説明します。
+このガイドでは、H列ASP名自動記録対応のGASコード（v4.3.3）をGoogle Sheetsにデプロイする手順を説明します。
 
 ## 前提条件
 
@@ -145,6 +145,205 @@ eventId: "event-uuid-123"
 2. メニュー「成果処理」→「クリックログの背景色を更新」実行
 3. 変更したステータスに応じた背景色が設定される
 
+## v4.3.0の変更点（Rentracks承認済件数対応）
+
+### 1. HEADER_CANDIDATES拡張
+
+**追加されたヘッダー候補**:
+
+- **status**: `'承認済件数'`, `'承認済み件数'`, `'approved_count'`, `'approved'`
+
+### 2. 承認済件数→ステータス変換処理
+
+**処理内容**:
+
+- Rentracks「承認済件数」列（0/1の数値）を自動的にステータス文字列に変換
+- 0 → "未確定"
+- 1 → "確定"
+
+**変換例**:
+
+```javascript
+// 入力（承認済件数列）
+0
+
+// 変換結果（G列ステータス）
+"未確定"
+
+// 入力（承認済件数列）
+1
+
+// 変換結果（G列ステータス）
+"確定"
+```
+
+### 3. 下位互換性
+
+- ✅ A8.net Parameter Tracking Report CSVの処理は既存処理を維持
+- ✅ Rentracks CSVとA8.net CSVの両方に対応
+- ✅ uix分割処理（v4.1.0）との整合性を保証
+
+## v4.3.1〜v4.3.2の変更点（HEADER_CANDIDATES重複検出問題の修正）
+
+### 1. 緊急バグ修正
+
+**修正内容**:
+
+- HEADER_CANDIDATES.eventId から `'uix'`, `'備考'`, `'remarks'`, `'note'`, `'memo'` を削除
+- これらのヘッダー候補は memberId 専用として維持
+
+### 2. 問題の詳細
+
+**症状**:
+
+- Rentracks CSV処理が完全に失敗（成功: 0件、失敗: 全件）
+- id1 と id2 が同じ値になる（例: 両方とも `0f23d556-348a-4da7-b18d-311ed5b3fd81-4a501767-adf9-49d2-8051-e1db3b671de8`）
+
+**根本原因**:
+
+- HEADER_CANDIDATES の memberId と eventId 配列に同じヘッダー候補（`'uix'`, `'備考'`等）が重複
+- `findColIdx_()` 関数が Rentracks CSV の「備考」列を memberId と eventId の両方で検出
+- 両変数が同じ列インデックスを指すため、同じ値を取得
+- uix 分割条件 `(!eventId || eventId === '')` が不成立となり、分割処理がスキップ
+- クリックログとのマッチングが失敗
+
+**修正後の動作**:
+
+1. memberId 検索: 「備考」列を検出 → 列インデックス 0
+2. eventId 検索: 該当列なし → 列インデックス -1（空文字）
+3. eventId が空のため、uix 分割条件が成立
+4. UUID v4 の 5 パーツ構造を利用して正しく分割
+5. クリックログとのマッチングが成功
+
+### 3. 影響範囲
+
+- ✅ Rentracks CSV処理の正常化
+- ✅ A8.net互換性は完全に維持（パラメータ(ID2)列は検出される）
+- ✅ ユーザー操作は不要（GASコード更新のみで自動的に修正）
+
+### 4. v4.3.2 追加修正（eventId 必須チェック削除）
+
+**問題**:
+
+v4.3.1 デプロイ後、Rentracks CSV処理時に以下のエラーが発生:
+```
+エラー: id2（イベントID）カラムが見つかりません
+ヘッダー候補: パラメータ(id2), id2, eventid
+```
+
+**原因**:
+
+- GAS コード L142-145 で eventId 列の必須チェックが実装されていた
+- Rentracks CSV には eventId 列が存在しない（uix分割で対応する仕様）
+- A8.net 用の必須チェックが Rentracks CSV を不当にエラーとして扱っていた
+
+**修正内容（v4.3.2）**:
+
+```javascript
+// 修正前（v4.3.1）
+if (col.eventId < 0) {
+  SpreadsheetApp.getUi().alert('エラー: id2（イベントID）カラムが見つかりません...');
+  throw new Error('id2カラムが見つかりません');
+}
+
+// 修正後（v4.3.2）
+// eventId は任意（Rentracks: uix分割で対応、A8.net: 専用列で対応）
+if (col.eventId < 0) {
+  console.log('[info] eventId列が見つかりません。Rentracks uix形式として処理します。');
+}
+```
+
+**影響**:
+
+- ✅ Rentracks CSV が正常に処理可能に
+- ✅ A8.net CSV も引き続き正常に動作
+- ✅ エラーの代わりに情報ログを出力
+
+## v4.3.3の変更点（H列ASP名自動記録）
+
+### 1. 新規機能: クリックログH列にASP名を記録
+
+**機能概要**:
+
+成果マッチング処理時に、成果データのソースASP（A8.netまたはRentracks）を自動判定し、クリックログのH列に記録します。
+
+**ASP判定ロジック**:
+
+| 条件 | 判定結果 | H列記録値 |
+|------|----------|-----------|
+| 成果CSV_RAW に eventId列が存在する | A8.net CSV | `"A8.net"` |
+| 成果CSV_RAW に eventId列が存在しない | Rentracks CSV | `"Rentracks"` |
+
+**実装の特徴**:
+
+- ✅ **自動判定**: 成果CSV_RAWのヘッダー構造からASPを自動識別
+- ✅ **F/G列処理との統合**: 既存の案件名・ステータス更新と同時にH列も更新
+- ✅ **下位互換性**: 既存のF/G列更新処理に影響なし
+
+### 2. クリックログシート構造（更新後）
+
+**v4.3.3での変更**:
+
+```
+A: 日時
+B: 会員ID (id1)
+C: 案件名
+D: 案件ID
+E: イベントID (id2)
+F: 申し込み案件名（GAS更新 - v4.0.0〜）
+G: ステータス（GAS更新 - v4.0.0〜）
+★H: ASP名（GAS更新 - v4.3.3新規）
+```
+
+**推奨事項**:
+
+クリックログシートのH1セルに「ASP名」または「ASP」ヘッダーを手動で追加することを推奨します（任意）。
+
+### 3. 使用例
+
+**シナリオ1: A8.net CSV処理**
+
+1. 成果CSV_RAWに A8.net Parameter Tracking Report CSV を貼り付け
+2. メニュー「成果処理」→「成果をクリックログに記録」実行
+3. クリックログ更新確認:
+   - F列: プログラム名
+   - G列: ステータス名
+   - **★H列: "A8.net"**
+
+**シナリオ2: Rentracks CSV処理**
+
+1. 成果CSV_RAWに Rentracks 注文リスト CSV を貼り付け
+2. メニュー「成果処理」→「成果をクリックログに記録」実行
+3. クリックログ更新確認:
+   - F列: プロダクト名
+   - G列: 状況（"確定" または "未確定"）
+   - **★H列: "Rentracks"**
+
+### 4. コンソールログ出力例
+
+**A8.net CSV処理時**:
+
+```
+[info] カラム検出: {memberId: 0, eventId: 1, dealName: 2, status: 3}
+[info] 検出されたASP: A8.net
+[info] マッチング成功: id1=UUID, id2=eventID → 案件名=プログラム名, ステータス=成果確定, ASP=A8.net
+```
+
+**Rentracks CSV処理時**:
+
+```
+[info] eventId列が見つかりません。Rentracks uix形式として処理します。
+[info] 検出されたASP: Rentracks
+[info] uix分割成功: memberId=UUID, eventId=eventID
+[info] マッチング成功: id1=UUID, id2=eventID → 案件名=プロダクト名, ステータス=確定, ASP=Rentracks
+```
+
+### 5. 下位互換性
+
+- ✅ 既存のF列（案件名）・G列（ステータス）更新処理は完全に維持
+- ✅ A8.net CSV、Rentracks CSV の両方で正常動作
+- ✅ v4.3.2以前のデータとの互換性あり（H列が空でもエラーなし）
+
 ## トラブルシューティング
 
 ### メニュー「成果処理」が表示されない
@@ -215,16 +414,16 @@ eventId: "event-uuid-123"
 2. ⏸️ Rentracks「注文リスト」CSVダウンロード（週1回運用）
 3. ⏸️ 成果CSV_RAWにCSV貼り付け
 4. ⏸️ GASスクリプト実行
-5. ⏸️ クリックログF/G列更新確認
+5. ⏸️ クリックログF/G/H列更新確認
 
 ## 関連ドキュメント
 
-- **プランファイル**: `.claude/plans/quirky-snuggling-hamming.md`
+- **プランファイル**: `.claude/plans/harmonic-marinating-lemon.md`
 - **GASソースコード**: `google-spread-sheet/code.gs.js`
 - **Rentracks仕様**: プランファイル「技術仕様」セクション
 
 ---
 
-**バージョン**: v4.2.0（ステータス色分け対応）
+**バージョン**: v4.3.3（H列ASP名自動記録対応）
 **最終更新**: 2025-12-21
 **作成者**: Claude Code
