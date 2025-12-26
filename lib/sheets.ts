@@ -412,6 +412,13 @@ export async function updateMember(
 
     // 現在のデータを取得
     const currentRow = rows[rowIndex];
+
+    // currentRowの存在チェック（型安全性）
+    if (!currentRow) {
+      console.error(`Row data not found at index ${rowIndex} for memberId: ${memberId}`);
+      return null;
+    }
+
     const currentMember: MemberRow = {
       memberId: currentRow[0] || "",
       name: currentRow[1] || "",
