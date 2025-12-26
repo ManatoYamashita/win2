@@ -387,6 +387,79 @@ export async function updateMemberEmailVerified(
   }
 }
 
+/**
+ * 会員情報を更新（汎用的な部分更新対応）
+ * @param memberId 会員ID
+ * @param updates 更新するフィールド（Partial型で部分更新可能）
+ * @returns 更新後の会員情報（会員が見つからない場合はnull）
+ *
+ * 注意: memberId と registeredAt は更新不可（型定義で排除）
+ */
+export async function updateMember(
+  memberId: string,
+  updates: Partial<Omit<MemberRow, "memberId" | "registeredAt">>
+): Promise<MemberRow | null> {
+  try {
+    const rows = await readSheet(SHEET_NAMES.MEMBERS, "A2:I");
+
+    // memberIdで行を検索
+    const rowIndex = rows.findIndex(row => row[0] === memberId);
+
+    if (rowIndex === -1) {
+      console.warn(`Member not found for update: ${memberId}`);
+      return null;
+    }
+
+    // 現在のデータを取得
+    const currentRow = rows[rowIndex];
+    const currentMember: MemberRow = {
+      memberId: currentRow[0] || "",
+      name: currentRow[1] || "",
+      email: currentRow[2] || "",
+      passwordHash: currentRow[3] || "",
+      birthday: currentRow[4],
+      postalCode: currentRow[5],
+      phone: currentRow[6],
+      registeredAt: currentRow[7] || "",
+      emailVerified: currentRow[8] === "TRUE" || currentRow[8] === "true",
+    };
+
+    // データをマージ
+    const updatedMember: MemberRow = {
+      ...currentMember,
+      ...updates,
+    };
+
+    // 行番号は2から開始（ヘッダー行が1行目）
+    const sheetRowNumber = rowIndex + 2;
+
+    // A列からI列までの全フィールドを更新
+    const updatedValues = [
+      updatedMember.memberId,         // A: memberId（変更不可だが一貫性のため含める）
+      updatedMember.name,              // B: 氏名
+      updatedMember.email,             // C: メールアドレス
+      updatedMember.passwordHash,      // D: パスワードハッシュ
+      updatedMember.birthday || "",    // E: 生年月日
+      updatedMember.postalCode || "",  // F: 郵便番号
+      updatedMember.phone || "",       // G: 電話番号
+      updatedMember.registeredAt,      // H: 登録日時（変更不可だが一貫性のため含める）
+      updatedMember.emailVerified === true ? "TRUE" : "FALSE", // I: メール認証状態
+    ];
+
+    await updateSheet(
+      SHEET_NAMES.MEMBERS,
+      `A${sheetRowNumber}:I${sheetRowNumber}`,
+      [updatedValues]
+    );
+
+    console.log(`Updated member ${memberId} successfully`);
+    return updatedMember;
+  } catch (error) {
+    console.error("Error updating member:", error);
+    throw error;
+  }
+}
+
 // ========================================
 // 案件マスタ関連の関数
 // ========================================

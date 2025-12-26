@@ -26,6 +26,7 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
   const pathname = usePathname();
   const isAllPostsActive = pathname === "/blog" && !currentCategoryId;
   const isCategoriesPage = pathname === "/categories";
+  const isOtonaPage = pathname === "/otona";
   const latestCategories = useMemo(() => {
     if (!Array.isArray(categories)) {
       return [];
@@ -69,6 +70,17 @@ export function CategoryNav({ categories, currentCategoryId }: CategoryNavProps)
             aria-current={isCategoriesPage ? "page" : undefined}
           >
             カテゴリ一覧へ
+          </Link>
+          <Link
+            href="/otona"
+            className={`px-3 py-1.5 rounded-md text-sm font-medium whitespace-nowrap transition-colors ${
+              isOtonaPage
+                ? "bg-orange-600 text-white shadow-md"
+                : "text-white/90 hover:bg-orange-600 hover:text-white"
+            }`}
+            aria-current={isOtonaPage ? "page" : undefined}
+          >
+            大人向け
           </Link>
         </div>
 

@@ -85,6 +85,12 @@ export default function MypageLayout({
                   登録情報
                 </Link>
                 <Link
+                  href="/mypage/profile"
+                  className="block px-4 py-2 rounded-md hover:bg-accent transition-colors"
+                >
+                  プロフィール編集
+                </Link>
+                <Link
                   href="/mypage/history"
                   className="block px-4 py-2 rounded-md hover:bg-accent transition-colors"
                 >
