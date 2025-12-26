@@ -56,6 +56,9 @@ docs/
 │   ├── 2025-01-05-afb-removal-handoff.md    ← AFB実装削除記録（Vercel Cron制限、1181行削除、A8最優先化）
 │   └── afb-postback-integration.md          ← AFBポストバック統合記録（Phase 1完了、本番運用保留）
 │
+├── MANUAL/                   ← 手動運用マニュアル（PDF形式）
+│   └── m1_a8.netの申込履歴を更新する.pdf    ← A8.net申込履歴更新手順（PDFマニュアル）
+│
 └── specs/                    ← プロジェクト仕様・外部連携情報
     ├── spec.md              ← WIN×Ⅱ プロジェクト要件定義書（システム設計・機能要件）
     ├── google.md            ← Google Sheets (win2_master) 構成・GAS仕様
@@ -176,6 +179,12 @@ docs/
 | **operations/a8-conversion-matching.md** | A8.net成果マッチング運用マニュアル | クリックログF/G列自動更新、週次CSV運用、初回検証手順、トラブルシューティング |
 | **operations/microcms-cache-revalidation.md** | microCMSキャッシュ再検証設定ガイド | ISR 60秒設定、キャッシュ問題の原因、代替案（キャッシュ無効化、Webhook）、トラブルシューティング |
 
+#### `MANUAL/` - 手動運用マニュアル（PDF形式）
+
+| ファイル | 内容 | 主要トピック |
+|---------|------|------------|
+| **m1_a8.netの申込履歴を更新する.pdf** | A8.net申込履歴更新手順 | PDF形式の手動運用マニュアル、A8.net成果データ更新フロー |
+
 ### 今後追加が想定されるドキュメントカテゴリ
 
 必要に応じて、以下のディレクトリ/ファイルを追加して構いません：
@@ -278,498 +287,100 @@ docs/
 
 このセクションは、ドキュメントの主要な更新を記録します。
 
-### 2025-12-04
+### 2025-12-21 (5回目)
+- **GAS v4.3.2 → v4.3.3: H列にASP名自動記録機能実装**
+  - **google-spread-sheet/code.gs.js**: v4.3.2 → v4.3.3
+    - FEATURE: クリックログH列にASP名を自動記録（"A8.net" / "Rentracks"）
+    - ASP判定ロジック: `col.eventId >= 0` → "A8.net"、`col.eventId < 0` → "Rentracks"
+    - 変更箇所: `findConversionsByHeaders_()` の戻り値拡張、`recordConversionsToClickLog()` のH列書き込み追加
+    - 互換性: 既存のF/G列更新処理に影響なし
+  - **docs/operations/gas-deployment-guide.md**: v4.3.3セクション追加
+    - ASP判定ロジック表、クリックログ構造図（H列追加）、使用例を追記
+  - **docs/operations/rentracks-conversion-matching.md**: クリックログ構造図更新（H列: ASP名追加）
+  - **docs/operations/a8-conversion-matching.md**: クリックログ構造図更新（H列: ASP名追加）
+  - **ステータス**: 実装完了、ドキュメント更新完了
 
-#### Rentracks成果トラッキング実装完了（Phase 1 & Phase 2 & Phase 3）
-- **operations/gas-deployment-guide.md**: 新規作成（GASデプロイガイド v1.0.0）
-  - デプロイ手順の詳細説明（Google Sheets → Apps Script編集 → コード貼り付け → 保存）
-  - v4.1.0変更点（HEADER_CANDIDATES拡張、uix分割処理）
-  - トラブルシューティングガイド（5つの問題パターンと解決策）
-  - サンプルCSVテストデータとクリックログ期待結果
-- **operations/rentracks-conversion-matching.md**: 新規作成（Rentracks成果マッチング運用マニュアル v1.0.0）
-  - システムフロー図とA8.netとの違い
-  - 週1回の運用フロー（5分、6ステップ）
-  - 詳細手順（Rentracks管理画面ログイン、注文リストCSVダウンロード、Google Sheets貼り付け、GAS実行、結果確認）
-  - トラブルシューティング（5つの問題パターン：データなし、ヘッダー検出失敗、uix分割失敗、マッチング失敗、空データ）
-  - 技術仕様（uixパラメータ形式、Rentracks「注文リスト」CSV構造、GAS処理フロー、クリックログシート構造）
-  - FAQ（8つの質問と回答：A8.net CSV同時処理、成果CSV_RAW自動クリア、処理期限、guest:UUID扱い、失敗成果の再処理、実行頻度制限、案件識別、uix分割失敗時の対処）
-- **app/api/track-click/route.ts**: Rentracks対応実装（v2.0.0）
-  - URLドメイン自動判定ロジック追加（rentracks.jp / rentracks.co.jp検出）
-  - uixパラメータ生成（`{trackingId}-{eventId}`形式）
-  - A8.net処理は既存コード維持（下位互換性保証）
-  - 詳細なログ出力（detectedASP, trackingUrl, uix値）
-- **google-spread-sheet/code.gs.js**: Rentracks対応実装（v4.1.0）
-  - HEADER_CANDIDATES拡張（memberId/eventId: 'uix', '備考', 'remarks', 'note', 'memo'）
-  - HEADER_CANDIDATES拡張（dealName: 'プロダクト', 'product'）
-  - HEADER_CANDIDATES拡張（status: '状況', 'situation', 'approval_status'）
-  - uix分割処理実装（UUID v4形式検証、5パーツ判定、guest:UUID対応）
-  - A8.net CSV処理は既存処理維持（下位互換性保証）
-- **Gitコミット**:
-  - `a80b8d9` - FEATURE: Rentracksトラッキング対応（URLドメイン自動判定）
-  - `8e2a254` - FEATURE: GAS Rentracksマッチング対応（uix分割処理）
-  - `5a5d7bc` - DOC: GASデプロイガイド作成（Rentracks対応v4.1.0）
-- **テスト結果**:
-  - ✅ TC4（Rentracks × 非会員）: uixパラメータ生成成功
-  - ✅ TC2（A8.net × 非会員）: id1/id2/eventIdパラメータ生成成功（回帰テスト合格）
-  - ✅ URLドメイン自動判定: 両ASPとも正しく検出
-  - ✅ クリックログ記録: Google Sheetsへの記録成功
-- **実装期間**: Phase 1-3完了（約8時間）
-  - Phase 1（URL判定実装、テスト実行、Vercelデプロイ）: 約4.5時間
-  - Phase 2（GAS拡張、コードレビュー、デプロイガイド）: 約3時間
-  - Phase 3（運用マニュアル作成）: 約0.5時間
-- **ステータス**: 実装完了、運用準備完了、ユーザーによるGASデプロイ待ち
-- **次のアクション**:
-  - Priority 1: ユーザーがGASエディタにコードをデプロイ（5分）
-  - Priority 2: Rentracks「注文リスト」CSVダウンロードと初回テスト実行（10分）
-  - Priority 3: 週1回の定期運用開始（5分/週）
+### 2025-12-21 (4回目)
+- **GAS v4.3.1 → v4.3.2: eventId 必須チェック削除の緊急修正**
+  - **google-spread-sheet/code.gs.js**: v4.3.1 → v4.3.2
+    - FIX: eventId 列の必須チェックを削除（L142-145）
+    - 原因: Rentracks CSV では eventId 列が存在しないためエラーが発生
+    - 修正: eventId は任意として扱い、見つからない場合は警告ログのみ
+    - 影響: Rentracks CSV が正常に処理可能に
+  - **docs/operations/gas-deployment-guide.md**: v4.3.2セクション追加
+    - v4.3.1デプロイ後のエラー詳細と修正内容を記載
+  - **ステータス**: 実装完了、GASデプロイ待ち
+
+### 2025-12-21 (3回目)
+- **GAS v4.3.0 → v4.3.1: HEADER_CANDIDATES重複検出問題の緊急修正**
+  - **google-spread-sheet/code.gs.js**: v4.3.0 → v4.3.1
+    - FIX: HEADER_CANDIDATES.eventId から uix/備考 を削除
+    - 原因: memberIdとeventIdが同じ列を検出し、uix分割処理が失敗
+    - 影響: Rentracks CSV処理の正常化（A8.net互換性は維持）
+  - **docs/operations/gas-deployment-guide.md**: v4.3.1セクション追加
+    - 問題の詳細説明（症状、根本原因、修正後の動作）
+  - **docs/operations/rentracks-conversion-matching.md**: トラブルシューティング#6追加
+    - 「id1とid2が同じ値になる」問題の解決方法を明記
+  - **ステータス**: 実装完了、GASデプロイ完了（v4.3.2で追加修正）
+
+### 2025-12-21 (2回目)
+- **GAS v4.2.0 → v4.3.0: Rentracks承認済件数対応**
+  - **google-spread-sheet/code.gs.js**: v4.2.0 → v4.3.0
+    - HEADER_CANDIDATES拡張: status候補に「承認済件数」を追加
+    - 承認済件数→ステータス変換処理実装（0→"未確定", 1→"確定"）
+    - A8.net CSVとの下位互換性を保証
+  - **docs/operations/gas-deployment-guide.md**: v4.3.0対応に更新
+    - v4.3.0の変更点セクション追加（承認済件数変換処理、変換例）
+  - **docs/operations/rentracks-conversion-matching.md**: 承認済件数の扱いを追記
+  - **ステータス**: 実装完了、GASデプロイ待ち
+
+### 2025-12-21
+- **GAS v4.2.0: クリックログシート ステータス色分け機能実装**
+  - **google-spread-sheet/code.gs.js**: v4.1.0 → v4.2.0
+    - 新規関数追加: `applyClickLogRowColors()` - G列（ステータス）の値に応じて行背景色を自動設定
+    - 背景色ルール: 空=白、未確定=薄黄(#FFF9C4)、確定=薄緑(#C8E6C9)、否認=薄赤(#FFCDD2)、キャンセル=薄グレー(#E0E0E0)、その他=濃黄(#FFD700)
+    - 自動適用: `recordConversionsToClickLog()`実行後に背景色を自動更新
+    - 手動実行: メニュー「成果処理」→「クリックログの背景色を更新」
+    - パフォーマンス最適化: バッチ処理による一括背景色設定
+  - **docs/operations/gas-deployment-guide.md**: v4.2.0対応に更新
+    - v4.2.0の変更点セクション追加（背景色ルール、使用例、メリット）
+    - メニュー確認項目に「クリックログの背景色を更新」追加
+    - バージョン情報更新（v4.2.0、2025-12-21）
+  - **ステータス**: 実装完了、GASデプロイ待ち
+
+### 2025-12-04
+- **Rentracks成果トラッキング実装完了**: `operations/gas-deployment-guide.md`, `operations/rentracks-conversion-matching.md`新規作成、URLドメイン自動判定、uixパラメータ生成
 
 ### 2025-11-23
+- **Rentracks調査報告書作成**: `operations/rentracks-investigation-report.md`新規作成（JavaScriptタグ方式、広告主連携必須、5-8週間実装見積）
 
-#### レントラックス（Rentracks）成果トラッキング実装方法調査完了
-- **operations/rentracks-investigation-report.md**: 新規作成（レントラックス調査報告書 v1.0.0）
-  - **調査範囲**: Web公開情報のみ（管理画面実機確認前）
-  - **調査結果サマリー**:
-    - レントラックスはA8.net/AFBとは根本的に異なる仕組み（URLパラメータ不可、JavaScriptタグ方式）
-    - コンバージョンタグ（`_rt.cinfo`）に会員ID・イベントIDを埋め込む方式
-    - **広告主側のタグ設置が必須**（メディア側だけでは完結しない）
-    - A8.netのようなURLパラメータ方式は使用不可
-  - **実装可否判定**:
-    - ✅ A8.net改良型（手動CSV + 広告主連携）: 実装可能（広告主連携が成功した場合）
-    - ⚠️ AFB型（自動ポーリング）: 条件付き可能（API提供があり、広告主連携も成功した場合）
-    - ❌ A8.net型（URLパラメータ）: 実装不可（レントラックスの仕様上不可）
-  - **実装前確認事項チェックリスト**:
-    - レントラックス担当者への問い合わせ事項（6項目）
-    - 広告主との調整事項（4項目）
-    - 技術実装前の確認（4項目）
-  - **推奨実装パターン**: A8.net改良型（手動CSV + 広告主連携）
-    - Phase 1: 広告主との連携設定（コンバージョンタグに`_rt.cinfo`埋め込み）
-    - Phase 2: GASコード拡張（HEADER_CANDIDATES追加）
-    - Phase 3: Google Sheets「成果CSV_RAW」へのデータ貼り付け
-    - Phase 4: クリックログのマッチング処理（既存GAS処理がそのまま動作）
-  - **リスクと注意事項**:
-    - 高リスク項目: 広告主との連携が必須、CSVフォーマットの不確定性、成果特定情報の取得失敗
-    - 推奨される対策: レントラックス担当者との密接な連携、段階的な実装、フォールバックプラン
-  - **実装スケジュール提案**: 合計5-8週間
-    - Phase 1: 情報収集（2週間）
-    - Phase 2: 広告主連携（2-4週間）
-    - Phase 3: GASコード実装（1週間）
-    - Phase 4: 運用開始（1週間）
-  - **参考リンク**: 8つの公式・技術記事リンク
-- **index.md**: 更新（operations/セクション追加、更新履歴追加 v2.3.0）
-  - ツリー構造に `rentracks-investigation-report.md` 追加
-  - `operations/` セクションのドキュメント概要テーブル新規作成（5ドキュメント）
-  - 更新履歴に2025-11-23エントリ追加
-- **ステータス**: Phase 1（情報収集）待ち、実装前の準備完了
-- **次のアクション**:
-  - Priority 1: レントラックス担当者への問い合わせ（成果レポートCSV機能、`_rt.cinfo`埋め込み可否、API提供有無）
-  - Priority 2: 広告主との連携可否の確認
-  - Priority 3: 実装判断（上記2つが成功した場合のみ、GASコード拡張を実施）
+### 2025-12-21
+- **GAS v4.2.0: クリックログシート ステータス色分け機能実装**
+  - **google-spread-sheet/code.gs.js**: v4.1.0 → v4.2.0
+    - 新規関数追加: `applyClickLogRowColors()` - G列（ステータス）の値に応じて行背景色を自動設定
+    - 背景色ルール: 空=白、未確定=薄黄(#FFF9C4)、確定=薄緑(#C8E6C9)、否認=薄赤(#FFCDD2)、キャンセル=薄グレー(#E0E0E0)、その他=濃黄(#FFD700)
+    - 自動適用: `recordConversionsToClickLog()`実行後に背景色を自動更新
+    - 手動実行: メニュー「成果処理」→「クリックログの背景色を更新」
+    - パフォーマンス最適化: バッチ処理による一括背景色設定
+  - **docs/operations/gas-deployment-guide.md**: v4.2.0対応に更新
+    - v4.2.0の変更点セクション追加（背景色ルール、使用例、メリット）
+    - メニュー確認項目に「クリックログの背景色を更新」追加
+    - バージョン情報更新（v4.2.0、2025-12-21）
+  - **ステータス**: 実装完了、GASデプロイ待ち
 
-### 2025-11-17
-
-#### microCMSキャッシュ再検証設定（ISR実装）
-- **operations/microcms-cache-revalidation.md**: 新規作成（microCMSキャッシュ再検証設定ガイド v1.0.0）
-  - 問題: microCMSコンテンツ更新がデプロイ済みサイトに反映されない（Next.js 15デフォルトキャッシング）
-  - 解決策: ISR（Incremental Static Regeneration）60秒設定
-  - 実装箇所: lib/microcms.ts、app/page.tsx、app/blog/**、app/category/**、app/api/blogs/route.ts
-  - 代替案: キャッシュ完全無効化、On-Demand Revalidation（Webhook）
-  - トラブルシューティング: ブラウザキャッシュ、CDNキャッシュ、APIレート制限
-- **コード変更**:
-  - `lib/microcms.ts`: すべてのmicroCMS関数に `customRequestInit: { next: { revalidate: 60 } }` 追加
-  - `app/page.tsx`, `app/blog/page.tsx`, `app/blog/[id]/page.tsx`, `app/category/[id]/page.tsx`: `export const revalidate = 60;` 追加
-  - `app/api/blogs/route.ts`: `export const revalidate = 60;` 追加
-- **影響**: microCMS更新後、最大60秒以内にデプロイ済みサイトに反映されるようになる
-
-### 2025-11-15
-
-#### AFB自動ポーリング + A8.net手動CSVハイブリッド実装完了（Issue #22完了）
-- **operations/afb-a8-hybrid-workflow.md**: 新規作成（AFB自動ポーリング + A8.net手動CSVハイブリッド運用マニュアル v1.0.0）
-  - AFB案件の完全自動化フロー（GitHub Actions Scheduler、10分毎ポーリング）
-  - A8.net案件の手動CSVワークフロー（週1回、所要5分）
-  - システム構成図とデータフロー図
-  - モニタリング方法（GitHub Actions実行ログ確認、Google Sheets確認）
-  - トラブルシューティング（AFB/A8.net別対策）
-  - 定期作業スケジュール（毎日自動、週次手動）
-  - 緊急時のFallback Plan
-- **operations/gas-a8net-update-guide.md**: 新規作成（Google Apps Script修正ガイド v1.0.0）
-  - A8.net Parameter Tracking Report CSV対応のためのGAS修正手順
-  - HEADER_CANDIDATES拡張（A8.net固有カラム名追加：パラメータ(ID1)、ステータス名、発生報酬額、プログラム名）
-  - APPROVED_VALUES拡張（A8.net固有ステータス値：成果確定、報酬確定、支払済）
-  - ステータス判定ロジック拡張（PENDING_VALUES、REJECTED_VALUES）
-  - A8.net CSVカラム構成とGAS変数マッピング表
-  - 実装手順（Apps Script編集、テスト実行、確認項目）
-  - トラブルシューティング
-- **operations/environment-variables-setup.md**: 新規作成（環境変数設定ガイド v1.0.0）
-  - GitHub Secrets設定（CRON_SECRET、APP_URL）
-  - Vercel環境変数設定（CRON_SECRET、AFB_PARTNER_ID、AFB_API_KEY）
-  - CRON_SECRET生成方法（OpenSSL、Node.js、オンラインツール）
-  - 設定値のバックアップとセキュア保管方法
-  - 既存環境変数との統合
-  - 動作確認手順（GitHub Actions手動実行、ログ確認、Google Sheets確認）
-  - トラブルシューティング（401 Unauthorized、500 Server Error、AFB APIエラー）
-  - セキュリティベストプラクティス（環境変数ローテーション、アクセス制限）
-- **operations/a8-conversion-matching.md**: 新規作成（A8.net成果マッチング運用マニュアル v1.0.0）
-  - システム概要（クリックログF/G列自動更新処理）
-  - Phase 1初回動作確認テスト（10分、詳細手順）
-  - 日常運用フロー（週1回、5分）
-  - A8.net Parameter Tracking Report CSV ダウンロード手順
-  - Google Sheets「成果CSV_RAW」貼り付け手順
-  - GASメニュー「成果処理」→「成果をクリックログに記録」実行手順
-  - トラブルシューティング（5つの主要問題と解決策）
-    - 問題1: 「成果処理」メニューが表示されない
-    - 問題2: ヘッダーが検出できないエラー
-    - 問題3: マッチングが失敗する（成功: 0件）
-    - 問題4: F列・G列が更新されない
-    - 問題5: 権限エラー
-  - 技術仕様（マッチングアルゴリズム、ヘッダー検出ロジック、データフォーマット）
-  - GAS実装詳細（code.gs.js v4.0.0、recordConversionsToClickLog関数）
-  - パフォーマンス最適化案（将来検討）
-  - FAQ（6つの質問と回答）
-- **.env.example**: 更新（AFB + GitHub Actions環境変数追加 v2.0.0）
-  - AFB_PARTNER_ID、AFB_API_KEY（コメント解除、実装完了マーク付き）
-  - CRON_SECRET追加（GitHub Actions認証用）
-  - A8.net注記更新（Manual CSV workflow、Media Member制限）
-- **.github/workflows/afb-sync.yml**: 新規作成（GitHub Actions Scheduler設定）
-  - 10分毎実行（cron: '*/10 * * * *'）
-  - AFB Sync API呼び出し（/api/cron/sync-afb-conversions）
-  - CRON_SECRET認証
-  - HTTPステータスコード検証
-  - エラー時の通知（失敗ログ出力）
-  - 手動実行サポート（workflow_dispatch）
-- **app/api/cron/sync-afb-conversions/route.ts**: 復元 + 認証強化（v2.0.0）
-  - コミット b8e9b98~1 からコード復元
-  - GETメソッドからPOSTメソッドに変更
-  - CRON_SECRET検証ロジック追加（Bearer token認証）
-  - 認証失敗時は401 Unauthorizedを返却
-  - CRON_SECRET未設定時は500 Server Errorを返却
-  - AFB APIポーリング処理（過去7日間の成果データ取得）
-  - 重複チェック（commit_idベース）
-  - Google Sheets「成果CSV_RAW」への自動書き込み
-- **lib/asp/afb-client.ts**: 復元（コミット b8e9b98~1 から）
-  - AFB API呼び出しロジック
-  - fetchAfbConversionsLastNDays関数
-- **lib/matching/conversion-matcher.ts**: 復元（コミット b8e9b98~1 から）
-  - 成果マッチングアルゴリズム
-- **types/afb-api.ts**: 復元（コミット b8e9b98~1 から）
-  - AFB API型定義
-  - AfbConversionData、ConversionStatus型
-- **index.md**: 更新（operations/セクション追加、更新履歴追加 v2.2.0）
-  - ツリー構造にoperations/ディレクトリ追加（3ドキュメント）
-  - 更新履歴に2025-11-15エントリ追加
-- **実装結果**:
-  - ✅ AFB自動ポーリング: GitHub Actions Schedulerで10分毎実行、完全自動化
-  - ✅ A8.net手動CSV: 週1回手動ダウンロード→Google Sheets貼り付け（所要5分）
-  - ✅ 両ASP成果統合: 「成果データ」シートで一元管理
-  - ✅ セキュリティ: CRON_SECRET認証によるAPI保護
-  - ✅ 運用マニュアル: 完全な運用フロー文書化
-  - ✅ 環境変数ガイド: GitHub Secrets + Vercel設定手順完備
-- **A8.net Parameter Tracking検証完了（Issue #22）**:
-  - ✅ Parameter Tracking Report機能確認済み（CSV出力成功）
-  - ✅ id1カラム存在確認（memberID正常記録）
-  - ✅ ステータス名カラム確認（未確定/確定/否認対応）
-  - ✅ 成果データ完全性確認（報酬額、成果ID、日時情報）
-  - ✅ GitHub Issue #22完了報告投稿
-  - ✅ Phase 2-4完了（A8.net Parameter Tracking検証成功）
-- **specs/google.md**: 更新（GASコードA8.net対応版に全面書き換え v2.0.0）
-  - HEADER_CANDIDATES拡張（A8.net Parameter Tracking Report固有カラム名対応）
-    - memberId: パラメータ(id1)、パラメータid1、パラメータ（id1）、パラメータ（ID1）、パラメータID1 追加
-    - reward: 発生報酬額、確定報酬額 追加
-    - status: ステータス名 追加
-    - dealName: プログラム名 追加
-  - APPROVED_VALUES拡張（A8.net固有ステータス値対応）
-    - 成果確定、報酬確定、支払済、支払い済み 追加
-  - PENDING_VALUES新規追加（未確定ステータス判定）
-    - 未確定、成果発生、未承認、審査中、確認中
-  - REJECTED_VALUES新規追加（否認ステータス判定）
-    - 否認、却下、非承認、キャンセル、取消、無効
-  - isApprovedStatus_関数拡張（ステータス判定ロジック強化）
-    - 未確定・否認の明示的判定追加
-    - PENDING_VALUES、REJECTED_VALUESによる厳密なステータス判定
-  - ✅ A8.net Parameter Tracking Report CSV完全対応
-  - ✅ AFB APIポーリングとのデータ統合対応
-  - ✅ 複数ASPの柔軟なCSVフォーマット対応
-- **google-spread-sheet/code.gs.js**: 更新（onEditトリガー実装、時間ベーストリガー削除 v3.0.0）
-  - onEdit()トリガー関数追加（141-189行目）
-    - 「成果CSV_RAW」シートへのCSV貼り付けを検知
-    - 複数行・複数列の編集のみ処理（単一セル編集は無視）
-    - 即座にrunImportAndAggregate()を実行
-    - エラーハンドリング追加（例外を投げずログ出力のみ）
-  - setupTrigger()関数削除（旧141-156行目）
-    - 毎日3:10の時間ベーストリガー不要（A8.net手動CSV即時処理）
-  - onOpen()メニュー更新（75-82行目）
-    - 「毎日 03:10 自動実行を設定」メニュー項目削除
-    - 「CSV取込→集計」と「設定...」のみ表示
-  - ファイルヘッダーコメント更新（1-27行目）
-    - 更新日を2025/11/15に変更
-    - トリガー説明を「onEdit()自動実行 + 手動実行」に更新
-    - A8.net対応内容を明記
-  - 動作仕様変更
-    - 旧: 毎日3:10自動実行 + メニューから手動実行
-    - 新: CSV貼り付け時に即座に自動実行 + メニューから手動実行
-  - ⚠️ 注意: API経由の書き込み（AFB自動ポーリング）は検知不可
-  - 📝 TODO: AFB成果の処理方法は別途検討（Web App化 or 時間トリガー）
-- **ステータス**: AFB自動ポーリング実装完了、A8.net手動CSV即時処理実装完了、GASコードA8.net対応完了、運用ドキュメント完備、Phase 2-4完了、Issue #22完了
-
-### 2025-01-09
-
-#### A8.net Parameter Tracking検証完了 - Media Member契約では利用不可の可能性が高い（Issue #22）
-- **dev/a8-support-inquiry-final.md**: 新規作成（A8.netサポート問い合わせ最終版 v1.0.0）
-  - 公式ドキュメントURL統合（パラメータ計測ガイド、新レポートヘルプ、レポートリニューアル案内）
-  - 検証期間と実施内容の詳細記述（2025-10-13〜2025-01-09、9回クリック）
-  - 問題状況の明確化（Parameter Tracking Report表示なし、複数検索条件でも表示されず）
-  - 4つの質問項目（利用可否、正しい手順、データ反映時間、代替方法）
-  - 期待される回答パターン4種（利用可能、利用不可、条件付き、設定必要）
-  - 回答後のアクションプラン（利用可/不可それぞれのタイムライン）
-  - 問い合わせ記録フォーマット
-- **dev/github-issue-22-update.md**: 既存（GitHub Issue #22更新用テンプレート v1.0.0）
-  - 検証完了レポート（2025-10-13〜2025-01-09、約4週間）
-  - WIN×Ⅱシステム実装100%完了確認（id1/eventId付与、Google Sheets記録、GAS処理）
-  - A8.net連携確認（過去30日間で9回クリック記録、日別レポートで確認済み）
-  - Parameter Tracking Report検証結果（データ表示なし、複数条件試行も表示されず）
-  - 暫定結論（Media Member契約では利用不可の可能性が極めて高い）
-  - 次のアクション（サポート問い合わせ、代替ASP調査）
-  - タイムライン（1週間以内にIssue完了判定）
-- **asp-api-integration.md**: 更新（A8.net検証結果セクション追加 v2.1.0）
-  - 「Verification Results (2025-01-09) - Parameter Tracking Unavailable」セクション新設
-  - Executive Summary（4週間テスト、Parameter Tracking表示なし、Media Member制限可能性）
-  - Verification Timeline（5フェーズ表形式）
-  - Detailed Test Results（WIN×Ⅱ実装100%、A8.net記録正常、Parameter Tracking表示なし）
-  - 30-Day Click History（日付別9回クリック詳細）
-  - Tentative Conclusion（5つの証拠）
-  - Next Actions（Priority 1: サポート問い合わせ、Priority 2: 代替ASP調査）
-  - Implementation Decision Matrix（Scenario A/B）
-  - Related Documentation（4ドキュメントへのリンク）
-  - Official A8.net Documentation References（3公式ドキュメント）
-- **CLAUDE.md**: 更新（Phase 2-4セクション追加 v2.0.1）
-  - 「Phase 2-4: A8.net Parameter Tracking検証」セクション新設
-  - Status（検証完了、Media Member利用不可の可能性）
-  - Technical Implementation（100%完了、id1/eventId付与、Google Sheets連携）
-  - System Verification（9回クリック、A8.net記録確認済み）
-  - Parameter Tracking Report Results（データ表示なし、複数検索パターン試行）
-  - Documentation Created（4ドキュメント作成完了）
-  - Next Actions（3つの優先度付きアクション）
-  - Implementation Status Summary（技術実装完了、機能利用不可、ドキュメント完了）
-- **index.md**: 更新（新規ドキュメント参照追加 v2.1.0）
-  - ツリー構造に `a8-support-inquiry-final.md` と `github-issue-22-update.md` を追加
-  - ドキュメント概要テーブルに新規ドキュメント2件を追加
-  - 更新履歴セクションに 2025-01-09 エントリ追加
-- **検証結果**:
-  - WIN×Ⅱシステム: ✅ 正常動作（id1/eventId付与、Google Sheets記録、GAS処理）
-  - A8.net連携: ✅ 正常動作（9回クリック記録確認）
-  - Parameter Tracking Report: ❌ データ表示なし（3週間以上経過、複数検索条件試行も表示されず）
-  - 暫定結論: Media Member契約では Parameter Tracking 機能が利用できない可能性が極めて高い
-- **次のステップ**:
-  - Priority 1: A8.netサポートへ問い合わせ（`a8-support-inquiry-final.md` 使用）
-  - Priority 2: 代替ASP調査（もしも、バリューコマース、AFB再実装）
-
-#### Landing Page Refresh & AFB Workflow Pause（2025-01-09追記）
-- **design/landing-page-refresh-2025-01-09.md**: Heroアニメーション刷新、Latest Blogsリスト再構成、Highlight/Serviceセクションの挙動変更、CTAレスポンシブ仕様などを整理。今後のメンテ指針を明文化。
-- **operations/afb-a8-hybrid-workflow.md**: AFB成果同期GitHub Actionsを一時停止した旨と、再開手順メモを追加。
-  - Priority 3: GitHub Issue #22更新（`github-issue-22-update.md` 使用）
-- **ステータス**: 検証完了、ドキュメント作成完了、サポート問い合わせ待ち
-
-### 2025-01-04
-
-#### ASP統合調査完了 - A8.net制限判明、AFB優先実装へ移行
-- **specs/asp/a8net-api.md**: Media Member制限警告追加（v2.0.0）
-  - **⚠️ 重要な発見**: WIN×ⅡのA8.net契約は「Media Member（メディア会員）」のため、個別成果トラッキングが不可能
-  - **制限内容**: A8.net確定API v3（広告主専用）にアクセス不可、個別の成果データ（order_no, order_click_date）取得不可、カスタムトラッキングパラメータ（id1, eventId）の個別マッチング不可
-  - **利用可能な機能**: 集計レポート（プログラム別総報酬額、クリック数）、手動CSVエクスポート
-  - **代替実装方法**: 3つのオプション（AFB優先実装、A8.netサポート問い合わせ、広告主契約変更）を明記
-  - **ドキュメント構造変更**: 冒頭に制限事項セクション追加、既存のAPI仕様セクションに「広告主契約前提」注記
-- **specs/asp/afb-implementation-guide.md**: 新規作成（AFBポストバック完全実装ガイド v1.0.0）
-  - **なぜAFB優先か**: A8.net制限、AFBの優位性（ポストバック対応、会員別トラッキング可能）、実装難易度の低さ、所要時間（2-3日）
-  - **AFBポストバック仕様**: エンドポイント形式、パラメータ仕様（paid, u, price, judge, adid, time）、ステータス変換ロジック
-  - **実装手順**:
-    - Phase 1: AFB管理画面設定（ポストバックURL登録、通知タイプ設定、IPアドレス確認）
-    - Phase 2: Webhookエンドポイント実装（`app/api/webhooks/afb-postback/route.ts`、Google Sheets関数追加）
-    - Phase 3: セキュリティ強化（環境変数設定、署名検証）
-    - Phase 4: テスト（ローカルテスト、E2Eテスト、デプロイ前チェックリスト）
-  - **データフロー**: クリック→/api/track-click→AFBアフィリエイトURL→ユーザー申し込み→AFBポストバック→Webhook→Google Sheets→GAS→会員マイページ
-  - **トラブルシューティング**: 4つの問題パターン（ポストバック届かない、重複データ、IPブロック、Google Sheets書き込みエラー）と対策
-  - **運用ドキュメント**: 日次モニタリング、週次メンテナンス、月次レポート
-  - **今後の拡張**: ステータス更新自動反映、案件名自動取得、エラー通知
-- **index.md**: ASP統合ドキュメント構造追加
-  - **ツリー構造更新**: `specs/asp/` ディレクトリ追加（a8net-api.md, afb-implementation-guide.md）
-  - **セクション追加**: `specs/asp/` - ASP統合仕様・実装ガイド
-  - **実装優先度明記**: AFB（最優先）> A8.net（集計レポートのみ）
-  - **制限事項サマリー**: A8.net（Media Member契約では個別成果トラッキング不可）、AFB（リアルタイムポストバック対応）、実装方針（AFB優先、A8.net集計のみ）
-- **調査結果**:
-  - A8.net Media Member契約の詳細確認（`docs/asp-api-integration.md`との照合）
-  - A8.net公式ドキュメント（https://document.a8.net/）で最新仕様確認
-  - 現在の実装状況確認（/api/track-click、Google Sheets構造、GASスクリプト）
-  - ギャップ分析（ドキュメント提案 vs 現実の制限）
-- **実装計画確定**:
-  - Phase 0: ドキュメント更新（完了）
-  - Phase 1: AFBポストバック実装（次のステップ）
-  - Phase 2: A8.netサポート問い合わせ（並行）
-  - Phase 3: テスト・本番稼働
-- **ステータス**: ASP統合調査完了、AFB実装ガイド完成、Phase 0ドキュメント更新完了、Phase 1実装準備完了
-
-### 2025-01-03
-
-#### DNS制限によるメール機能の制御（RESEND_VALIDフィーチャーフラグ実装・検証完了）
-- **architecture/dns-infrastructure.md**: 新規作成（DNS/メールインフラ構成ドキュメント v1.0.0）
-  - Wix.com + Vercel構成の詳細説明
-  - **Wix DNS制限**: MXレコード/NSレコードの書き換え禁止によりResend完全統合が不可
-  - **RESEND_VALIDフィーチャーフラグ**: 環境変数でメール機能を制御
-    - `RESEND_VALID=false`（デフォルト）: メール認証スキップ、会員登録時に即座に認証済み
-    - `RESEND_VALID=true`: 通常のメール認証フロー（DNS移管後のみ推奨）
-  - 代替メールサービスの検討（SendGrid, AWS SES, Mailgun, Postmark, Brevo）
-  - ドメイン移管の選択肢（Cloudflare, Route 53, Google Domains）
-  - トラブルシューティング、運用フロー、セキュリティ考慮事項
-  - **✅ 検証完了**: 会員登録・ログイン・ログアウト正常動作確認（`RESEND_VALID=false`構成）
-  - **ステータス**: DNS制限の完全な文書化完了、フィーチャーフラグ実装完了、動作検証完了
-- **CLAUDE.md**: Phase 2実装ステータス更新
-  - メール認証システムとパスワードリセットフローに「Feature Flag Controlled」注記追加
-  - 環境変数セクションに`RESEND_VALID`の説明追加
-- **guides/email-setup.md**: DNS制限セクション追加
-  - Wix DNS制限の詳細説明
-  - `RESEND_VALID`環境変数の使用方法
-  - `docs/architecture/dns-infrastructure.md`へのリンク
-- **コード変更**:
-  - `lib/email.ts`: `isResendValid`フィーチャーフラグ実装
-  - `app/api/register/route.ts`: RESEND_VALIDによる条件分岐（メール認証スキップ/有効）
-  - `app/api/forgot-password/route.ts`: RESEND_VALID=falseで503エラー返却
-  - `app/api/resend-verification/route.ts`: RESEND_VALID=falseで503エラー返却
-  - `.env.local` / `.env.example`: `RESEND_VALID=false`環境変数追加
-
-### 2025-10-30
-
-#### 全ページ包括的SEO実装完了
-- **seo-implementation.md**: 新規作成（SEO実装ガイド v1.0.0）
-  - 実装範囲: 7ページ（ホーム、ログイン、会員登録、ブログ詳細、ブログ一覧、カテゴリ、ルートレイアウト）
-  - **Phase 1**: 主要ページ（ホーム、ログイン、会員登録）のメタデータ・JSON-LD実装
-    - app/page.tsx: サーバーコンポーネント化（useScrollReveal削除）、Organization・WebSiteスキーマ
-    - app/login/layout.tsx: クライアントコンポーネント用layout作成、WebPageスキーマ
-    - app/register/layout.tsx: クライアントコンポーネント用layout作成、WebPageスキーマ
-  - **Phase 2**: ブログ関連ページのSEO拡張
-    - app/blog/[id]/page.tsx: Articleスキーマ追加（動的メタデータ生成）
-    - app/blog/page.tsx: Twitter Card + CollectionPageスキーマ追加
-    - app/category/[id]/page.tsx: OpenGraph完全実装 + Twitter Card + CollectionPageスキーマ
-  - **Phase 3**: ルートレイアウトSEO拡張
-    - app/layout.tsx: title.template設定、包括的なOGP・Twitter Card・robots設定
-  - **技術仕様**:
-    - Next.js 15 Metadata API使用
-    - 全ページで `/ogp.jpg` (1200x630px) 使用
-    - JSON-LD: Organization, WebSite, WebPage, Article, CollectionPageスキーマ
-    - robots設定: index/follow + googleBot詳細設定
-    - canonical URL設定
-  - **検証方法**: Lighthouse SEO監査、OGP検証ツール、JSON-LD検証、Rich Results Test
-  - **今後の改善案**: BreadcrumbList・FAQ・HowToスキーマ、サイトマップ生成、RSSフィード、i18n対応
-  - **ステータス**: 全ページSEO実装完了、検証待ち
-
-### 2025-10-29
-
-#### Resend.com 詳細セットアップ手順書作成
-- **resend-setup.md**: 新規作成（Resend.com 完全セットアップガイド v1.0.0）
-  - アカウント作成手順（サインアップ、ダッシュボード確認）
-  - ドメイン追加（Region選択、ルートドメイン vs サブドメイン）
-  - **DNS設定詳細**（最重点）:
-    - SPF レコード（TXT）の設定方法と例（お名前.com、Cloudflare）
-    - DKIM レコード（TXT）の設定方法と例
-    - Return-Path レコード（CNAME）の設定方法と例
-    - DMARC レコード（TXT）のオプション設定
-    - DNS反映確認方法（dig コマンド、オンラインツール）
-  - ドメイン検証手順（緑チェックマーク確認）
-  - APIキー取得と環境変数設定
-  - テスト送信（会員登録、パスワードリセット）
-  - トラブルシューティング（5つの問題パターンと対策）
-  - チェックリスト、所要時間、参考リンク
-  - **ステータス**: 本番環境用DNS設定ガイド完成
-
-#### ブログ機能の完全統合とorigin/devブランチマージ（Phase 3完了）
-- **feature/blog-markdown-styling と origin/dev のマージ**
-  - Phase 2（メール認証、パスワードリセット機能）の実装を保持
-  - Phase 3（ブログ機能）の実装を統合
-  - コンフリクト解決: app/page.tsx, package.json, blog関連ファイル, lib/utils.ts, lib/sheets.ts, docs/index.md
-- **feature/phase2-advanced-features からブログ機能を統合**
-  - `app/blog/page.tsx`: ブログ一覧ページ（ページネーション対応）
-  - `app/blog/[id]/page.tsx`: ブログ詳細ページ（SEO/OGP対応）
-  - `app/category/[id]/page.tsx`: カテゴリページ（フィルタリング対応）
-  - `components/blog/blog-card.tsx`: ブログカードコンポーネント
-  - `components/deal/deal-cta-button.tsx`: 案件CTAボタンコンポーネント
-  - `components/ui/pagination.tsx`: ページネーションコンポーネント
-  - `lib/blog-utils.ts`: ブログユーティリティ（excerpt生成）
-  - `lib/utils.ts`: formatDate関数追加（日本語日付フォーマット）
-  - `app/page.tsx`: トップページはorigin/devの詳細なコンテンツを採用
-  - **型修正**: Blog.category を Category[] 配列型に対応
-  - **ステータス**: Phase 2 + Phase 3 統合完了、microCMS連携確認済み
-
-#### Markdownパース機能の完全化とスタイリング最適化
-- **@tailwindcss/typography プラグイン統合**
-  - `tailwind.config.ts`: typographyプラグインを追加
-  - `components/blog/blog-content.tsx`: proseクラスをオレンジテーマに最適化
-    - 見出し（H1-H6）のスタイリング強化
-    - リスト（ul/ol）、引用（blockquote）のデザイン改善
-    - コードブロック（inline/block）のシンタックスハイライト対応
-    - テーブル、画像、リンクのレスポンシブ対応
-  - `react-markdown`, `remark-gfm`, `rehype-raw`: Phase 2依存関係と共存
-  - `lib/sheets.ts`: TypeScript型エラー修正（parseFloat型安全性向上）
-  - **ステータス**: Markdown表示機能完全対応、スタイリング最適化完了
-### 2025-10-27
-- **Phase 3 CTA機能 実装完了**
-  - `guides/cta-shortcode-guide.md`: 新規作成（クライアント向けCTAショートコード使用ガイド v1.0.0）
-    - Google Sheetsへの案件登録手順（2フィールドのみ入力、残り5フィールドは自動入力）
-    - microCMSブログ記事内でのショートコード使用方法 `[CTA:dealId]`
-    - トラッキング仕組みの解説（会員/非会員の識別、eventID生成）
-    - FAQ とトラブルシューティング
-  - `guides/cta-technical-guide.md`: 新規作成（開発者向けCTA技術仕様 v1.0.0）
-    - システムアーキテクチャ図とデータフロー
-    - BlogContentコンポーネントの実装詳細（Markdown/HTML自動判定、State駆動レンダリング）
-    - /api/track-click の実装仕様
-    - Google Sheets API統合とGAS自動化の詳細
-    - デバッグ手法、テスト戦略、パフォーマンス最適化、セキュリティ考慮事項
-  - `specs/google.md`: カラムマッピング修正（v1.1.0）
-    - 案件マスタのカラム構造を実装に合わせて修正（A=アフィリエイトURL, B=案件ID）
-    - GASコードのonEdit監視カラムを修正（D列→A列）
-    - 全てのヘッダーを日本語に統一
-  - `lib/sheets.ts`, `types/sheets.ts`: カラムマッピング修正
-    - getDealById関数のB列検索修正
-    - カラムインデックスを正しいマッピングに修正
-  - `components/blog/blog-content.tsx`: 完全リファクタリング（v2.0.0）
-    - State駆動レンダリングに変更（dangerouslySetInnerHTML前にショートコード変換）
-    - Markdown/HTML自動判定機能追加（react-markdown, remark-gfm, rehype-raw導入）
-    - イベントハンドラーのライフサイクル管理を改善
-  - **ステータス:** CTA機能完全実装完了、動作確認待ち
-
-### 2025-10-26
-- **Phase 3 ブログ機能 実装完了**
-  - `microcms-setup.md`: 新規作成（microCMS完全セットアップガイド v1.0.0）
-    - 3つのAPI（blogs, deals, categories）の詳細なフィールド定義
-    - サンプルデータとベストプラクティス
-    - トラブルシューティングガイド
-  - 実装したコンポーネント・ページ:
-    - BlogCard, DealCTAButton, Pagination コンポーネント
-    - ブログ一覧（/blog）、詳細（/blog/[slug]）、カテゴリ（/category/[slug]）ページ
-    - トップページ更新（ヒーローセクション + 最新記事表示）
-  - SEO/OGP対応、ページネーション、レスポンシブデザイン完備
-  - **ステータス:** 実装完了、microCMSへのコンテンツ登録待ち
-
-- **Phase 2-1 Email Verification & Password Reset 開発環境テスト完了**
-  - `email-setup.md`: トラブルシューティング追加（v1.0.1）
-    - 環境変数の設定ミス（`RESEND_FROM_EMAIL` 未設定、`NEXT_PUBLIC_APP_URL` 誤設定）の解決方法を追加
-    - 開発環境でのメール送信テスト完了を確認
-  - **ステータス:** 開発環境テスト完了、本番用ドメイン取得待ち
-
-### 2025-10-25
-- **Phase 2-1 Email Verification & Password Reset 実装完了**
-  - `email-setup.md`: 新規作成（Email送信設定の完全ガイド v1.0.0）
-    - Resend開発環境セットアップ手順
-    - 将来の本番環境移行計画（ドメイン取得、DNS設定）
-    - トラブルシューティングガイド
-    - メール送信の技術仕様
-  - `index.md`: email-setup.md への参照追加、ドキュメント概要更新
-  - **重要:** 現在は開発環境用（`onboarding@resend.dev`）で稼働中、本番用ドメイン取得が必要
-
-### 2025-01-25
-- **Phase 1 実装状況を反映**
-  - `specs/spec.md`: 技術スタックに具体的なバージョン番号を追加（Next.js 15.1.4、React 19、TailwindCSS v3.4.1 等）
-  - `specs/spec.md`: Phase 1 チェックリストを更新し、70%完了状況を反映
-  - 完了項目: Next.js初期化、TailwindCSS、microCMS SDK、Google Sheets API、shadcn/ui、基本レイアウト
-  - 実装中: Next-Auth設定
-  - `dev/architecture.md`: 新規作成（ディレクトリ構成とTypeScript設定の詳細を文書化）
-  - 本ファイル（`index.md`）: 更新履歴セクション追加
+### 2025-12-21
+- **GAS v4.2.0: クリックログシート ステータス色分け機能実装**
+  - **google-spread-sheet/code.gs.js**: v4.1.0 → v4.2.0
+    - 新規関数追加: `applyClickLogRowColors()` - G列（ステータス）の値に応じて行背景色を自動設定
+    - 背景色ルール: 空=白、未確定=薄黄(#FFF9C4)、確定=薄緑(#C8E6C9)、否認=薄赤(#FFCDD2)、キャンセル=薄グレー(#E0E0E0)、その他=濃黄(#FFD700)
+    - 自動適用: `recordConversionsToClickLog()`実行後に背景色を自動更新
+    - 手動実行: メニュー「成果処理」→「クリックログの背景色を更新」
+    - パフォーマンス最適化: バッチ処理による一括背景色設定
+  - **docs/operations/gas-deployment-guide.md**: v4.2.0対応に更新
+    - v4.2.0の変更点セクション追加（背景色ルール、使用例、メリット）
+    - メニュー確認項目に「クリックログの背景色を更新」追加
+    - バージョン情報更新（v4.2.0、2025-12-21）
+  - **ステータス**: 実装完了、GASデプロイ待ち
 
 ### 2025-12-21
 - **GAS v4.2.0: クリックログシート ステータス色分け機能実装**
@@ -798,6 +409,43 @@ docs/
     - `app/page.tsx`, `app/blog/page.tsx`, `app/blog/[id]/page.tsx`, `app/category/[id]/page.tsx`: `export const revalidate = 60;` 追加
     - `app/api/blogs/route.ts`: `export const revalidate = 60;` 追加
   - **影響**: microCMS更新後、最大60秒以内にデプロイ済みサイトに反映されるようになる
+
+### 2025-11-15
+- **AFB自動ポーリング + A8.net手動CSVハイブリッド実装完了**: `operations/`配下4ドキュメント新規作成、GitHub Actions 10分毎実行、GAS v3.0.0（onEditトリガー）、A8.net Parameter Tracking検証完了
+
+### 2025-01-09
+- **A8.net Parameter Tracking検証完了**: `dev/a8-support-inquiry-final.md`, `dev/github-issue-22-update.md`新規作成、Media Member契約では利用不可の可能性が高い
+
+### 2025-01-04
+- **ASP統合調査完了**: `specs/asp/a8net-api.md` v2.0.0（Media Member制限警告）、`specs/asp/afb-implementation-guide.md`新規作成、AFB優先実装へ移行
+
+### 2025-01-03
+- **DNS制限によるメール機能の制御**: `architecture/dns-infrastructure.md`新規作成、RESEND_VALIDフィーチャーフラグ実装・検証完了
+
+### 2025-10-30
+- **全ページ包括的SEO実装完了**: `dev/seo-implementation.md`新規作成（7ページのメタデータ・OGP・Twitter Card・JSON-LD）
+
+### 2025-10-29
+- **Resend.com詳細セットアップ手順書作成**: `guides/resend-setup.md`新規作成
+- **ブログ機能の完全統合**: `app/blog/**`, `components/blog/**`実装、`@tailwindcss/typography`プラグイン統合
+
+### 2025-10-27
+- **Phase 3 CTA機能実装完了**: `guides/cta-shortcode-guide.md`, `guides/cta-technical-guide.md`新規作成、`components/blog/blog-content.tsx` v2.0.0
+
+### 2025-10-26
+- **Phase 3 ブログ機能実装完了**: `guides/microcms-setup.md`新規作成、BlogCard/DealCTAButton/Paginationコンポーネント実装
+
+### 2025-10-25
+- **Phase 2-1 Email Verification & Password Reset実装完了**: `guides/email-setup.md`新規作成
+
+### 2025-01-25
+- **Phase 1 実装状況を反映**
+  - `specs/spec.md`: 技術スタックに具体的なバージョン番号を追加（Next.js 15.1.4、React 19、TailwindCSS v3.4.1 等）
+  - `specs/spec.md`: Phase 1 チェックリストを更新し、70%完了状況を反映
+  - 完了項目: Next.js初期化、TailwindCSS、microCMS SDK、Google Sheets API、shadcn/ui、基本レイアウト
+  - 実装中: Next-Auth設定
+  - `dev/architecture.md`: 新規作成（ディレクトリ構成とTypeScript設定の詳細を文書化）
+  - 本ファイル（`index.md`）: 更新履歴セクション追加
 
 ---
 

@@ -46,6 +46,7 @@ export interface Blog {
   content: string;               // リッチエディタコンテンツ（HTML形式）
   thumbnail?: MicroCMSImage;     // サムネイル画像（オプション）
   category?: Category;           // 単一カテゴリ参照（microCMS設定に準拠）
+  restricted?: boolean;          // 年齢制限フラグ（20歳以上限定コンテンツ）
 }
 
 export type BlogResponse = Blog & MicroCMSDate;

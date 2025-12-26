@@ -50,7 +50,7 @@ export const getBlogs = async (queries?: BlogQueries) => {
     queries: {
       ...queries,
       // categoryの詳細情報を取得
-      fields: queries?.fields || "id,title,content,thumbnail,category.id,category.name,category.description,publishedAt,createdAt,updatedAt,revisedAt",
+      fields: queries?.fields || "id,title,content,thumbnail,category.id,category.name,category.description,restricted,publishedAt,createdAt,updatedAt,revisedAt",
     },
     customRequestInit: {
       next: { revalidate: 60 }, // 60秒ごとに再検証
@@ -77,7 +77,7 @@ export const getBlogById = async (contentId: string, queries?: BlogQueries) => {
     queries: {
       ...queries,
       // categoryの詳細情報を取得
-      fields: queries?.fields || "id,title,content,thumbnail,category.id,category.name,category.description,publishedAt,createdAt,updatedAt,revisedAt",
+      fields: queries?.fields || "id,title,content,thumbnail,category.id,category.name,category.description,restricted,publishedAt,createdAt,updatedAt,revisedAt",
     },
     customRequestInit: {
       next: { revalidate: 60 }, // 60秒ごとに再検証

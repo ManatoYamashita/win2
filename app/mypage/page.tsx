@@ -179,6 +179,15 @@ export default function MypagePage() {
             >
               ブログで最新情報を見る
             </Link>
+            <Link
+              href="/mypage/profile"
+              className={cn(
+                buttonVariants({ size: "lg" }),
+                "rounded-full border-2 border-white bg-transparent px-8 text-white shadow-lg hover:bg-white/10"
+              )}
+            >
+              登録情報を編集する
+            </Link>
           </div>
         </motion.div>
         <motion.div variants={fadeUpVariants}>
