@@ -24,7 +24,7 @@ interface HistoryItem {
   dealName: string;           // 案件名
   dealId: string;             // 案件ID
   eventId: string;            // イベントID
-  status: string | null;      // ステータス（未確定/成果確定/否認、G列が空の場合はnull）
+  status: string | null;      // ステータス（未確定/確定/否認、G列が空の場合はnull）
   statusLabel: string | null; // ステータス表示ラベル（G列が空の場合はnull）
   originalReward?: number;    // 原始報酬額（参考、成果がある場合）
 }
@@ -87,9 +87,9 @@ export async function GET(_request: NextRequest) {
           status = "pending";
           statusLabel = "未確定";
           originalReward = result?.originalReward;
-        } else if (normalizedStatus.includes("成果確定") || normalizedStatus.includes("確定") || normalizedStatus.includes("approved")) {
+        } else if (normalizedStatus.includes("確定") || normalizedStatus.includes("確定") || normalizedStatus.includes("approved")) {
           status = "approved";
-          statusLabel = "成果確定";
+          statusLabel = "確定";
           originalReward = result?.originalReward;
         } else if (normalizedStatus.includes("否認") || normalizedStatus.includes("cancelled")) {
           status = "cancelled";
@@ -106,9 +106,9 @@ export async function GET(_request: NextRequest) {
           status = "pending";
           statusLabel = "未確定";
           originalReward = result.originalReward;
-        } else if (resultStatus.includes("成果確定") || resultStatus.includes("確定") || resultStatus.includes("approved")) {
+        } else if (resultStatus.includes("確定") || resultStatus.includes("確定") || resultStatus.includes("approved")) {
           status = "approved";
-          statusLabel = "成果確定";
+          statusLabel = "確定";
           originalReward = result.originalReward;
         } else if (resultStatus.includes("否認") || resultStatus.includes("cancelled")) {
           status = "cancelled";

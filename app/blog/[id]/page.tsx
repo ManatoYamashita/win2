@@ -7,6 +7,8 @@ import { formatDate } from "@/lib/utils";
 import { extractExcerpt } from "@/lib/blog-utils";
 import { BlogContent } from "@/components/blog/blog-content";
 import { BackToBlogLink } from "@/components/blog/back-to-blog-link";
+import { verifyAge, getAccessDeniedError } from "@/lib/age-verification";
+import AccessDeniedMessage from "@/components/age-verification/access-denied-message";
 // import { DealCTAButton } from "@/components/deal/deal-cta-button"; // 将来的にGoogle Sheets APIから案件取得時に使用
 
 interface BlogDetailPageProps {
@@ -88,6 +90,20 @@ export default async function BlogDetailPage({ params }: BlogDetailPageProps) {
 
   if (!blog) {
     notFound();
+  }
+
+  // 年齢制限コンテンツの場合は年齢検証
+  if (blog.restricted) {
+    const ageVerification = await verifyAge();
+    const accessError = getAccessDeniedError(ageVerification);
+
+    if (accessError) {
+      return (
+        <div className="container mx-auto px-4 py-8">
+          <AccessDeniedMessage error={accessError} />
+        </div>
+      );
+    }
   }
 
   const excerpt = extractExcerpt(blog.content, 120);

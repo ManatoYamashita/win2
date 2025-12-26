@@ -58,6 +58,7 @@ export default async function BlogListPage() {
     getBlogs({
       limit: BLOGS_PER_PAGE,
       offset: 0,
+      filters: "restricted[not_equals]true", // 年齢制限コンテンツを除外
     }),
     getCategories({ limit: 100 }),
   ]);
