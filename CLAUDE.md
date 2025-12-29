@@ -9,8 +9,8 @@ WIN×Ⅱ is a membership-based affiliate blog platform that tracks conversions f
 ## Tech Stack
 
 **Frontend & Backend:**
-- Next.js 15.5.6 (App Router)
-- React 19
+- Next.js 15.5.9 (App Router) - CVE-2025-55184/67779/55183 対応済み (2025-12-29)
+- React 19.2.1
 - TypeScript 5 (strict mode, noUncheckedIndexedAccess enabled)
 - TailwindCSS v3.4.1 (v4 planned for future)
 - shadcn/ui for UI components
@@ -757,6 +757,23 @@ See `.env.example` in project root for a complete template with all required var
 ASPログイン認証情報（A8.net, AFB, もしもアフィリエイト, バリューコマース）はリポジトリ外のセキュアストレージで管理してください（例: 共有パスワードマネージャ）。
 
 Google Sheets: See `docs/google.md` for spreadsheet URL and GAS editor link.
+
+## Security Response History
+
+### 2025-12-29: CVE-2025-55184/67779/55183 対応
+- **脆弱性**: React Server Components DoS攻撃 (High, CVSS 7.5) + ソースコード露出 (Medium, CVSS 5.3)
+- **対応内容**: Next.js 15.5.7 → 15.5.9 へアップグレード
+- **方法**: Vercel公式パッチブランチ（`origin/vercel/react-server-components-cve-vu-vf7qpq`）をマージ
+- **コミット**: 10c8149
+- **ブランチ**: feature/age-restricted-content
+- **検証結果**: ✅ pnpm audit でCVE-2025-55184/67779/55183 検出されず
+- **参考**: [Next.js Security Update: December 11, 2025](https://nextjs.org/blog/security-update-2025-12-11)
+
+### 過去のセキュリティ対応
+- **2025-12-XX**: CVE-2025-55182 対応 (React RCE)
+  - React 19.2.0 → 19.2.1
+  - Next.js 15.5.6 → 15.5.7
+  - コミット: ff5ed61
 
 ## Testing Strategy
 
