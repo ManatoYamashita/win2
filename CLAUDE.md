@@ -784,9 +784,9 @@ Google Sheets: See `docs/google.md` for spreadsheet URL and GAS editor link.
   - CVE-2025-55132 (MEDIUM): child_process.spawn shell injection
 - **対応内容**:
   - Node.js v22.22.0確認済み（既にインストール済み）
-  - package.json engines設定追加（Node.js >=22.22.0, pnpm >=10.0.0）
+  - package.json engines設定追加（Node.js >=22.0.0 <23.0.0, pnpm >=10.0.0）
   - pnpm overrides設定追加（Next.js 15.5.9強制、react-email依存解決）
-  - vercel.json作成（Node.js v22.x系強制、API Routes明示的指定）
+  - vercel.json作成（pnpm + Next.js自動検出設定、functionsフィールド削除で22.xに固定）
   - .nvmrc作成（開発環境バージョン統一: 22.22.0）
 - **影響**:
   - アプリケーションコード変更なし（CVE露出ゼロのため）
