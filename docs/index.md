@@ -410,6 +410,15 @@ docs/
     - `app/api/blogs/route.ts`: `export const revalidate = 60;` 追加
   - **影響**: microCMS更新後、最大60秒以内にデプロイ済みサイトに反映されるようになる
 
+### 2025-01-19
+- **Node.js v22.22.0セキュリティアップグレード**: CVE-2025-55131/59465/55130/56041/55132対応完了
+  - package.json engines/overrides設定追加
+  - vercel.json作成（Node.js v22.x系強制）
+  - .nvmrc作成（開発環境統一）
+  - react-email依存のNext.js強制上書き（15.5.9）
+  - 実装影響: なし（CVE露出ゼロ）
+  - セキュリティ監査: ✅ pnpm audit --prod クリア
+
 ### 2025-11-15
 - **AFB自動ポーリング + A8.net手動CSVハイブリッド実装完了**: `operations/`配下4ドキュメント新規作成、GitHub Actions 10分毎実行、GAS v3.0.0（onEditトリガー）、A8.net Parameter Tracking検証完了
 

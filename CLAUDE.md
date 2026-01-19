@@ -775,6 +775,27 @@ Google Sheets: See `docs/google.md` for spreadsheet URL and GAS editor link.
   - Next.js 15.5.6 → 15.5.7
   - コミット: ff5ed61
 
+### 2025-01-19: Node.js v22.22.0 + pnpm overrides設定（CVE-2025-55131/59465/55130/56041/55132対応）
+- **脆弱性**:
+  - CVE-2025-55131 (HIGH): Buffer memory leak
+  - CVE-2025-59465 (HIGH): HTTP/2 server crash DoS
+  - CVE-2025-55130 (HIGH): fs permission model bypass
+  - CVE-2025-56041 (MEDIUM): fs.lstat bypass
+  - CVE-2025-55132 (MEDIUM): child_process.spawn shell injection
+- **対応内容**:
+  - Node.js v22.22.0確認済み（既にインストール済み）
+  - package.json engines設定追加（Node.js >=22.22.0, pnpm >=10.0.0）
+  - pnpm overrides設定追加（Next.js 15.5.9強制、react-email依存解決）
+  - vercel.json作成（Node.js v22.x系強制、API Routes明示的指定）
+  - .nvmrc作成（開発環境バージョン統一: 22.22.0）
+- **影響**:
+  - アプリケーションコード変更なし（CVE露出ゼロのため）
+  - react-email依存の古いNext.js（15.1.2）をoverridesで15.5.9に強制上書き
+  - Vercel本番環境のNode.jsランタイムセキュリティ強化
+- **ブランチ**: feature/age-restricted-content
+- **検証結果**: ✅ pnpm audit --prod でCritical/High脆弱性0件
+- **参考**: [Node.js Security Release: December 2025](https://nodejs.org/en/blog/vulnerability/december-2025-security-releases)
+
 ## Testing Strategy
 
 When implementing tracking functionality:
