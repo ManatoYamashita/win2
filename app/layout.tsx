@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { PageTransition } from "@/components/layout/page-transition";
 import { GoogleTagManager, GoogleTagManagerNoScript } from "@/components/analytics/google-tag-manager";
+import { Analytics } from "@vercel/analytics/next";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID || "";
@@ -87,6 +88,7 @@ export default function RootLayout({
           </PageTransition>
           <Toaster />
         </SessionProvider>
+        <Analytics />
       </body>
     </html>
   );
