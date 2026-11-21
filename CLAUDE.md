@@ -26,6 +26,7 @@ WIN×Ⅱ is a membership-based affiliate blog platform that tracks conversions f
 - Future: AFB, もしもアフィリエイト, バリューコマース
 
 **Analytics & Tracking:**
+- Vercel Analytics (@vercel/analytics): Page views and Web Vitals monitoring
 - Google Tag Manager (GTM): Tag management and event tracking
 - Google Analytics 4 (GA4): User behavior analytics
 - Google Search Console (GSC): Search performance and sitemap management
@@ -38,6 +39,7 @@ WIN×Ⅱ is a membership-based affiliate blog platform that tracks conversions f
 - Radix UI primitives (@radix-ui/react-slot, @radix-ui/react-label)
 - @tailwindcss/typography (Markdown prose styling)
 - react-markdown v10.1.0 + remark-gfm + rehype-raw (Markdown rendering)
+- @vercel/analytics (page views, Web Vitals monitoring)
 
 **Deployment:**
 - Vercel
@@ -82,6 +84,7 @@ WIN×Ⅱ is a membership-based affiliate blog platform that tracks conversions f
 - `components/providers/session-provider.tsx`: Next-Auth SessionProvider wrapper
 
 **Analytics & Tracking:**
+- `app/layout.tsx`: Vercel Analytics `<Analytics />` component (page views, Web Vitals)
 - `components/analytics/google-tag-manager.tsx`: GTM script injection components
 - `lib/gtm.ts`: Type-safe GTM helper functions (trackSignUp, trackDealClick)
 - `types/gtm.d.ts`: GTM event type definitions and window.dataLayer extension
