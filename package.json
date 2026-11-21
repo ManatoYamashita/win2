@@ -28,12 +28,12 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.548.0",
     "microcms-js-sdk": "^3.2.0",
-    "next": "15.5.9",
-    "next-auth": "^4.24.11",
+    "next": "15.5.29",
+    "next-auth": "^4.24.15",
     "rate-limiter-flexible": "^5.0.3",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
-    "react-email": "^3.0.0",
+    "react-email": "^6.11.16",
     "react-hook-form": "^7.65.0",
     "react-markdown": "^10.1.0",
     "rehype-raw": "^7.0.0",
@@ -41,7 +41,7 @@
     "resend": "^4.0.0",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",
-    "zod": "^4.1.12"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.19",
@@ -50,7 +50,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "15.1.4",
+    "eslint-config-next": "15.5.29",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
