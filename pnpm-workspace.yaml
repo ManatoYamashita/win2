@@ -1,5 +1,7 @@
 # Security: raise vulnerable transitive dependencies within their major versions.
 overrides:
+  # next 15 asks for sharp ^0.34, which has known vulnerabilities; use the patched 0.35 line until next 16.
+  'sharp': '^0.35.5'
   'postcss': '^8.5.18'
   'ws': '^8.21.0'
   'minimatch@>=9.0.0 <9.0.7': '^9.0.7'
