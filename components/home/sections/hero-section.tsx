@@ -102,9 +102,13 @@ export function HeroSection({ resolveCta }: HeroSectionProps) {
       <div className="absolute inset-0 overflow-hidden">
         {/* LCP要素: 背景画像を即座に表示（アニメーションなし） */}
         <div className="relative h-full w-full min-h-full">
+          {/* LCP のため素の <img> のまま、縮小版を srcSet で渡して小さい画面では 1920px 版を取得しない。
+              強くぼかした画像なので、縦長のモバイルで object-cover により拡大されても見た目は変わらない。 */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/assets/images/office-super-blur.webp"
+            srcSet="/assets/images/office-super-blur-640.webp 640w, /assets/images/office-super-blur-960.webp 960w, /assets/images/office-super-blur-1280.webp 1280w, /assets/images/office-super-blur.webp 1920w"
+            sizes="100vw"
             alt="オフィス背景"
             className="origin-top object-cover"
             style={{
