@@ -1,5 +1,8 @@
 # Security: raise vulnerable transitive dependencies within their major versions.
 overrides:
+  'postcss-selector-parser': '^6.1.5'
+  'prismjs': '^1.30.0'
+  'qs': '^6.16.1'
   # next 15 asks for sharp ^0.34, which has known vulnerabilities; use the patched 0.35 line until next 16.
   'sharp': '^0.35.5'
   'postcss': '^8.5.18'
