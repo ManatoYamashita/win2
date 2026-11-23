@@ -237,6 +237,9 @@ export function HeroSection({ resolveCta }: HeroSectionProps) {
               alt="メインビジュアル"
               width={880}
               height={880}
+              // md 以上では 1100px のコンテナ内で本文の横に並び、実測で最大約 415px 幅。md 未満は非表示。
+              // priority のプリロードがモバイルで大きな画像を取得しないよう、md 未満は最小幅を指定する。
+              sizes="(min-width: 768px) 420px, 16px"
               className="relative w-full object-contain"
               priority
               draggable={false}
