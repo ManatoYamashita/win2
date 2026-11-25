@@ -102,9 +102,13 @@ export function HeroSection({ resolveCta }: HeroSectionProps) {
       <div className="absolute inset-0 overflow-hidden">
         {/* LCP要素: 背景画像を即座に表示（アニメーションなし） */}
         <div className="relative h-full w-full min-h-full">
+          {/* LCP のため素の <img> のまま、縮小版を srcSet で渡して小さい画面では 1920px 版を取得しない。
+              強くぼかした画像なので、縦長のモバイルで object-cover により拡大されても見た目は変わらない。 */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/assets/images/office-super-blur.webp"
+            srcSet="/assets/images/office-super-blur-640.webp 640w, /assets/images/office-super-blur-960.webp 960w, /assets/images/office-super-blur-1280.webp 1280w, /assets/images/office-super-blur.webp 1920w"
+            sizes="100vw"
             alt="オフィス背景"
             className="origin-top object-cover"
             style={{
@@ -237,6 +241,9 @@ export function HeroSection({ resolveCta }: HeroSectionProps) {
               alt="メインビジュアル"
               width={880}
               height={880}
+              // md 以上では 1100px のコンテナ内で本文の横に並び、実測で最大約 415px 幅。md 未満は非表示。
+              // priority のプリロードがモバイルで大きな画像を取得しないよう、md 未満は最小幅を指定する。
+              sizes="(min-width: 768px) 420px, 16px"
               className="relative w-full object-contain"
               priority
               draggable={false}
