@@ -143,7 +143,11 @@ export function LatestBlogsSection() {
                   src={thumbnailUrl}
                   alt={blog.title}
                   fill
-                  sizes="(min-width: 1024px) 320px, 100vw"
+                  // 実測したカード幅: md 未満は 1 列（100vw - 50px）、md は 2 列（約 47vw）。
+                  // lg 以上は 3 列で枠は最大 232x160px だが、object-cover のため 2:1 前後のサムネイルは
+                  // 高さ 160px に合わせて約 320px 幅で描画される。
+                  // 素の "100vw" を書くと next/image が 640px 未満の候補を外すため、モバイルは calc() で書く。
+                  sizes="(min-width: 1024px) 320px, (min-width: 768px) 47vw, calc(100vw - 48px)"
                   className="object-cover transition duration-500 group-hover:scale-105"
                   draggable={false}
                 />
