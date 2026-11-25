@@ -26,7 +26,9 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          # overrides を pnpm-workspace.yaml に置いているため pnpm 10 が必要（pnpm 9 は packages の無い
+          # pnpm-workspace.yaml を受け付けず、そこにある overrides も読まない）。Vercel のビルドも pnpm 10。
+          version: 10
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
